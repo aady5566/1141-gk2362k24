@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 與社會工作的新交集</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --font-family: 'Calibri', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .slides-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            color: var(--accent-color);
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* AI 與社會工作簡報樣式 */
+        .advantages-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 1000px;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .advantage-card {
+            background: rgba(163, 163, 129, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--accent-color);
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+
+        .advantage-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .advantage-card h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .advantage-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .chart-description {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        .model-description {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .process-step {
+            background: #f4f2ef;
+            border: 2px solid #f4f2ef;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .process-step h5 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .process-step p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .promise-peril-container {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .promise-section, .peril-section {
+            flex: 1;
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+
+        .promise-section {
+            background: rgba(120, 150, 120, 0.1);
+            border-left: 8px solid #789678;
+        }
+
+        .peril-section {
+            background: rgba(180, 120, 120, 0.1);
+            border-left: 8px solid #b47878;
+        }
+
+        .promise-section h4, .peril-section h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .promise-section h4 {
+            color: #789678;
+        }
+
+        .peril-section h4 {
+            color: #b47878;
+        }
+
+        .promise-section ul, .peril-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .promise-section li, .peril-section li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .promise-section li {
+            color: #789678;
+        }
+
+        .peril-section li {
+            color: #b47878;
+        }
+
+        .supervision-description {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .supervision-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .flow-step {
+            background: rgba(120, 150, 120, 0.1);
+            border: 2px solid #789678;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .flow-step.critical {
+            background: rgba(180, 120, 120, 0.1);
+            border: 4px dashed #b47878;
+            animation: pulse 2s infinite;
+        }
+
+        .flow-step h5 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-step p {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .competencies-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 1000px;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .competency-card {
+            background: rgba(163, 163, 129, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-bottom: 8px solid var(--accent-color);
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+
+        .competency-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .competency-card h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .competency-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .advantages-container, .competencies-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .promise-peril-container {
+                flex-direction: column;
+            }
+
+            .process-flow, .supervision-flow {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slides-container">
+        <section class="slide">
+            <h1>AI 與社會工作的新交集</h1>
+        </section>
+
+        <section class="slide">
+            <h3>AI 賦能：三大核心優勢</h3>
+            <div class="advantages-container">
+                <div class="advantage-card">
+                    <div class="advantage-icon">⏱️</div>
+                    <h4>效率躍升</h4>
+                    <p>自動化行政流程，將寶貴時間還給「人」，專注於建立信任與深度輔導。</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">🔍</div>
+                    <h4>洞察先機</h4>
+                    <p>數據驅動的預測分析，協助識別潛在風險，促使服務從「被動回應」轉向「主動預防」。</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">🌐</div>
+                    <h4>服務擴增</h4>
+                    <p>藉由數位工具打破時空限制，提供 24/7 的初步支持與資源。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h3>AI 應用光譜：重要性、風險與影響力</h3>
+            <p class="chart-description">X 軸為「重要性」，Y 軸為「倫理風險」，圓圈大小為「潛在影響力」。社工需在此光譜中找到平衡。</p>
+            <div class="chart-container">
+                <canvas id="bubbleChart"></canvas>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h3>深入剖析：預測性風險模型</h3>
+            <p class="model-description">這是一種「社會問題的天氣預報」，透過分析大量數據，預測負面事件（如兒虐）的發生機率。</p>
+
+            <div class="process-flow">
+                <div class="process-step">
+                    <h5>1. 數據輸入</h5>
+                    <p>餵養巨量的匿名化數據，如個案紀錄、公共數據、經濟狀況等。</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-step">
+                    <h5>2. 模式識別</h5>
+                    <p>AI 演算法從數據中學習並找出與負面結果相關的「關聯性模式」。</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-step">
+                    <h5>3. 風險評分</h5>
+                    <p>為新個案計算出一個具體的「風險分數」，例如 <span class="highlight">85/100</span>。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h3>一把鋒利的雙面刃</h3>
+            <div class="promise-peril-container">
+                <div class="promise-section">
+                    <h4>💡 希望 (The Promise)</h4>
+                    <ul>
+                        <li><strong>從「被動」到「主動」</strong>：轉向預防性服務，及早介入。</li>
+                        <li><strong>資源有效分配</strong>：將有限的人力集中在高風險個案上。</li>
+                        <li><strong>輔助客觀決策</strong>：為複雜情況提供一個數據參考點。</li>
+                    </ul>
+                </div>
+                <div class="peril-section">
+                    <h4>⚠️ 風險 (The Peril)</h4>
+                    <ul>
+                        <li><strong>演算法偏誤</strong>：複製甚至放大社會既有偏見，造成數位歧視。</li>
+                        <li><strong>數據隱私與監控</strong>：整合大量敏感個資，引發倫理疑慮。</li>
+                        <li><strong>透明度問題（黑盒子）</strong>：難以解釋分數成因，使申訴變得困難。</li>
+                        <li><strong>去人性化風險</strong>：過度依賴分數，可能忽略個案的獨特脈絡。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h3>倫理守門員：人在環中的監督模型</h3>
+            <p class="supervision-description">AI 的分析結果僅是「參考」，絕非「命令」。社工的專業判斷是確保科技向善的最後、也是最重要的一道防線。</p>
+            <div class="supervision-flow">
+                <div class="flow-step">
+                    <h5>1. AI 分析</h5>
+                </div>
+                <div class="arrow">→</div>
+                <div class="flow-step critical">
+                    <h5>2. 關鍵審核</h5>
+                    <p>社工進行批判性評估與脈絡化解讀</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="flow-step">
+                    <h5>3. 最終決策</h5>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h3>未來社工的核心素養</h3>
+            <div class="competencies-container">
+                <div class="competency-card">
+                    <div class="competency-icon">🧠</div>
+                    <h4>批判性數位素養</h4>
+                    <p>不僅懂得使用科技，更能洞察其限制、偏誤與社會影響。</p>
+                </div>
+                <div class="competency-card">
+                    <div class="competency-icon">⚖️</div>
+                    <h4>演算法正義倡議</h4>
+                    <p>為弱勢群體發聲，監督並挑戰可能加劇不平等的演算法系統。</p>
+                </div>
+                <div class="competency-card">
+                    <div class="competency-icon">❤️</div>
+                    <h4>人本科技整合</h4>
+                    <p>巧妙地融合 AI 數據洞察力與人類獨有的同理心、關懷與溫度。</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slidesContainer = document.querySelector('.slides-container');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(index) {
+                if (index >= totalSlides) {
+                    currentSlide = 0;
+                } else if (index < 0) {
+                    currentSlide = totalSlides - 1;
+                } else {
+                    currentSlide = index;
+                }
+
+                const offset = -currentSlide * 100;
+                slidesContainer.style.transform = `translateX(${offset}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+            });
+
+            prevBtn.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    showSlide(currentSlide + 1);
+                } else if (e.key === 'ArrowLeft') {
+                    showSlide(currentSlide - 1);
+                }
+            });
+
+            // Initial setup
+            showSlide(0);
+
+            // Initialize Chart.js for bubble chart
+            const bubbleCtx = document.getElementById('bubbleChart')?.getContext('2d');
+            if (bubbleCtx) {
+                new Chart(bubbleCtx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: '預測性風險模型',
+                            data: [{ x: 9.2, y: 8.5, r: 25, label: '預測性風險模型' }],
+                            backgroundColor: 'rgba(180, 120, 120, 0.6)',
+                            borderColor: '#b47878'
+                        }, {
+                            label: '行政工作自動化',
+                            data: [{ x: 8.8, y: 4.0, r: 30, label: '行政工作自動化' }],
+                            backgroundColor: 'rgba(120, 150, 120, 0.6)',
+                            borderColor: '#789678'
+                        }, {
+                            label: '智慧資源媒合',
+                            data: [{ x: 7.5, y: 5.5, r: 18, label: '智慧資源媒合' }],
+                            backgroundColor: 'rgba(120, 140, 160, 0.6)',
+                            borderColor: '#788ca0'
+                        }, {
+                            label: 'AI 聊天機器人支持',
+                            data: [{ x: 6.1, y: 6.5, r: 15, label: 'AI 聊天機器人支持' }],
+                            backgroundColor: 'rgba(160, 140, 180, 0.6)',
+                            borderColor: '#a08cb4'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '重要性評分 →',
+                                    font: { size: 14 }
+                                },
+                                min: 0,
+                                max: 10,
+                                grid: { color: '#d1d1c2' }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: '倫理風險評分 →',
+                                    font: { size: 14 }
+                                },
+                                min: 0,
+                                max: 10,
+                                grid: { color: '#d1d1c2' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    font: { size: 14 },
+                                    usePointStyle: true,
+                                    boxHeight: 12
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: (tooltipItems) => tooltipItems[0].dataset.label,
+                                    label: (context) => [
+                                        `重要性: ${context.parsed.x}`,
+                                        `倫理風險: ${context.parsed.y}`,
+                                        `影響力: ${context.raw.r}`
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
