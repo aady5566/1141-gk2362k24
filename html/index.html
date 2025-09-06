@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1141-gk2362k24 課程投影片</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;        /* 主背景色 - 溫暖的米白色 */
+            --text-color: #5a5a5a;      /* 主文字色 - 深灰色 */
+            --accent-color: #78785b;    /* 強調色 - 低飽和橄欖綠 */
+            --line-color: #d1d1c2;      /* 邊框線色 - 淺灰色 */
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;  /* 字體 */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .header .subtitle {
+            color: #888;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-weight: 300;
+        }
+
+        .weeks-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .weeks-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .weeks-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .week-card {
+            background: rgba(163, 163, 129, 0.1);
+            border-radius: 1rem;
+            padding: clamp(1.5rem, 3vw, 2rem);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--line-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .week-title {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .slides-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .slide-item {
+            margin-bottom: 0.8rem;
+        }
+
+        .slide-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            background: rgba(120, 120, 91, 0.1);
+            border: 1px solid var(--line-color);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+        }
+
+        .slide-link:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            transform: translateX(5px);
+        }
+
+        .slide-title {
+            font-weight: 400;
+            margin-bottom: 0.3rem;
+        }
+
+        .slide-description {
+            font-size: 0.85em;
+            color: #777;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--line-color);
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards;
+        }
+
+        .week-card:nth-child(1) { animation-delay: 0.2s; }
+        .week-card:nth-child(2) { animation-delay: 0.4s; }
+        .week-card:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>1141-gk2362k24</h1>
+            <p class="subtitle">課程投影片集合</p>
+        </div>
+
+        <div class="weeks-container">
+            <!-- Week 1 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第一週</h2>
+                <ul class="slides-list">
+                    <li class="slide-item">
+                        <a href="w1.html" class="slide-link">
+                            <div class="slide-title">課程簡介</div>
+                            <div class="slide-description">課程大綱與基本介紹</div>
+                        </a>
+                    </li>
+                    <li class="slide-item">
+                        <a href="w1-2095-ai-forecast.html" class="slide-link">
+                            <div class="slide-title">2095 AI 預測</div>
+                            <div class="slide-description">AI 發展趨勢預測分析</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第二週</h2>
+                <ul class="slides-list">
+                    <li class="slide-item">
+                        <a href="w2-ai-social-work.html" class="slide-link">
+                            <div class="slide-title">AI 與社會工作</div>
+                            <div class="slide-description">人工智慧在社會工作領域的應用</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 ydhuang. All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // 為所有週次卡片添加淡入動畫
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.week-card');
+            cards.forEach(card => {
+                card.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>
+</html>

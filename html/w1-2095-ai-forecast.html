@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 影響 2095 預測簡報</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        /* --- 風格指南 CSS 變數 --- */
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif; /* 新增備用字體 */
+
+            /* 擴展色盤 */
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-success: rgba(120, 150, 120, 0.7);
+            --color-info: rgba(120, 140, 160, 0.7);
+            --color-warning: rgba(160, 140, 180, 0.7);
+        }
+
+        /* --- 基本樣式 --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .slides-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            text-align: center;
+            position: relative;
+        }
+
+        /* --- 排版系統 --- */
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            color: var(--accent-color);
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            max-width: 80ch; /* 限制段落寬度以提高可讀性 */
+        }
+
+        .slide-subtitle {
+             color: #888;
+             font-size: clamp(1rem, 2vw, 1.4rem);
+             font-weight: 300;
+             margin-top: -1rem;
+        }
+
+        /* --- 組件樣式 --- */
+        .card-container {
+            background: rgba(163, 163, 129, 0.1);
+            border-radius: 1rem;
+            padding: clamp(1rem, 2vw, 2rem);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--line-color);
+            margin-bottom: 1rem;
+            width: 100%;
+            text-align: left;
+        }
+        .card-container h3 {
+             color: var(--accent-color);
+             border-bottom: 1px solid var(--line-color);
+             padding-bottom: 0.5rem;
+        }
+
+        /* --- Markdown 風格內容佈局 --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        @media (min-width: 768px) {
+            .content-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .content-section {
+            text-align: left;
+            padding: 0;
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .content-section p {
+            margin-bottom: 0.5rem;
+            line-height: 1.7;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* --- 佈局系統 --- */
+        .grid {
+            display: grid;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-height: 65vh; /* 確保圖表在 slide 內有足夠空間 */
+            padding: 1rem;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="slides-container">
+                <!-- Slide 1: 封面 -->
+                <section class="slide">
+                    <h1>智慧時代</h1>
+                    <p class="slide-subtitle">70 年後，AI對人類社會的階段性影響</p>
+                </section>
+
+                <!-- Slide 2: ERA 1 介紹 -->
+                <section class="slide">
+                    <h1>第一階段：整合與幻滅時代</h1>
+                    <p>2025 – 2035</p>
+                    <p>此階段的特徵是巨大的AI投資與令人失望的生產力增長之間的矛盾</p>
+                    <p>勞動力市場開始感受到初步但集中的衝擊</p>
+                </section>
+
+                <!-- Slide 3: ERA 1 圖表 1 -->
+                <section class="slide">
+                    <h3>生產力悖論：投資與回報的脫節</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="productivityParadoxChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Slide 4: ERA 1 圖表 2 & 3 -->
+                <section class="slide">
+                    <h3>第一波衝擊：就業與環境</h3>
+                     <div class="grid grid-2">
+                        <div class="chart-wrapper">
+                             <canvas id="laborImpactChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="powerConsumptionChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Slide 5: ERA 2 介紹 -->
+                <section class="slide">
+                    <h1>第二階段：社會經濟轉型時代</h1>
+                    <p>2035 – 2060</p>
+                    <p>AI從專業工具演變為通用設施，引發深刻的社會結構重組</p>
+                    <p>人類重新思考工作、不平等和人際關係的本質</p>
+                </section>
+
+                <!-- Slide 6: ERA 2 圖表 -->
+                <section class="slide">
+                    <h3>自動化經濟：各行業崗位替代與創造預測</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="jobDisplacementChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Slide 7: ERA 2 概念 -->
+                 <section class="slide">
+                    <h3>社會結構的質變</h3>
+                    <div class="content-grid">
+                        <div class="content-section">
+                            <h4>「增強者」的出現</h4>
+                            <p>腦機介面(BCI)從醫療走向大眾認知增強，可能根據財富創造出「增強者」與「自然人」的生物階層，挑戰平等的社會基石。</p>
+                        </div>
+                        <div class="content-section">
+                            <h4>人類連結的重構</h4>
+                            <p>AI伴侶提供理想化的「超常刺激」，可能緩解短期孤獨，但長期恐加劇社會孤立，導致「同理心萎縮」，侵蝕真實的人際交往能力。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Slide 8: ERA 3 介紹 -->
+                <section class="slide">
+                    <h1>第三階段：AGI與地緣政治重組</h1>
+                    <p>2060 – 2095</p>
+                    <p>通用人工智慧(AGI)的到來代表了歷史的根本性斷裂</p>
+                    <p>引發全球穩定和人類存續的根本性挑戰</p>
+                    <p>開發AGI的競賽成為地緣政治的主導力量</p>
+                </section>
+
+                <!-- Slide 9: ERA 3 圖表 -->
+                <section class="slide">
+                     <h3>通用智慧的黎明：AGI出現時間預測</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="agiTimelineChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Slide 10: ERA 3 概念 -->
+                <section class="slide">
+                    <h3>終極競賽與挑戰</h3>
+                    <div class="content-grid">
+                        <div class="content-section">
+                            <h4>AGI軍備競賽</h4>
+                            <p>美中之間「贏者通吃」的競賽將定義這個時代。率先開發出AGI的國家可能獲得無法超越的軍事和經濟優勢，引發全球權力格局的重塑與潛在衝突。</p>
+                        </div>
+                        <div class="content-section">
+                            <h4>治理不可治理之物</h4>
+                            <p>AGI的巨大風險將推動全球治理的嘗試，但這與國家主權利益相衝突。一個核心挑戰是，贏得競賽的國家可能隨即失去對自身命運的控制權。</p>
+                        </div>
+                    </div>
+                </section>
+
+                 <!-- Slide 11: 結語 -->
+                <section class="slide">
+                    <h2>未來已來，只是尚未均勻分佈。</h2>
+                </section>
+
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const slidesContainer = document.querySelector('.slides-container');
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        if (index >= totalSlides) {
+            currentSlide = 0;
+        } else if (index < 0) {
+            currentSlide = totalSlides - 1;
+        } else {
+            currentSlide = index;
+        }
+
+        const offset = -currentSlide * 100;
+        slidesContainer.style.transform = `translateX(${offset}%)`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+        showSlide(currentSlide + 1);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        showSlide(currentSlide - 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+            showSlide(currentSlide + 1);
+        } else if (e.key === 'ArrowLeft') {
+            showSlide(currentSlide - 1);
+        }
+    });
+
+    // Initial setup
+    showSlide(0);
+
+    // --- Chart.js 配置 ---
+    Chart.defaults.color = '#5a5a5a';
+    Chart.defaults.borderColor = '#d1d1c2';
+    Chart.defaults.font.family = "'Calibri', 'Noto Sans TC', sans-serif";
+    Chart.defaults.plugins.legend.position = 'bottom';
+    Chart.defaults.maintainAspectRatio = false;
+
+    const colorPalette = {
+        primary: 'rgba(120, 120, 91, 0.7)',
+        secondary: 'rgba(163, 163, 128, 0.7)',
+        accent: 'rgba(180, 120, 120, 0.7)',
+        success: 'rgba(120, 150, 120, 0.7)',
+        info: 'rgba(120, 140, 160, 0.7)',
+        warning: 'rgba(210, 160, 90, 0.7)'
+    };
+
+    // --- 圖表初始化 ---
+    // 圖表 1: 生產力悖論
+    const ctx1 = document.getElementById('productivityParadoxChart')?.getContext('2d');
+    if (ctx1) new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['私營AI投資', '大型科技資本支出', 'AI整合成功率', '典型成本節約', '典型營收增長'],
+            datasets: [{
+                label: '金額 (十億美元)',
+                data: [252.3, 361, null, null, null],
+                backgroundColor: colorPalette.primary,
+                yAxisID: 'yAmount',
+            }, {
+                label: '百分比 (%)',
+                data: [null, null, 5, 10, 5],
+                backgroundColor: colorPalette.secondary,
+                yAxisID: 'yPercentage',
+            }]
+        },
+        options: {
+            plugins: { tooltip: { callbacks: { label: (c) => c.dataset.yAxisID === 'yAmount' ? `${c.dataset.label}: ${c.raw} 十億美元` : `${c.dataset.label}: ${c.raw}%` } } },
+            scales: {
+                yAmount: { type: 'linear', position: 'left', title: { display: true, text: '金額 (十億美元)' }, max: 500 },
+                yPercentage: { type: 'linear', position: 'right', title: { display: true, text: '百分比 (%)' }, max: 100, grid: { drawOnChartArea: false } },
+            }
+        }
+    });
+
+    // 圖表 2: 勞動力衝擊
+    const ctx2 = document.getElementById('laborImpactChart')?.getContext('2d');
+    if (ctx2) new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['科技業青年失業率增幅', '服務業減少招聘比例'],
+            datasets: [{
+                label: '百分比 (%)',
+                data: [3, 12],
+                backgroundColor: [colorPalette.accent, colorPalette.warning],
+            }]
+        },
+        options: { plugins: { legend: { display: false }, title: {display: true, text: "青年就業困境"} }, scales: { x: { beginAtZero: true, title: { display: true, text: '百分比 (%)' } } } }
+    });
+
+    // 圖表 3: 電力消耗
+    const ctx3 = document.getElementById('powerConsumptionChart')?.getContext('2d');
+    if(ctx3) new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: ['2022', '2026 (預測)'],
+            datasets: [{
+                label: '全球數據中心用電量 (TWh)',
+                data: [460, 1050],
+                fill: true,
+                backgroundColor: 'rgba(120, 150, 120, 0.2)',
+                borderColor: colorPalette.success,
+                tension: 0.1
+            }]
+        },
+        options: { plugins: { title: {display: true, text: "AI的環境代價"} }, scales: { y: { beginAtZero: true, title: { display: true, text: '太瓦時 (TWh)' } } } }
+    });
+
+    // 圖表 4: 崗位替代
+    const ctx4 = document.getElementById('jobDisplacementChart')?.getContext('2d');
+    if (ctx4) new Chart(ctx4, {
+        type: 'bar',
+        data: {
+            labels: ['金融', '製造業', '醫療健康', '交通運輸', '創意藝術', '行政/客服'],
+            datasets: [
+                { label: '崗位替代率 (%)', data: [45, 65, 25, 75, 20, 67.5], backgroundColor: colorPalette.accent },
+                { label: '崗位創造率 (%)', data: [12.5, 7.5, 30, 7.5, 25, 7.5], backgroundColor: colorPalette.success }
+            ]
+        },
+        options: { indexAxis: 'y', scales: { x: { stacked: false, title: { display: true, text: '百分比 (%)' } }, y: { stacked: false } } }
+    });
+
+    // 圖表 5: AGI 時間線 (FIXED)
+    const ctx5 = document.getElementById('agiTimelineChart')?.getContext('2d');
+    if (ctx5) new Chart(ctx5, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { label: '行業領袖 (2026-2029)', data: [{x: new Date('2027-06-30'), y: 0}], backgroundColor: colorPalette.accent, pointRadius: 10, pointHoverRadius: 12 },
+                { label: 'Metaculus 社群 (2031)', data: [{x: new Date('2031-06-30'), y: 0}], backgroundColor: colorPalette.warning, pointRadius: 10, pointHoverRadius: 12 },
+                { label: 'AI 研究人員 (~2047)', data: [{x: new Date('2047-01-01'), y: 0}], backgroundColor: colorPalette.info, pointRadius: 10, pointHoverRadius: 12 },
+                { label: '超級預測員 (2048)', data: [{x: new Date('2048-01-01'), y: 0}], backgroundColor: colorPalette.primary, pointRadius: 10, pointHoverRadius: 12 }
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: { unit: 'year' },
+                    min: new Date('2025-01-01'),
+                    max: new Date('2060-01-01'),
+                    title: { display: true, text: '預測年份' }
+                },
+                y: { display: false, min: -1, max: 1 }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
