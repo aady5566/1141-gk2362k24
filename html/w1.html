@@ -284,6 +284,38 @@
             gap: 1.5rem;
         }
 
+        /* 手機版優化 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .syllabus-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .syllabus-column {
+                width: 100%;
+            }
+
+            h3 {
+                width: 95%;
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+            }
+        }
+
         @media (min-width: 768px) {
             .homework-steps {
                 grid-template-columns: repeat(2, 1fr);
@@ -337,7 +369,7 @@
         <section class="slide">
             <h1>課程簡介</h1>
             <h2>AI趨勢與程式應用</h2>
-            <h2 style="margin-top: 3rem; font-size: 1.2rem;">講師：黃尹笛</h2>
+            <h2 style="margin-top: 3rem; font-size: 1.2rem;">黃尹笛</h2>
         </section>
 
         <section class="slide">
@@ -354,7 +386,7 @@
                     <div class="timeline-item">
                         <div class="timeline-year">2013</div>
                         <div class="timeline-content">
-                            <div class="title">舒潔</div>
+                            <div class="title">金百利克拉克</div>
                             <div class="subtitle">實習生<br>衛生紙行銷</div>
                         </div>
                     </div>
