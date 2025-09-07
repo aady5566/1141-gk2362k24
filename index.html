@@ -57,6 +57,7 @@
             gap: 2rem;
             margin-bottom: 3rem;
             justify-items: center;  /* 卡片置中對齊 */
+            place-items: center;    /* 額外確保置中 */
         }
 
         /* 手機版優化 */
@@ -82,24 +83,29 @@
         @media (min-width: 768px) {
             .weeks-container {
                 grid-template-columns: repeat(2, 1fr);
-                justify-items: stretch;  /* 平板版：卡片填滿網格 */
+                justify-items: center;
+                place-items: center;
             }
         }
 
         @media (min-width: 1024px) {
             .weeks-container {
                 grid-template-columns: repeat(3, 1fr);
-                justify-items: stretch;  /* 桌面版：卡片填滿網格 */
+                justify-items: center;
+                place-items: center;
             }
         }
 
-        /* 當卡片數量不足填滿一行時，置中對齊 */
-        .weeks-container:has(.week-card:only-child) {
-            justify-items: center;
+        /* 當有2個卡片時，讓它們填滿2欄網格 */
+        .weeks-container:has(.week-card:nth-child(2)):not(:has(.week-card:nth-child(3))) {
+            justify-items: stretch;
+            place-items: stretch;
         }
 
-        .weeks-container:has(.week-card:nth-child(2):last-child) {
-            justify-items: center;
+        /* 當有3個或更多卡片時，讓它們填滿3欄網格 */
+        .weeks-container:has(.week-card:nth-child(3)) {
+            justify-items: stretch;
+            place-items: stretch;
         }
 
         .week-card {
@@ -196,13 +202,13 @@
     <div class="container">
         <div class="header">
             <h1>1141-gk2362k24</h1>
-            <p class="subtitle">課程投影片集合</p>
+            <p class="subtitle">課程內容</p>
         </div>
 
         <div class="weeks-container">
             <!-- Week 1 -->
             <div class="week-card fade-in">
-                <h2 class="week-title">第一週</h2>
+                <h2 class="week-title">第一週 9/9</h2>
                 <ul class="slides-list">
                     <li class="slide-item">
                         <a href="html/w1.html" class="slide-link">
@@ -216,6 +222,142 @@
                             <div class="slide-description">AI 發展趨勢預測分析</div>
                         </a>
                     </li>
+                </ul>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第二週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第三週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第四週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第五週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 6 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第六週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 7 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第七週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 8 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第八週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 9 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第九週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 10 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 11 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十一週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 12 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十二週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 13 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十三週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 14 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十四週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 15 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十五週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 16 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十六週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 17 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十七週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
+                </ul>
+            </div>
+
+            <!-- Week 18 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第十八週</h2>
+                <ul class="slides-list">
+                    <!-- 內容待新增 -->
                 </ul>
             </div>
         </div>
