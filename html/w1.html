@@ -361,6 +361,23 @@
         }
 
 
+        /* Embed Slide Styles */
+        .embed-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            height: 70vh;
+            border: 1px solid var(--line-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .embed-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -372,7 +389,15 @@
             <h2 style="margin-top: 3rem; font-size: 1.2rem;">YD (黃尹笛)</h2>
         </section>
 
+        <!-- Google Slides Embed -->
         <section class="slide">
+            <h3>外部投影片預覽</h3>
+            <div class="embed-wrapper">
+                <iframe src="https://docs.google.com/presentation/d/17GdCPFJR-b98okDr3Fhrob3Uqlso4uQCgYykx7aof1I/embed?start=false&loop=false&delayms=3000" allowfullscreen allow="autoplay"></iframe>
+            </div>
+        </section>
+
+        <section class="slide" style="display:none;">
             <h3>自我介紹</h3>
             <div class="timeline-container">
                 <div class="timeline-track">
@@ -465,7 +490,7 @@
                 </div>
             </div>
             <div class="assessment">
-                <p>評量方式：作業、報告</p>
+                <p>評量方式：作業：20%/ 期中小組分享 30%/ 期末成果分享 50% (大概)</p>
             </div>
         </section>
 
