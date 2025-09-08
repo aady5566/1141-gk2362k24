@@ -378,6 +378,12 @@
             border: 0;
         }
 
+        /* 隱藏單一投影片（保留版面寬度，避免位移錯亂） */
+        .slide[data-hidden="true"] {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -397,7 +403,7 @@
             </div>
         </section>
 
-        <section class="slide" style="display:none;">
+        <section class="slide" data-hidden="true">
             <h3>自我介紹</h3>
             <div class="timeline-container">
                 <div class="timeline-track">
@@ -547,44 +553,50 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const slidesContainer = document.querySelector('.slides-container');
-            const slides = document.querySelectorAll('.slide');
+            const allSlides = Array.from(document.querySelectorAll('.slide'));
+            const visibleSlides = allSlides.filter(s => s.dataset.hidden !== 'true');
             const prevBtn = document.getElementById('prev');
             const nextBtn = document.getElementById('next');
 
-            let currentSlide = 0;
-            const totalSlides = slides.length;
+            let currentIndex = 0; // index in visibleSlides
 
-            function showSlide(index) {
-                if (index >= totalSlides) {
-                    currentSlide = 0;
+            function showSlideByIndex(index) {
+                const total = visibleSlides.length;
+                if (total === 0) return;
+
+                if (index >= total) {
+                    currentIndex = 0;
                 } else if (index < 0) {
-                    currentSlide = totalSlides - 1;
+                    currentIndex = total - 1;
                 } else {
-                    currentSlide = index;
+                    currentIndex = index;
                 }
 
-                const offset = -currentSlide * 100;
+                // 計算目標可見 slide 在 allSlides 中的絕對位置
+                const targetSlide = visibleSlides[currentIndex];
+                const absoluteIndex = allSlides.indexOf(targetSlide);
+                const offset = -absoluteIndex * 100;
                 slidesContainer.style.transform = `translateX(${offset}%)`;
             }
 
             nextBtn.addEventListener('click', () => {
-                showSlide(currentSlide + 1);
+                showSlideByIndex(currentIndex + 1);
             });
 
             prevBtn.addEventListener('click', () => {
-                showSlide(currentSlide - 1);
+                showSlideByIndex(currentIndex - 1);
             });
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowRight') {
-                    showSlide(currentSlide + 1);
+                    showSlideByIndex(currentIndex + 1);
                 } else if (e.key === 'ArrowLeft') {
-                    showSlide(currentSlide - 1);
+                    showSlideByIndex(currentIndex - 1);
                 }
             });
 
             // Initial setup
-            showSlide(0);
+            showSlideByIndex(0);
 
         });
     </script>
