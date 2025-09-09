@@ -180,27 +180,40 @@
             font-size: 0.9rem;
         }
 
-        .language-switcher {
+        /* 左上角工具列（回首頁 / 語言切換） */
+        .top-toolbar {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 0.5rem;
+            left: 0.5rem;
             z-index: 1000;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid var(--line-color);
+            border-radius: 0.5rem;
+            padding: 0.35rem 0.5rem;
+            backdrop-filter: blur(8px);
         }
 
-        .lang-btn {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+        .toolbar-link {
+            display: inline-block;
+            color: var(--text-color);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: opacity 0.3s ease;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.35rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .lang-btn:hover {
-            opacity: 0.8;
+        .toolbar-link:hover {
+            background: var(--accent-color);
+            color: #fff;
         }
+
+        /* mobile-first：避免遮擋內容，增加上方安全邊距 */
+        .container { padding-top: 3rem; }
+        @media (min-width: 768px) { .container { padding-top: 3.2rem; } }
 
         .fade-in {
             opacity: 0;
@@ -221,8 +234,9 @@
     </style>
 </head>
 <body>
-    <div class="language-switcher">
-                <a href="html_en/index_en.html" class="lang-btn">English</a>
+    <div class="top-toolbar">
+        <a href="index.html" class="toolbar-link">首頁</a>
+        <a href="html_en/index_en.html" class="toolbar-link">English</a>
     </div>
 
     <div class="container">
