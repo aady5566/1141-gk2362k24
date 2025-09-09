@@ -119,11 +119,18 @@ p {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     padding: 5vw;
     text-align: center;
     position: relative;
+    overflow-y: auto;
+}
+
+/* 第一頁（標題頁）置中顯示 */
+.slide:first-child {
+    justify-content: center;
+    overflow-y: hidden; /* 第一頁不需要滾動 */
 }
 ```
 
@@ -410,6 +417,13 @@ p {
     .slide {
         padding: 3vw;
         overflow-y: auto;  /* 允許垂直滾動，避免內容被裁切 */
+        justify-content: flex-start;
+    }
+
+    /* 手機版第一頁也置中 */
+    .slide:first-child {
+        justify-content: center;
+        overflow-y: hidden;
     }
 
     /* 導航按鈕優化 */
@@ -462,10 +476,12 @@ p {
 
 #### 手機版設計原則
 1. **內容可滾動**：使用 `overflow-y: auto` 確保內容完整顯示
-2. **增大觸控區域**：按鈕和連結使用較大的 padding
-3. **單欄佈局**：複雜內容改為垂直排列
-4. **減少間距**：適當縮小 padding 和 margin 以節省空間
-5. **優化字體大小**：使用 clamp() 確保文字在小螢幕上可讀
+2. **第一頁置中**：標題頁使用 `justify-content: center` 和 `overflow-y: hidden`
+3. **其他頁面從頂部開始**：長內容頁面使用 `justify-content: flex-start` 支援滾動
+4. **增大觸控區域**：按鈕和連結使用較大的 padding
+5. **單欄佈局**：複雜內容改為垂直排列
+6. **減少間距**：適當縮小 padding 和 margin 以節省空間
+7. **優化字體大小**：使用 clamp() 確保文字在小螢幕上可讀
 
 #### 斷點系統
 ```css
@@ -885,6 +901,8 @@ HTML：
 - 適當的斷點：767px (手機), 768px (平板), 1024px (桌面)
 - 手機版必須考慮觸控操作和內容可讀性
 - 投影片內容使用 `overflow-y: auto` 確保完整顯示
+- 第一頁（標題頁）置中顯示，其他頁面支援滾動
+- 長內容頁面從頂部開始顯示，避免內容被裁切
 
 ### 4. 無障礙設計
 - 確保色彩對比度符合 WCAG 標準
