@@ -342,6 +342,50 @@
             font-weight: 500;
         }
 
+        /* 回到首頁按鈕樣式 */
+        .home-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            border: 1px solid var(--line-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-link:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 767px) {
+            .home-button {
+                top: 0.5rem;
+                left: 0.5rem;
+            }
+            
+            .home-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
         .homework-step p {
             font-size: clamp(0.9rem, 1.5vw, 1rem);
             line-height: 1.6;
@@ -388,6 +432,11 @@
 </head>
 <body>
 
+    <!-- 回到首頁按鈕 -->
+    <div class="home-button">
+        <a href="../index.html" class="home-link">🏠 首頁</a>
+    </div>
+
     <div class="slides-container">
         <section class="slide">
             <h1>課程簡介</h1>
@@ -412,6 +461,7 @@
                         <div class="timeline-content">
                             <div class="title">台灣大學</div>
                             <div class="subtitle">心理學士</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">大專生科技部計劃</div>
 
                         </div>
                     </div>
@@ -419,35 +469,40 @@
                         <div class="timeline-year">2013</div>
                         <div class="timeline-content">
                             <div class="title">金百利克拉克</div>
-                            <div class="subtitle">實習生<br>衛生紙行銷</div>
+                            <div class="subtitle">實習生</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">衛生紙行銷</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-year">2013-2014</div>
                         <div class="timeline-content">
                             <div class="title">兵役</div>
-                            <div class="subtitle">預備軍官<br>新訓中心</div>
+                            <div class="subtitle">預備軍官</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">新兵、回役兵訓練</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-year">2014-2016</div>
                         <div class="timeline-content">
                             <div class="title">心理所</div>
-                            <div class="subtitle">碩士生<br>情緒對賭局決策的影響</div>
+                            <div class="subtitle">碩士生</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">情緒對賭局決策的影響</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-year">2015</div>
                         <div class="timeline-content">
                             <div class="title">商發院</div>
-                            <div class="subtitle">實習生<br>資料分析/ 視覺化</div>
+                            <div class="subtitle">實習生</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">資料視覺化</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-year">2016</div>
                         <div class="timeline-content">
                             <div class="title">雲圖科學</div>
-                            <div class="subtitle">資料分析師<br>分析資料/ 寫程式</div>
+                            <div class="subtitle">資料分析師</div>
+                            <div class="text" style="font-size: 0.8rem; color: var(--text-color);">數據建模</div>
                         </div>
                     </div>
                     <div class="timeline-item" style="min-width: 250px;">

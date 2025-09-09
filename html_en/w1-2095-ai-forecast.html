@@ -211,10 +211,59 @@
             padding: 1rem;
         }
 
+        /* 回到首頁按鈕樣式 */
+        .home-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            border: 1px solid var(--line-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-link:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 767px) {
+            .home-button {
+                top: 0.5rem;
+                left: 0.5rem;
+            }
+            
+            .home-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
 
     </style>
 </head>
 <body>
+
+    <!-- 回到首頁按鈕 -->
+    <div class="home-button">
+        <a href="index.html" class="home-link">🏠 Home</a>
+    </div>
 
     <div class="slides-container">
                 <!-- Slide 1: Cover -->
@@ -447,30 +496,30 @@ document.addEventListener('DOMContentLoaded', () => {
         options: { plugins: { title: {display: true, text: "Environmental Cost of AI"} }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Terawatt Hours (TWh)' } } } }
     });
 
-    // 圖表 4: 崗位替代
+    // Chart 4: Job Displacement
     const ctx4 = document.getElementById('jobDisplacementChart')?.getContext('2d');
     if (ctx4) new Chart(ctx4, {
         type: 'bar',
         data: {
-            labels: ['金融', '製造業', '醫療健康', '交通運輸', '創意藝術', '行政/客服'],
+            labels: ['Finance', 'Manufacturing', 'Healthcare', 'Transportation', 'Creative Arts', 'Administrative/Customer Service'],
             datasets: [
-                { label: '崗位替代率 (%)', data: [45, 65, 25, 75, 20, 67.5], backgroundColor: colorPalette.accent },
-                { label: '崗位創造率 (%)', data: [12.5, 7.5, 30, 7.5, 25, 7.5], backgroundColor: colorPalette.success }
+                { label: 'Job Displacement Rate (%)', data: [45, 65, 25, 75, 20, 67.5], backgroundColor: colorPalette.accent },
+                { label: 'Job Creation Rate (%)', data: [12.5, 7.5, 30, 7.5, 25, 7.5], backgroundColor: colorPalette.success }
             ]
         },
-        options: { indexAxis: 'y', scales: { x: { stacked: false, title: { display: true, text: '百分比 (%)' } }, y: { stacked: false } } }
+        options: { indexAxis: 'y', scales: { x: { stacked: false, title: { display: true, text: 'Percentage (%)' } }, y: { stacked: false } } }
     });
 
-    // 圖表 5: AGI 時間線 (FIXED)
+    // Chart 5: AGI Timeline (FIXED)
     const ctx5 = document.getElementById('agiTimelineChart')?.getContext('2d');
     if (ctx5) new Chart(ctx5, {
         type: 'scatter',
         data: {
             datasets: [
-                { label: '行業領袖 (2026-2029)', data: [{x: new Date('2027-06-30'), y: 0}], backgroundColor: colorPalette.accent, pointRadius: 10, pointHoverRadius: 12 },
-                { label: 'Metaculus 社群 (2031)', data: [{x: new Date('2031-06-30'), y: 0}], backgroundColor: colorPalette.warning, pointRadius: 10, pointHoverRadius: 12 },
-                { label: 'AI 研究人員 (~2047)', data: [{x: new Date('2047-01-01'), y: 0}], backgroundColor: colorPalette.info, pointRadius: 10, pointHoverRadius: 12 },
-                { label: '超級預測員 (2048)', data: [{x: new Date('2048-01-01'), y: 0}], backgroundColor: colorPalette.primary, pointRadius: 10, pointHoverRadius: 12 }
+                { label: 'Industry Leaders (2026-2029)', data: [{x: new Date('2027-06-30'), y: 0}], backgroundColor: colorPalette.accent, pointRadius: 10, pointHoverRadius: 12 },
+                { label: 'Metaculus Community (2031)', data: [{x: new Date('2031-06-30'), y: 0}], backgroundColor: colorPalette.warning, pointRadius: 10, pointHoverRadius: 12 },
+                { label: 'AI Researchers (~2047)', data: [{x: new Date('2047-01-01'), y: 0}], backgroundColor: colorPalette.info, pointRadius: 10, pointHoverRadius: 12 },
+                { label: 'Superforecasters (2048)', data: [{x: new Date('2048-01-01'), y: 0}], backgroundColor: colorPalette.primary, pointRadius: 10, pointHoverRadius: 12 }
             ]
         },
         options: {
@@ -480,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     time: { unit: 'year' },
                     min: new Date('2025-01-01'),
                     max: new Date('2060-01-01'),
-                    title: { display: true, text: '預測年份' }
+                    title: { display: true, text: 'Prediction Year' }
                 },
                 y: { display: false, min: -1, max: 1 }
             }

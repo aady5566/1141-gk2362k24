@@ -342,6 +342,50 @@
             font-weight: 500;
         }
 
+        /* 回到首頁按鈕樣式 */
+        .home-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            border: 1px solid var(--line-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-link:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 767px) {
+            .home-button {
+                top: 0.5rem;
+                left: 0.5rem;
+            }
+            
+            .home-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
         .homework-step p {
             font-size: clamp(0.9rem, 1.5vw, 1rem);
             line-height: 1.6;
@@ -387,6 +431,11 @@
     </style>
 </head>
 <body>
+
+    <!-- 回到首頁按鈕 -->
+    <div class="home-button">
+        <a href="index.html" class="home-link">🏠 Home</a>
+    </div>
 
     <div class="slides-container">
         <section class="slide">
