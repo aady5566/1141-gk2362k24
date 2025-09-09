@@ -675,24 +675,20 @@ document.querySelectorAll('.scroll-target').forEach(el => {
 .home-link {
     display: inline-flex;
     align-items: center;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--text-color);
+    padding: 0.35rem 0.7rem;
+    background: #4d4d3b;
+    color: #ffffff;
     text-decoration: none;
-    border-radius: 0.5rem;
-    border: 1px solid var(--line-color);
-    font-size: 0.9rem;
+    border-radius: 0.35rem;
+    font-size: 0.63rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .home-link:hover {
-    background: var(--accent-color);
-    color: white;
+    background: #3a3a2c;
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* 響應式調整 */
@@ -703,8 +699,8 @@ document.querySelectorAll('.scroll-target').forEach(el => {
     }
 
     .home-link {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+        padding: 0.28rem 0.56rem;
+        font-size: 0.56rem;
     }
 }
 ```
@@ -930,23 +926,93 @@ HTML：
 - **首頁**：中文版為 `index.html`，英文版為 `index_en.html`
 
 ### 語言切換功能
-每個首頁都應包含語言切換按鈕：
+每個首頁都應包含語言切換按鈕，使用統一的工具列樣式：
 
 ```html
 <!-- 中文版首頁的語言切換 -->
-<div class="language-switcher">
-    <a href="html_en/index_en.html" class="lang-btn">English</a>
+<div class="top-toolbar">
+    <a href="html_en/index_en.html" class="toolbar-link">English</a>
 </div>
 
 <!-- 英文版首頁的語言切換 -->
-<div class="language-switcher">
-    <a href="../index.html" class="lang-btn">中文</a>
+<div class="top-toolbar">
+    <a href="../index.html" class="toolbar-link">中文</a>
 </div>
+```
+
+```css
+/* 左上角工具列樣式 */
+.top-toolbar {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 1000;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.toolbar-link {
+    display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.63rem;
+    padding: 0.21rem 0.42rem;
+    border-radius: 0.25rem;
+    background: #4d4d3b;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.toolbar-link:hover {
+    background: #3a3a2c;
+    color: #ffffff;
+}
+
+/* 首頁容器調整 - 避免工具列遮擋內容 */
+.container {
+    padding-top: 3rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding-top: 3.2rem;
+    }
+}
 ```
 
 ### 回到首頁按鈕的多語言支援
 - **中文版投影片**：`<a href="../index.html" class="home-link">首頁</a>`
 - **英文版投影片**：`<a href="index_en.html" class="home-link">Home</a>`
+
+### 按鈕樣式統一規範
+所有按鈕（回到首頁、語言切換）都使用統一的樣式規範：
+
+```css
+/* 統一按鈕樣式 */
+.unified-button {
+    background: #4d4d3b;           /* 深色背景 */
+    color: #ffffff;                /* 白色文字 */
+    border: none;                  /* 無邊框 */
+    font-size: 0.63rem;           /* 縮小 30% 的字體 */
+    padding: 0.35rem 0.7rem;      /* 縮小 30% 的內邊距 */
+    border-radius: 0.35rem;       /* 圓角 */
+    transition: all 0.3s ease;    /* 平滑過渡 */
+}
+
+.unified-button:hover {
+    background: #3a3a2c;          /* 深色懸停效果 */
+    color: #ffffff;
+    transform: translateY(-2px);  /* 輕微上移效果 */
+}
+
+/* 手機版進一步縮小 */
+@media (max-width: 767px) {
+    .unified-button {
+        padding: 0.28rem 0.56rem;
+        font-size: 0.56rem;
+    }
+}
+```
 
 ### 翻譯注意事項
 1. **HTML 屬性**：`lang` 屬性應設為對應語言（`zh-Hant` 或 `en`）
@@ -954,6 +1020,9 @@ HTML：
 3. **圖表標籤**：Chart.js 圖表的所有標籤和工具提示都需翻譯
 4. **技術術語**：保持專業術語的準確性
 5. **文化適應**：適當調整表達方式以符合目標語言習慣
+6. **投影片隱藏**：使用 `data-hidden="true"` 隱藏的投影片在兩個語言版本中應保持一致
+7. **按鈕文字**：回到首頁按鈕使用對應語言（中文：「首頁」，英文：「Home」）
+8. **講師姓名**：英文版使用羅馬拼音格式（如：YD (Yin-Dir, Hwang)）
 
 ## 檔案結構範例
 
@@ -969,7 +1038,23 @@ project/
 │   ├── w1_en.html              # 課程簡介投影片（英文）
 │   ├── w1-2095-ai-forecast_en.html # AI 預測投影片（英文）
 │   └── upcoming_gitignore/     # 被忽略的檔案
+├── .gitignore                  # Git 忽略檔案設定
 └── slide_style.md              # 風格指南
+```
+
+### 實際專案結構
+```
+1141-gk2362k24/
+├── index.html                  # 中文版首頁（課程內容）
+├── html/
+│   ├── w1.html                 # 第一週：課程簡介
+│   └── w1-2095-ai-forecast.html # 第一週：2095 AI 預測
+├── html_en/
+│   ├── index_en.html           # 英文版首頁（Course Slides Collection）
+│   ├── w1_en.html              # Week 1: Course Introduction
+│   └── w1-2095-ai-forecast_en.html # Week 1: 2095 AI Forecast
+├── .gitignore                  # 忽略 html/upcoming_gitignore/ 和 html_en/upcoming_gitignore/
+└── slide_style.md              # 本風格指南
 ```
 
 ---
