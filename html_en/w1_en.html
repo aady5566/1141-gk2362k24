@@ -41,11 +41,18 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             padding: 5vw;
             text-align: center;
             position: relative;
+            overflow-y: auto;
+        }
+
+        /* 第一頁（標題頁）置中顯示 */
+        .slide:first-child {
+            justify-content: center;
+            overflow-y: hidden; /* 第一頁不需要滾動 */
         }
 
         h1 {
@@ -289,7 +296,15 @@
             .slide {
                 padding: 3vw;
                 overflow-y: auto;
+                justify-content: flex-start;
             }
+
+            /* 手機版第一頁也置中 */
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+        }
 
             .nav {
                 width: 95%;
