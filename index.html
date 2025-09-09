@@ -180,6 +180,28 @@
             font-size: 0.9rem;
         }
 
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            opacity: 0.8;
+        }
+
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
@@ -199,6 +221,10 @@
     </style>
 </head>
 <body>
+    <div class="language-switcher">
+        <a href="html_en/index.html" class="lang-btn">English</a>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>1141-gk2362k24</h1>
