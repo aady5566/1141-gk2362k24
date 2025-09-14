@@ -11,6 +11,7 @@
 - **響應式優先**：確保在各種裝置上都有良好的顯示效果
 - **無障礙設計**：考慮視覺障礙用戶的使用體驗
 - **Markdown 風格**：簡潔直接的內容呈現，減少視覺干擾
+- **統一導航**：使用側邊欄提供一致的導航體驗，避免重複的按鈕元素
 
 ## 色彩系統
 
@@ -50,9 +51,10 @@ h1 {
 
 /* 次標題 - 用於投影片副標題 */
 h2 {
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
     font-weight: 300;
     color: var(--accent-color);
+    margin-bottom: 0.8rem;
 }
 
 /* 內容標題 - 用於投影片內容區塊標題 */
@@ -174,7 +176,158 @@ p {
 
 ## 組件樣式
 
-### 1. 卡片容器（傳統樣式）
+### 1. 側邊欄導航組件
+```css
+/* 側邊欄容器 */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: var(--font-family, 'Calibri', 'Noto Sans TC', sans-serif);
+}
+
+/* 側邊欄切換按鈕（漢堡選單） */
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background: #4d4d3b;
+    border-radius: 4px;
+    padding: 6px;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+    background: #3a3a2c;
+    transform: translateY(-2px);
+}
+
+.sidebar-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+/* 側邊欄選單 */
+.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-color);  /* 使用主背景色 - 淺米色 */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-menu.active {
+    left: 0;
+}
+
+/* 側邊欄標題區域 */
+.sidebar-header {
+    background: #4d4d3b;
+    color: #ffffff;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* 側邊欄內容區域 */
+.sidebar-content {
+    padding: 1rem 0;
+}
+
+/* 側邊欄選項 */
+.sidebar-item {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-item:hover {
+    background: rgba(120, 120, 91, 0.1);  /* 低飽和度懸停效果 */
+    color: #4d4d3b;
+    transform: translateX(5px);
+}
+
+.sidebar-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* 遮罩層 */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 手機版優化 */
+@media (max-width: 767px) {
+    .sidebar-toggle {
+        top: 0.5rem;
+        left: 0.5rem;
+        width: 28px;
+        height: 28px;
+        padding: 5px;
+    }
+
+    .sidebar-toggle span {
+        width: 16px;
+        height: 2px;
+    }
+
+    .sidebar-menu {
+        width: 260px;
+    }
+
+    .sidebar-item {
+        padding: 0.7rem 1.2rem;
+    }
+
+    .sidebar-text {
+        font-size: 0.85rem;
+    }
+}
+```
+
+### 2. 卡片容器（傳統樣式）
 ```css
 .card-container {
     background: rgba(163, 163, 129, 0.1);
@@ -194,7 +347,7 @@ p {
 }
 ```
 
-### 2. Markdown 風格內容佈局
+### 3. Markdown 風格內容佈局
 ```css
 .content-grid {
     display: grid;
@@ -230,7 +383,7 @@ p {
 }
 ```
 
-### 3. 時間軸組件
+### 4. 時間軸組件
 ```css
 .timeline-container {
     width: 100%;
@@ -320,7 +473,7 @@ p {
 }
 ```
 
-### 4. 課程大綱組件
+### 5. 課程大綱組件
 ```css
 .syllabus-container {
     display: flex;
@@ -363,7 +516,7 @@ p {
 }
 ```
 
-### 5. 破冰活動組件
+### 6. 破冰活動組件
 ```css
 .icebreaker-list {
     list-style: none;
@@ -384,7 +537,223 @@ p {
 .icebreaker-list li:nth-child(3) { animation-delay: 1.5s; }
 ```
 
-### 6. 外部投影片預覽（Google Slides 嵌入）
+### 7. 客製化投影片樣式
+
+#### 圖表投影片 (chart-slide)
+```css
+/* 圖表投影片特殊樣式 - 加寬處理 */
+.slide.chart-slide {
+    padding: 2vw;
+    align-items: stretch;
+}
+
+.slide.chart-slide h3 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.slide.chart-slide .iq-chart-container {
+    width: 100%;
+    max-width: none;
+    margin: 10px 0;
+}
+
+/* 手機版圖表投影片優化 */
+@media (max-width: 767px) {
+    .slide.chart-slide {
+        padding: 1vw;
+        align-items: stretch;
+    }
+
+    .slide.chart-slide h3 {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        width: 100%;
+        margin-bottom: 2vh;
+    }
+
+    .slide.chart-slide .iq-chart-container {
+        margin: 5px 0;
+        width: 100%;
+    }
+
+    .slide.chart-slide .slide-footer {
+        font-size: 0.7rem;
+        margin-top: 1vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide.chart-slide {
+        padding: 0.5vw;
+    }
+
+    .slide.chart-slide h3 {
+        font-size: clamp(1rem, 5vw, 1.5rem);
+        margin-bottom: 1vh;
+    }
+}
+```
+
+#### 影片投影片 (video-slide)
+```css
+/* 影片投影片特殊樣式 - 加寬處理 */
+.slide.video-slide {
+    padding: 2vw;
+    align-items: stretch;
+}
+
+.slide.video-slide h2 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.slide.video-slide .video-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 20px auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+/* 手機版影片投影片優化 */
+@media (max-width: 767px) {
+    .slide.video-slide {
+        padding: 1vw;
+        align-items: stretch;
+    }
+
+    .slide.video-slide h2 {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        width: 100%;
+        margin-bottom: 2vh;
+    }
+
+    .slide.video-slide .video-container {
+        margin: 10px 0;
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide.video-slide {
+        padding: 0.5vw;
+    }
+
+    .slide.video-slide h2 {
+        font-size: clamp(1rem, 5vw, 1.5rem);
+        margin-bottom: 1vh;
+    }
+}
+```
+
+#### 作業投影片 (homework-slide)
+```css
+/* 作業專用 slide 樣式 - 針對字多的內容優化 */
+.homework-slide {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2vh 2vw;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.homework-slide > div {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0;
+}
+
+.homework-slide h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    margin-bottom: 1vh;
+    text-align: center;
+}
+
+.homework-slide .homework-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* 作業說明框樣式 */
+.slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] {
+    font-size: 1.1rem !important;
+    line-height: 1.5;
+}
+
+.slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] strong {
+    font-size: 1.2rem !important;
+}
+
+/* 作業 slide 中的 code 區塊樣式 */
+.slide.homework-slide .homework-content pre {
+    background-color: var(--bg-color);
+    border: 1px solid var(--line-color);
+    border-radius: 4px;
+    padding: 10px;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    font-size: 0.7rem;
+    line-height: 1.4;
+}
+
+.slide.homework-slide .homework-content pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.7rem;
+    color: #333;
+    white-space: pre;
+}
+
+/* 手機版作業 slide 優化 */
+@media (max-width: 767px) {
+    .homework-slide {
+        padding: 1vh 1vw;
+        align-items: flex-start;
+    }
+
+    .homework-slide h2 {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        margin-bottom: 0.8vh;
+    }
+
+    .homework-slide .homework-content {
+        font-size: 0.75rem;
+        line-height: 1.3;
+        padding: 0 0.3rem;
+    }
+
+    .slide.homework-slide .homework-content pre {
+        background-color: var(--bg-color);
+        border: 1px solid var(--line-color);
+        font-size: 0.5rem;
+        line-height: 1.2;
+        padding: 8px;
+        margin: 0.4rem 0;
+    }
+
+    .slide.homework-slide .homework-content pre code {
+        font-size: 0.5rem;
+    }
+
+    .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] {
+        font-size: 0.9rem !important;
+        line-height: 1.4;
+        padding: 12px !important;
+    }
+
+    .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] strong {
+        font-size: 1rem !important;
+    }
+}
+```
+
+### 8. 外部投影片預覽（Google Slides 嵌入）
 ```css
 /* 外部投影片預覽容器 */
 .embed-wrapper {
@@ -580,7 +949,120 @@ p {
 
 ## JavaScript 功能
 
-### 1. 投影片導航系統
+### 1. 側邊欄導航系統
+```javascript
+// 側邊欄工具 JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // 建立側邊欄 HTML 結構
+    function createSidebar() {
+        const sidebar = document.createElement('div');
+        sidebar.id = 'sidebar';
+        sidebar.innerHTML = `
+            <div class="sidebar-toggle" id="sidebarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="sidebar-menu" id="sidebarMenu">
+                <div class="sidebar-header">
+                    <h3>工具選單</h3>
+                </div>
+                <div class="sidebar-content">
+                    <a href="../index.html" class="sidebar-item">
+                        <span class="sidebar-text">回首頁</span>
+                    </a>
+                    <a href="#" class="sidebar-item" id="languageToggle">
+                        <span class="sidebar-text">切換語言</span>
+                    </a>
+                    <a href="random_grouping.html" class="sidebar-item" target="_blank">
+                        <span class="sidebar-text">隨機分組</span>
+                    </a>
+                </div>
+            </div>
+        `;
+        return sidebar;
+    }
+
+    // 初始化側邊欄
+    function initSidebar() {
+        // 檢查是否已經存在側邊欄
+        if (document.getElementById('sidebar')) {
+            return;
+        }
+
+        // 建立側邊欄
+        const sidebar = createSidebar();
+        document.body.appendChild(sidebar);
+
+        // 建立遮罩層
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        // 綁定事件
+        const toggle = document.getElementById('sidebarToggle');
+        const menu = document.getElementById('sidebarMenu');
+        const languageToggle = document.getElementById('languageToggle');
+
+        // 切換側邊欄顯示/隱藏
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        // 點擊遮罩層關閉側邊欄
+        overlay.addEventListener('click', function() {
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // 語言切換功能
+        if (languageToggle) {
+            languageToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentPath = window.location.pathname;
+
+                // 判斷當前語言並切換
+                if (currentPath.includes('_en.html') || currentPath.includes('/html_en/')) {
+                    // 當前是英文版，切換到中文版
+                    if (currentPath.includes('_en.html')) {
+                        const chinesePath = currentPath.replace('_en.html', '.html');
+                        window.location.href = chinesePath;
+                    } else if (currentPath.includes('/html_en/')) {
+                        window.location.href = '../index.html';
+                    }
+                } else {
+                    // 當前是中文版，切換到英文版
+                    if (currentPath.includes('.html') && !currentPath.includes('_en.html')) {
+                        const englishPath = currentPath.replace('.html', '_en.html');
+                        window.location.href = englishPath;
+                    } else if (currentPath.endsWith('/index.html')) {
+                        window.location.href = 'html_en/index_en.html';
+                    }
+                }
+            });
+        }
+
+        // 點擊側邊欄項目後關閉側邊欄
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.getAttribute('target') === '_blank') {
+                    return; // 隨機分組不關閉側邊欄
+                }
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        });
+    }
+
+    // 執行初始化
+    initSidebar();
+});
+```
+
+### 2. 投影片導航系統
 ```javascript
 document.addEventListener('DOMContentLoaded', () => {
     const slidesContainer = document.querySelector('.slides-container');
@@ -630,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-### 2. Chart.js 配置
+### 3. Chart.js 配置
 ```javascript
 // 全域圖表設定
 Chart.defaults.color = '#5a5a5a';
@@ -650,7 +1132,7 @@ const colorPalette = {
 };
 ```
 
-### 3. 滾動動畫觸發器
+### 4. 滾動動畫觸發器
 ```javascript
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -669,59 +1151,27 @@ document.querySelectorAll('.scroll-target').forEach(el => {
 
 ## 使用指南
 
-### 回到首頁按鈕
-每個投影片頁面都應在左上角包含回到首頁按鈕：
+### 側邊欄導航系統
+每個頁面都應包含側邊欄導航系統，提供統一的導航功能：
 
+#### 1. 引入側邊欄 JavaScript
 ```html
-<!-- 回到首頁按鈕 -->
-<div class="home-button">
-    <a href="../index.html" class="home-link">首頁</a>
-</div>
+<script src="sidebar_tools/sidebar.js"></script>
 ```
 
-```css
-/* 回到首頁按鈕樣式 */
-.home-button {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1000;
-}
+#### 2. 側邊欄功能
+- **回首頁**：根據當前頁面自動導向正確的首頁
+- **切換語言**：智能判斷當前語言並切換到對應版本
+- **隨機分組**：連結到隨機分組工具（新開分頁）
 
-.home-link {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35rem 0.7rem;
-    background: #4d4d3b;
-    color: #ffffff;
-    text-decoration: none;
-    border-radius: 0.35rem;
-    font-size: 0.63rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
+#### 3. 路徑設定
+- **根目錄頁面**：`<script src="sidebar_tools/sidebar.js"></script>`
+- **子目錄頁面**：`<script src="../sidebar_tools/sidebar.js"></script>`
 
-.home-link:hover {
-    background: #3a3a2c;
-    color: #ffffff;
-    transform: translateY(-2px);
-}
+#### 4. 自動初始化
+側邊欄會在頁面載入時自動初始化，無需額外設定。
 
-/* 響應式調整 */
-@media (max-width: 767px) {
-    .home-button {
-        top: 0.5rem;
-        left: 0.5rem;
-    }
-
-    .home-link {
-        padding: 0.28rem 0.56rem;
-        font-size: 0.56rem;
-    }
-}
-```
-
-### 1. 基本 HTML 結構
+### 基本 HTML 結構
 ```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -761,7 +1211,7 @@ document.querySelectorAll('.scroll-target').forEach(el => {
 </html>
 ```
 
-### 2. 投影片類型
+### 投影片類型
 
 #### 封面投影片
 ```html
@@ -796,15 +1246,68 @@ document.querySelectorAll('.scroll-target').forEach(el => {
 </section>
 ```
 
-#### 圖表投影片
+#### 圖表投影片 (chart-slide)
 ```html
-<section class="slide">
+<section class="slide chart-slide">
     <h3>圖表標題</h3>
     <div class="chart-wrapper">
         <canvas id="chartId"></canvas>
     </div>
 </section>
 ```
+
+**特色：**
+- 加寬處理，充分利用投影片空間
+- 圖表容器最大寬度無限制
+- 標題置中對齊
+- 手機版優化，確保可讀性
+
+#### 影片投影片 (video-slide)
+```html
+<section class="slide video-slide">
+    <h2>影片標題</h2>
+    <p>影片描述（可選）</p>
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+        </iframe>
+    </div>
+</section>
+```
+
+**特色：**
+- 影片容器最大寬度 1600px（約為標準的兩倍）
+- 保持 16:9 寬高比
+- 自動置中對齊
+- 手機版完全響應式適配
+
+#### 作業投影片 (homework-slide)
+```html
+<section class="slide homework-slide">
+    <h2>週二作業</h2>
+    <div class="homework-content">
+        <h4>作業標題</h4>
+        <p style="background-color: #e8e5dc; padding: 15px; border-radius: 5px;">
+            <strong>重要說明：</strong>作業內容描述
+        </p>
+        <p><strong>範例（但不要直接照抄）：</strong></p>
+        <pre><code>• 範例問題一
+• 範例問題二
+• 範例問題三</code></pre>
+        <p>其他說明文字</p>
+    </div>
+</section>
+```
+
+**特色：**
+- 專門針對字多的內容優化
+- 支援滾動顯示完整內容
+- 作業說明框使用特殊樣式突出顯示
+- 範例問題使用 code 區塊呈現，字體更小更緊湊
+- 手機版進一步優化字體大小和間距
+- 確保所有內容都能在螢幕上完整顯示
 
 #### 手機版優化投影片
 ```html
@@ -886,8 +1389,10 @@ HTML：
 ### 1. 色彩使用
 - 主要內容使用 `--text-color`
 - 標題和強調元素使用 `--accent-color`
-- 背景使用 `--bg-color`
+- 背景使用 `--bg-color`（淺米色，避免全白色）
 - 邊框和分隔線使用 `--line-color`
+- **避免全白色背景**：優先使用淺米色 `#F4F2EF` 營造溫暖視覺體驗
+- 側邊欄和組件背景統一使用主背景色，保持視覺一致性
 
 ### 2. 間距規範
 - 卡片間距：2rem

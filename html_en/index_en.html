@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1141-gk2362k24 Course Slides</title>
+    <script src="../sidebar_tools/sidebar.js?v=6"></script>
     <style>
         :root {
             --bg-color: #F4F2EF;        /* Main background - warm off-white */
@@ -51,36 +52,9 @@
             font-weight: 300;
         }
 
-        /* 左上角工具列（Home / Language） */
-        .top-toolbar {
-            position: fixed;
-            top: 0.5rem;
-            left: 0.5rem;
-            z-index: 1000;
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .toolbar-link {
-            display: inline-block;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 0.63rem;
-            padding: 0.21rem 0.42rem;
-            border-radius: 0.25rem;
-            background: #4d4d3b;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        .toolbar-link:hover {
-            background: #3a3a2c;
-            color: #ffffff;
-        }
-
         /* mobile-first：避免遮擋內容，增加上方安全邊距 */
-        .container { padding-top: 3rem; }
-        @media (min-width: 768px) { .container { padding-top: 3.2rem; } }
+        .container { padding-top: 1rem; }
+        @media (min-width: 768px) { .container { padding-top: 1.2rem; } }
 
         .weeks-container {
             display: grid;
@@ -190,10 +164,6 @@
     </style>
 </head>
 <body>
-    <div class="top-toolbar">
-        <a href="../index.html" class="toolbar-link">中文</a>
-    </div>
-
     <div class="container">
         <div class="header">
             <h1>1141-gk2362k24</h1>
@@ -215,6 +185,19 @@
                         <a href="w1-2095-ai-forecast_en.html" class="slide-link">
                             <div class="slide-title">2095 AI Forecast</div>
                             <div class="slide-description">AI development trend prediction analysis</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">Week 2</h2>
+                <ul class="slides-list">
+                    <li class="slide-item">
+                        <a href="w2_en.html" class="slide-link">
+                            <div class="slide-title">AI Humanity and Self-Awareness</div>
+                            <div class="slide-description">Exploring AI consciousness, emotions, and human traits</div>
                         </a>
                     </li>
                 </ul>

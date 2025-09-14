@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課程簡介：AI趨勢與程式應用</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
     <style>
         :root {
             --bg-color: #F4F2EF;
@@ -357,45 +358,6 @@
             font-weight: 500;
         }
 
-        /* 回到首頁按鈕樣式 */
-        .home-button {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1000;
-        }
-
-        .home-link {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.35rem 0.7rem;
-            background: #4d4d3b;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 0.35rem;
-            font-size: 0.63rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .home-link:hover {
-            background: #3a3a2c;
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        /* 響應式調整 */
-        @media (max-width: 767px) {
-            .home-button {
-                top: 0.5rem;
-                left: 0.5rem;
-            }
-
-            .home-link {
-                padding: 0.28rem 0.56rem;
-                font-size: 0.56rem;
-            }
-        }
 
         .homework-step p {
             font-size: clamp(0.9rem, 1.5vw, 1rem);
@@ -442,11 +404,6 @@
     </style>
 </head>
 <body>
-
-    <!-- 回到首頁按鈕 -->
-    <div class="home-button">
-        <a href="../index.html" class="home-link">首頁</a>
-    </div>
 
     <div class="slides-container">
         <section class="slide">

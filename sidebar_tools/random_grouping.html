@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Group</title>
+    <!-- 載入 jf open 粉圓點陣體 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jf-openhuninn-dot@1.0/font.css">
+    <!-- 載入 Press Start 2P 作為英文/數字的備用字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* * CSS 風格設定
+         * 靈感來源：Minecraft & 8-bit 遊戲 UI
+         */
+        :root {
+            --bg-color: #3a3a3a; /* 深色石頭背景 */
+            --container-bg: #c6c6c6; /* 淺色石頭 UI 背景 */
+            --container-border: #5a5a5a;
+            --text-color: #3a3a3a;
+            --header-text-color: #dddddd;
+            --shadow-light: #ffffff;
+            --shadow-dark: #5a5a5a;
+            --button-bg: #7a7a7a;
+            --button-hover-bg: #8c8c8c;
+            /* 更新字體堆疊，優先使用粉圓點陣體 */
+            --font-pixel: 'jf-openhuninn-dot', 'Press Start 2P', cursive;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-pixel);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            /* 讓像素字體更清晰 */
+            image-rendering: pixelated;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--container-bg);
+            border: 4px solid var(--container-border);
+            box-shadow: 
+                inset -4px -4px 0px 0px var(--shadow-dark),
+                inset 4px 4px 0px 0px var(--shadow-light);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--header-text-color);
+            background-color: var(--container-border);
+            padding: 12px;
+            text-align: center;
+            margin: -28px -28px 24px -28px; /* 讓標題延伸至邊框 */
+            border-bottom: 4px solid var(--container-border);
+            text-shadow: 2px 2px #000000;
+        }
+
+        .controls h2 {
+            font-size: 20px; /* 稍微放大讓點陣字更清楚 */
+            margin-bottom: 10px;
+        }
+
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: var(--container-bg);
+            border: 3px solid var(--container-border);
+            box-shadow: inset 2px 2px 0px 0px var(--shadow-dark);
+            font-family: var(--font-pixel);
+            font-size: 22px; /* 點陣字體需要稍大尺寸才清晰 */
+            line-height: 1.6;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        
+        textarea {
+            min-height: 150px;
+        }
+
+        textarea:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #8a8a8a;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-family: var(--font-pixel);
+            font-size: 22px;
+            color: var(--header-text-color);
+            text-shadow: 2px 2px #000000;
+            background-color: var(--button-bg);
+            border: 3px solid var(--container-border);
+            box-shadow: 
+                inset -3px -3px 0px 0px var(--shadow-dark),
+                inset 3px 3px 0px 0px var(--shadow-light);
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .action-button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .action-button:active {
+            box-shadow: inset 2px 2px 0px 0px var(--shadow-dark);
+            transform: translateY(2px);
+        }
+        
+        #result-container {
+            margin-top: 24px;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+
+        .group-card {
+            background-color: var(--container-bg);
+            border: 3px solid var(--container-border);
+            box-shadow: 
+                inset -3px -3px 0px 0px var(--shadow-dark),
+                inset 3px 3px 0px 0px var(--shadow-light);
+            padding: 15px;
+        }
+
+        .group-card h3 {
+            font-size: 16px;
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--container-border);
+        }
+
+        .group-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .group-card li {
+            font-size: 22px;
+            padding: 4px 0;
+            line-height: 1.6;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Random Group</h1>
+        
+        <div class="controls">
+            <h2>輸入名單:</h2>
+            <textarea id="name-list" placeholder="例如：
+史提夫
+艾莉克斯
+苦力怕
+終界龍"></textarea>
+
+            <h2>輸入分組數</h2>
+            <input id="group-count" type="number" value="2" min="1">
+        </div>
+
+        <button id="generate-btn" class="action-button">開始分組 !</button>
+
+        <div id="result-container"></div>
+    </div>
+
+    <script>
+        // 程式邏輯區塊
+        const nameListInput = document.getElementById('name-list');
+        const groupCountInput = document.getElementById('group-count');
+        const generateBtn = document.getElementById('generate-btn');
+        const resultContainer = document.getElementById('result-container');
+
+        // Fisher-Yates (aka Knuth) Shuffle 演算法，用來洗牌陣列，確保隨機性
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // ES6 語法交換元素
+            }
+        }
+
+        function generateGroups() {
+            // 1. 取得輸入資料並清理
+            const names = nameListInput.value
+                .split('\n')
+                .map(name => name.trim()) // 去除前後空白
+                .filter(name => name !== ''); // 過濾掉空行
+
+            const groupCount = parseInt(groupCountInput.value, 10);
+
+            // 2. 驗證輸入
+            if (names.length === 0) {
+                alert('請至少輸入一個名字！');
+                return;
+            }
+            if (isNaN(groupCount) || groupCount <= 0) {
+                alert('分組數必須是大於 0 的數字！');
+                return;
+            }
+            if (groupCount > names.length) {
+                alert('分組數不能大於總人數！');
+                return;
+            }
+
+            // 3. 核心分組邏輯
+            shuffleArray(names); // 將名單順序隨機打亂
+            
+            // 建立空的群組陣列
+            const groups = Array.from({ length: groupCount }, () => []);
+
+            // 使用 modulo 運算子 (%) 將成員逐一分配到各組，確保人數盡量平均
+            for (let i = 0; i < names.length; i++) {
+                groups[i % groupCount].push(names[i]);
+            }
+
+            // 4. 渲染結果到畫面上
+            displayResults(groups);
+        }
+        
+        function displayResults(groups) {
+            // 清空舊的結果
+            resultContainer.innerHTML = '';
+
+            // 建立每個分組的卡片
+            groups.forEach((group, index) => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+
+                const title = document.createElement('h3');
+                title.textContent = `第 ${index + 1} 組`;
+                card.appendChild(title);
+
+                const memberList = document.createElement('ul');
+                group.forEach(member => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = member;
+                    memberList.appendChild(listItem);
+                });
+                card.appendChild(memberList);
+
+                resultContainer.appendChild(card);
+            });
+        }
+
+        // 綁定主按鈕的點擊事件
+        generateBtn.addEventListener('click', generateGroups);
+    </script>
+</body>
+</html>
+
