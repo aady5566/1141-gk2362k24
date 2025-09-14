@@ -39,13 +39,14 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
-            padding: 5vw;
+            padding: 40px 60px;
             text-align: center;
             position: relative;
             overflow-y: auto;
             box-sizing: border-box;
+            font-size: 1.5rem;
         }
 
         .slide:first-child {
@@ -53,51 +54,25 @@
             overflow-y: hidden;
         }
 
-        h1 {
-            font-size: clamp(3rem, 9vw, 5.25rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 1rem;
+        .slide h1, .slide h2, .slide h3 {
+            color: var(--highlight-color);
+            font-weight: normal;
+            margin-bottom: 20px;
         }
 
-        h2 {
-            font-size: clamp(1.8rem, 4.5vw, 2.7rem);
-            font-weight: 300;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-        }
+        .slide h1 { font-size: 4rem; }
+        .slide h2 { font-size: 3rem; }
+        .slide h3 { font-size: 2rem; }
 
-        h3 {
-            font-size: clamp(2.25rem, 6vw, 3.3rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 4vh;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 1rem;
-            width: 80%;
-            max-width: 800px;
-        }
-
-        h4 {
-            font-size: clamp(1.65rem, 3vw, 2.1rem);
-            font-weight: 400;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 0.3rem;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 1rem;
+        .slide p, .slide li {
+            font-size: 1.8rem;
             line-height: 1.6;
-            font-size: clamp(1.35rem, 2.25vw, 1.65rem);
-            max-width: 80ch;
+            max-width: 800px;
         }
 
         .slide-subtitle {
             color: #888;
-            font-size: clamp(1.5rem, 3vw, 2.1rem);
+            font-size: 1.8rem;
             font-weight: 300;
             margin-top: -1rem;
         }
@@ -167,9 +142,24 @@
             text-align: center;
         }
 
-        .slide.video-slide .video-container {
+        .video-container {
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            margin-top: 20px;
+            border: 1px solid var(--line-color);
+        }
+
+        .video-container iframe {
             width: 100%;
-            max-width: 1600px;
+            height: 100%;
+            border: none;
+        }
+
+        .slide.video-slide .video-container {
+            width: 80%;
+            max-width: 800px;
             margin: 20px auto;
             height: auto;
             aspect-ratio: 16 / 9;
@@ -202,6 +192,72 @@
             line-height: 1.4;
             max-width: 100%;
             margin: 0;
+        }
+
+        /* 字多版本容器樣式 */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+        }
+
+        .bunch-word-container .homework-content {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .bunch-word-container .homework-content h4 {
+            font-size: 1.65rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .bunch-word-container .homework-content p {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .bunch-word-container .homework-content pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--line-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .bunch-word-container .homework-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 1.2rem;
+            color: #333;
+            white-space: pre;
         }
 
         .homework-slide .homework-content pre {
@@ -268,6 +324,35 @@
                 font-size: clamp(1.2rem, 4vw, 1.8rem);
             }
 
+            h2 {
+                font-size: clamp(1rem, 3vw, 1.5rem);
+                margin-bottom: 0.8rem;
+            }
+
+            .split-layout {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .split-layout > div {
+                width: 100%;
+            }
+
+            .split-layout h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .split-layout ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            .split-layout li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
+
             .slide.chart-slide {
                 padding: 1vw;
                 align-items: stretch;
@@ -296,9 +381,9 @@
             }
 
             .slide.video-slide .video-container {
-                margin: 10px 0;
-                width: 100%;
-                max-width: none;
+                margin: 10px auto;  /* 置中對齊 */
+                width: 90%;
+                max-width: 450px;
             }
 
             .homework-slide {
@@ -327,6 +412,56 @@
             .homework-slide .homework-content pre code {
                 font-size: 0.5rem;
             }
+
+            /* 字多版本響應式樣式 */
+            .bunch-word-container {
+                padding: 1vh 1vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1rem, 2.8vw, 1.3rem);
+                margin-bottom: 1vh;
+            }
+
+            .bunch-word-container .homework-content {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                padding: 0 0.3rem;
+            }
+
+            .bunch-word-container .homework-content h4 {
+                font-size: 1.35rem;
+                line-height: 1.3;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content p {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content pre {
+                font-size: 0.9rem;
+                line-height: 1.3;
+                padding: 10px;
+                margin: 0.8rem 0;
+            }
+
+            .bunch-word-container .homework-content pre code {
+                font-size: 0.9rem;
+            }
+
+            /* 手機版 ul, li 優化 */
+            ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            ul li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
         }
 
         /* 其他樣式 */
@@ -339,11 +474,11 @@
         }
 
         .chart73 {
-            font-size: 4rem;
+            font-size: 10rem;
             font-weight: bold;
-            color: var(--accent-color);
-            text-align: center;
+            color: var(--highlight-color);
             margin: 20px 0;
+            line-height: 1;
         }
 
         .iq-chart-container {
@@ -454,13 +589,13 @@
         }
 
         .pie-chart {
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
             background: conic-gradient(
-                #a39e93 0deg 138.6deg,
-                #c1bcae 138.6deg 277.2deg,
-                #dcd9d1 277.2deg 360deg
+                #a39e93 0% 38.5%,
+                #c1bcae 38.5% 77%,
+                #dcd9d1 77% 100%
             );
             margin-bottom: 20px;
         }
@@ -468,19 +603,21 @@
         .legend {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: flex-start;
+            font-size: 1.2rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 2px;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid var(--text-color);
         }
 
         .slide-footer {
@@ -491,14 +628,29 @@
         }
 
         ul {
+            list-style: none;
+            padding: 0;
             text-align: left;
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 800px;
         }
 
-        li {
-            margin-bottom: 0.5rem;
-            padding-left: 1.2rem;
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            line-height: 1.6;
+        }
+
+        ul li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            position: absolute;
+            left: 0;
         }
     </style>
 </head>
@@ -559,14 +711,15 @@
             <div class="split-layout">
                 <div>
                     <h3 style="font-size: 1.4rem;">成員分工</h3>
-
-                        <h5>研究 x2</h5>
-                        <h5>筆記統整 x2</h5>
-                        <h5>主持會議 x1</h5>
-                        <h5>代表發言 x1</h5>
+                    <ul>
+                        <h6 style="font-size: 1rem;">研究 x 2</h6>
+                        <h6 style="font-size: 1rem;">筆記統整 x 2</h6>
+                        <h6 style="font-size: 1rem;">主持會議 x 1</h6>
+                        <h6 style="font-size: 1rem;">代表發言 x 1</h6>
+                    </ul>
 
                 </div>
-                <div style="width: 100%;">
+                <div style="width: 60%;">
                      <h3 style="font-size: 1.4rem;">討論主題</h3>
                     <div style="background-color: var(--bg-color); padding: 20px; border-radius: 5px; font-size: 1.1rem; line-height: 1.6; width: 100%; border: 1px solid var(--line-color);">
                         你覺得 AI 有思考能力嗎？有智力嗎？有自我意識和人性嗎？<br>
@@ -667,9 +820,9 @@
         <div>
             <h2>人類意識的普遍定義</h2>
             <ul>
-                <li><strong>自我意識：</strong>知道自己是誰、有獨立思想和存在。</li>
-                <li><strong>主觀經驗：</strong>對世界的感受、內心體驗。</li>
-                <li><strong>感受與情緒：</strong>喜怒哀樂、痛苦與愉悅。</li>
+                <li>自我意識：知道自己是誰、有獨立思想和存在。</li>
+                <li>主觀經驗：對世界的感受、內心體驗。</li>
+                <li>感受與情緒：喜怒哀樂、痛苦與愉悅。</li>
             </ul>
         </div>
     </section>
@@ -711,7 +864,7 @@
         </div>
     </section>
 
-    <section class="slide homework-slide">
+    <section class="slide bunch-word-container">
         <div>
             <h2>週二作業</h2>
             <div class="homework-content">
