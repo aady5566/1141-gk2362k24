@@ -39,13 +39,14 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
-            padding: 5vw;
+            padding: 40px 60px;
             text-align: center;
             position: relative;
             overflow-y: auto;
             box-sizing: border-box;
+            font-size: 1.5rem;
         }
 
         .slide:first-child {
@@ -53,51 +54,25 @@
             overflow-y: hidden;
         }
 
-        h1 {
-            font-size: clamp(3rem, 9vw, 5.25rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 1rem;
+        .slide h1, .slide h2, .slide h3 {
+            color: var(--highlight-color);
+            font-weight: normal;
+            margin-bottom: 20px;
         }
 
-        h2 {
-            font-size: clamp(1.8rem, 4.5vw, 2.7rem);
-            font-weight: 300;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-        }
+        .slide h1 { font-size: 4rem; }
+        .slide h2 { font-size: 3rem; }
+        .slide h3 { font-size: 2rem; }
 
-        h3 {
-            font-size: clamp(2.25rem, 6vw, 3.3rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 4vh;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 1rem;
-            width: 80%;
-            max-width: 800px;
-        }
-
-        h4 {
-            font-size: clamp(1.65rem, 3vw, 2.1rem);
-            font-weight: 400;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 0.3rem;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 1rem;
+        .slide p, .slide li {
+            font-size: 1.8rem;
             line-height: 1.6;
-            font-size: clamp(1.35rem, 2.25vw, 1.65rem);
-            max-width: 80ch;
+            max-width: 800px;
         }
 
         .slide-subtitle {
             color: #888;
-            font-size: clamp(1.5rem, 3vw, 2.1rem);
+            font-size: 1.8rem;
             font-weight: 300;
             margin-top: -1rem;
         }
@@ -163,22 +138,170 @@
             opacity: 1;
         }
 
+        /* 圖表投影片特殊樣式 */
+        .slide.chart-slide {
+            padding: 2vw;
+            align-items: stretch;
+        }
+
+        .slide.chart-slide h3 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+        }
+
+        .slide.chart-slide .iq-chart-container {
+            width: 100%;
+            max-width: none;
+            margin: 10px 0;
+        }
+
+        /* 影片投影片特殊樣式 */
+        .slide.video-slide {
+            padding: 2vw;
+            align-items: stretch;
+        }
+
+        .slide.video-slide h2 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+        }
+
+        .slide.video-slide .video-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
+        /* 作業投影片特殊樣式 */
+        .homework-slide {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .homework-slide > div {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0;
+        }
+
+        .homework-slide h2 {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 1vh;
+            text-align: center;
+        }
+
+        .homework-slide .homework-content {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        /* 字多版本容器樣式 */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+        }
+
+        .bunch-word-container .homework-content {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .bunch-word-container .homework-content h4 {
+            font-size: 1.65rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .bunch-word-container .homework-content p {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .bunch-word-container .homework-content pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--line-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .bunch-word-container .homework-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 1.2rem;
+            color: #333;
+            white-space: pre;
+        }
+
+        .homework-slide .homework-content pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--line-color);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            font-size: 0.7rem;
+            line-height: 1.4;
+        }
+
+        .homework-slide .homework-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.7rem;
+            color: #333;
+            white-space: pre;
+        }
+
 
         .split-layout {
             display: flex;
-            justify-content: space-around;
+            gap: 2rem;
             align-items: flex-start;
-            width: 100%;
             max-width: 1000px;
-        }
-
-        .split-layout > div {
-            width: 45%;
+            margin: 0 auto;
         }
 
         .video-container {
-            width: 60%;
-            max-width: 300px;
+            width: 80%;
+            max-width: 800px;
             height: auto;
             aspect-ratio: 16 / 9;
             margin-top: 20px;
@@ -526,104 +649,7 @@
             }
         }
 
-        /* Special styles for chart slide - wider layout */
-        .slide.chart-slide {
-            padding: 2vw;
-            align-items: stretch;
-        }
-
-        .slide.chart-slide h3 {
-            width: 100%;
-            max-width: none;
-            text-align: center;
-        }
-
-        .slide.chart-slide .iq-chart-container {
-            width: 100%;
-            max-width: none;
-            margin: 10px 0;
-        }
-
-        /* Special styles for video slide - wider layout */
-        .slide.video-slide {
-            padding: 2vw;
-            align-items: stretch;
-        }
-
-        .slide.video-slide h2 {
-            width: 100%;
-            max-width: none;
-            text-align: center;
-        }
-
-        .slide.video-slide .video-container {
-            width: 90%;
-            max-width: 450px;
-            margin: 20px auto;
-            height: auto;
-            aspect-ratio: 16 / 9;
-        }
-
-        @media (max-width: 767px) {
-            .slide.chart-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.chart-slide h3 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.chart-slide .iq-chart-container {
-                margin: 5px 0;
-                width: 100%;
-            }
-
-            .slide.chart-slide .slide-footer {
-                font-size: 0.7rem;
-                margin-top: 1vh;
-            }
-
-            .slide.video-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.video-slide h2 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.video-slide .video-container {
-                margin: 10px 0;
-                width: 90%;
-                max-width: 450px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .slide.chart-slide {
-                padding: 0.5vw;
-            }
-
-            .slide.chart-slide h3 {
-                font-size: clamp(1rem, 5vw, 1.5rem);
-                margin-bottom: 1vh;
-            }
-
-            .slide.video-slide {
-                padding: 0.5vw;
-            }
-
-            .slide.video-slide h2 {
-                font-size: clamp(1rem, 5vw, 1.5rem);
-                margin-bottom: 1vh;
-            }
-        }
-
+        /* 手機版優化 */
         @media (max-width: 767px) {
             .slide {
                 padding: 3vw;
@@ -646,15 +672,6 @@
                 font-size: 14px;
             }
 
-            .split-layout {
-                flex-direction: column;
-                gap: 2rem;
-            }
-
-            .split-layout > div {
-                width: 100%;
-            }
-
             h3 {
                 width: 95%;
                 font-size: clamp(1.2rem, 4vw, 1.8rem);
@@ -665,43 +682,63 @@
                 margin-bottom: 0.8rem;
             }
 
-            /* Mobile optimization for homework page */
-            .slide .homework-content {
-                max-width: 100%;
-                font-size: 0.85rem;
-                padding: 0 0.5rem;
-                line-height: 1.4;
+            .split-layout {
+                flex-direction: column;
+                gap: 2rem;
             }
 
-            .slide .homework-content ul {
-                column-count: 1;
-                font-size: 0.8rem;
-                line-height: 1.4;
-                margin: 0.8rem 0;
+            .split-layout > div {
+                width: 100%;
             }
 
-            .slide .homework-content li {
-                margin-bottom: 0.6rem;
-                padding-left: 1rem;
+            .split-layout h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
             }
 
-            .slide .homework-content code {
-                font-size: 0.75rem;
-                padding: 2px 4px;
-                word-break: break-all;
+            .split-layout ul {
+                font-size: 1rem;
+                line-height: 1.6;
             }
 
-            .slide .homework-content p {
-                font-size: 0.85rem;
-                line-height: 1.4;
+            .split-layout li {
                 margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
             }
 
-            .slide .homework-content strong {
-                font-size: 0.9rem;
+            .slide.chart-slide {
+                padding: 1vw;
+                align-items: stretch;
             }
 
-            /* Mobile styles for dedicated homework slide */
+            .slide.chart-slide h3 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.chart-slide .iq-chart-container {
+                margin: 5px 0;
+                width: 100%;
+            }
+
+            .slide.video-slide {
+                padding: 1vw;
+                align-items: stretch;
+            }
+
+            .slide.video-slide h2 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px auto;  /* 置中對齊 */
+                width: 90%;
+                max-width: 450px;
+            }
+
             .homework-slide {
                 padding: 1vh 1vw;
                 align-items: flex-start;
@@ -718,108 +755,69 @@
                 padding: 0 0.3rem;
             }
 
-            .homework-slide .homework-content ul {
-                font-size: 0.23rem !important;
-                column-count: 1;
+            .homework-slide .homework-content pre {
+                font-size: 0.5rem;
                 line-height: 1.2;
-                margin: 0.5rem 0;
-            }
-
-            .homework-slide .homework-content li {
-                margin-bottom: 0.3rem;
-                padding-left: 0.6rem;
-            }
-
-            .homework-slide .homework-content p {
-                font-size: 0.75rem;
-                line-height: 1.3;
-                margin-bottom: 0.5rem;
-            }
-
-            .homework-slide .homework-content code {
-                font-size: 0.65rem;
-                padding: 1px 3px;
-            }
-
-            .homework-slide .homework-content strong {
-                font-size: 0.8rem;
-            }
-
-            /* Mobile styles for code block in homework slide */
-            .slide.homework-slide .homework-content pre {
-                background-color: var(--bg-color);
-                border: 1px solid var(--line-color);
-                border-radius: 4px;
                 padding: 8px;
                 margin: 0.4rem 0;
-                overflow-x: auto;
-                font-size: 0.5rem;
-                line-height: 1.2;
             }
 
-            .slide.homework-slide .homework-content pre code {
-                background: none;
-                padding: 0;
+            .homework-slide .homework-content pre code {
                 font-size: 0.5rem;
-                color: #333;
-                white-space: pre;
             }
 
-            /* Mobile styles for homework instruction box */
-            .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] {
-                font-size: 0.9rem !important;
+            /* 字多版本響應式樣式 */
+            .bunch-word-container {
+                padding: 1vh 1vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1rem, 2.8vw, 1.3rem);
+                margin-bottom: 1vh;
+            }
+
+            .bunch-word-container .homework-content {
+                font-size: 1.2rem;
                 line-height: 1.4;
-                padding: 12px !important;
+                padding: 0 0.3rem;
             }
 
-            .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] strong {
-                font-size: 1rem !important;
-            }
-
-            /* Mobile optimization for pie chart */
-            .pie-chart-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-            }
-
-            .pie-chart {
-                width: 250px;
-                height: 250px;
-            }
-
-            .legend {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .legend-item {
-                font-size: 1rem;
+            .bunch-word-container .homework-content h4 {
+                font-size: 1.35rem;
+                line-height: 1.3;
                 margin-bottom: 0.8rem;
             }
 
-            .legend-color {
-                width: 16px;
-                height: 16px;
-                margin-right: 8px;
-            }
-
-            /* Mobile optimization for group discussion */
-            .split-layout h3 {
+            .bunch-word-container .homework-content p {
                 font-size: 1.2rem;
-                margin-bottom: 1rem;
+                line-height: 1.4;
+                margin-bottom: 0.8rem;
             }
 
-            .split-layout ul {
+            .bunch-word-container .homework-content pre {
+                font-size: 0.9rem;
+                line-height: 1.3;
+                padding: 10px;
+                margin: 0.8rem 0;
+            }
+
+            .bunch-word-container .homework-content pre code {
+                font-size: 0.9rem;
+            }
+
+            /* 手機版 ul, li 優化 */
+            ul {
                 font-size: 1rem;
                 line-height: 1.6;
             }
 
-            .split-layout li {
+            ul li {
                 margin-bottom: 0.8rem;
                 padding-left: 1.2rem;
             }
         }
+
+
     </style>
 </head>
 <body>
@@ -910,7 +908,7 @@
     <section class="slide">
         <div>
             <h2>Group Presentations</h2>
-            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session?)</p>
+            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session)</p>
         </div>
     </section>
 
@@ -1031,7 +1029,7 @@
         </div>
     </section>
 
-    <section class="slide homework-slide">
+    <section class="slide bunch-word-container">
         <div>
             <h2>Tuesday's Assignment</h2>
             <div class="homework-content">
