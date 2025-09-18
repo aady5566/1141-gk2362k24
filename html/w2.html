@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 人性與自我意識</title>
-    <script src="../sidebar_tools/sidebar.js?v=6"></script>
+    <script src="../sidebar_tools/sidebar.js"></script>
     <style>
         :root {
             --bg-color: #F4F2EF;
@@ -15,14 +15,18 @@
             --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
         }
 
-        html, body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            width: 100%;
+        }
+
+        html, body {
             height: 100%;
+            width: 100%;
             overflow: hidden;
-            background-color: var(--bg-color);
             font-family: var(--font-family);
+            background-color: var(--bg-color);
             color: var(--text-color);
         }
 
@@ -39,37 +43,70 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 60px;
+            justify-content: center;    /* 垂直置中 */
+            align-items: center;        /* 水平置中 */
+            padding: 5vw;              /* 響應式 padding */
             text-align: center;
             position: relative;
             overflow-y: auto;
             box-sizing: border-box;
-            font-size: 1.5rem;
+            font-size: 1.5rem;         /* 基礎字體大小 */
         }
 
+        /* 第一頁（標題頁）置中顯示 */
         .slide:first-child {
             justify-content: center;
             overflow-y: hidden;
         }
 
-        .slide h1, .slide h2, .slide h3 {
-            color: var(--highlight-color);
-            font-weight: normal;
-            margin-bottom: 20px;
+        /* 主標題 - 用於投影片主標題 */
+        h1 {
+            font-size: 4rem;
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
         }
 
-        .slide h1 { font-size: 4rem; }
-        .slide h2 { font-size: 3rem; }
-        .slide h3 { font-size: 2rem; }
+        /* 次標題 - 用於投影片副標題 */
+        h2 {
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
 
-        .slide p, .slide li {
-            font-size: 1.8rem;
-            line-height: 1.6;
+        /* 內容標題 - 用於投影片內容區塊標題 */
+        h3 {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
             max-width: 800px;
         }
 
+        /* 小標題 - 用於內容區塊內的小標題 */
+        h4 {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        /* 內文 */
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.8rem;
+            max-width: 80ch; /* 限制段落寬度以提高可讀性 */
+        }
+
+        /* 投影片副標題 */
         .slide-subtitle {
             color: #888;
             font-size: 1.8rem;
@@ -133,7 +170,8 @@
         /* 影片投影片特殊樣式 */
         .slide.video-slide {
             padding: 2vw;
-            align-items: stretch;
+            align-items: center !important;  /* 水平置中 */
+            justify-content: center !important;  /* 垂直置中 */
         }
 
         .slide.video-slide h2 {
@@ -155,14 +193,6 @@
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        .slide.video-slide .video-container {
-            width: 80%;
-            max-width: 800px;
-            margin: 20px auto;
-            height: auto;
-            aspect-ratio: 16 / 9;
         }
 
         /* 作業投影片特殊樣式 */
@@ -198,8 +228,8 @@
         .bunch-word-container {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-start;
+            align-items: center !important;  /* 水平置中，使用 !important */
+            justify-content: flex-start !important;
             padding: 1.5vh 2vw;
             overflow-y: auto;
             text-align: left;
@@ -277,191 +307,6 @@
             font-size: 0.7rem;
             color: #333;
             white-space: pre;
-        }
-
-        @media (max-width: 767px) {
-            .iq-chart-container {
-                max-width: 100%;
-                margin: 10px 0;
-            }
-
-            #iq-chart {
-                height: 350px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #iq-chart {
-                height: 300px;
-            }
-        }
-
-        /* 手機版優化 */
-        @media (max-width: 767px) {
-            .slide {
-                padding: 3vw;
-                overflow-y: auto;
-                justify-content: flex-start;
-            }
-
-            .slide:first-child {
-                justify-content: center;
-                overflow-y: hidden;
-            }
-
-            .nav {
-                width: 95%;
-                left: 2.5%;
-            }
-
-            .nav-btn {
-                padding: 12px 16px;
-                font-size: 14px;
-            }
-
-            h3 {
-                width: 95%;
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-            }
-
-            h2 {
-                font-size: clamp(1rem, 3vw, 1.5rem);
-                margin-bottom: 0.8rem;
-            }
-
-            .split-layout {
-                flex-direction: column;
-                gap: 2rem;
-            }
-
-            .split-layout > div {
-                width: 100%;
-            }
-
-            .split-layout h3 {
-                font-size: 1.2rem;
-                margin-bottom: 1rem;
-            }
-
-            .split-layout ul {
-                font-size: 1rem;
-                line-height: 1.6;
-            }
-
-            .split-layout li {
-                margin-bottom: 0.8rem;
-                padding-left: 1.2rem;
-            }
-
-            .slide.chart-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.chart-slide h3 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.chart-slide .iq-chart-container {
-                margin: 5px 0;
-                width: 100%;
-            }
-
-            .slide.video-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.video-slide h2 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.video-slide .video-container {
-                margin: 10px auto;  /* 置中對齊 */
-                width: 90%;
-                max-width: 450px;
-            }
-
-            .homework-slide {
-                padding: 1vh 1vw;
-                align-items: flex-start;
-            }
-
-            .homework-slide h2 {
-                font-size: clamp(1rem, 2.5vw, 1.2rem);
-                margin-bottom: 0.8vh;
-            }
-
-            .homework-slide .homework-content {
-                font-size: 0.75rem;
-                line-height: 1.3;
-                padding: 0 0.3rem;
-            }
-
-            .homework-slide .homework-content pre {
-                font-size: 0.5rem;
-                line-height: 1.2;
-                padding: 8px;
-                margin: 0.4rem 0;
-            }
-
-            .homework-slide .homework-content pre code {
-                font-size: 0.5rem;
-            }
-
-            /* 字多版本響應式樣式 */
-            .bunch-word-container {
-                padding: 1vh 1vw;
-            }
-
-            .bunch-word-container h2 {
-                font-size: clamp(1rem, 2.8vw, 1.3rem);
-                margin-bottom: 1vh;
-            }
-
-            .bunch-word-container .homework-content {
-                font-size: 1.2rem;
-                line-height: 1.4;
-                padding: 0 0.3rem;
-            }
-
-            .bunch-word-container .homework-content h4 {
-                font-size: 1.35rem;
-                line-height: 1.3;
-                margin-bottom: 0.8rem;
-            }
-
-            .bunch-word-container .homework-content p {
-                font-size: 1.2rem;
-                line-height: 1.4;
-                margin-bottom: 0.8rem;
-            }
-
-            .bunch-word-container .homework-content pre {
-                font-size: 0.9rem;
-                line-height: 1.3;
-                padding: 10px;
-                margin: 0.8rem 0;
-            }
-
-            .bunch-word-container .homework-content pre code {
-                font-size: 0.9rem;
-            }
-
-            /* 手機版 ul, li 優化 */
-            ul {
-                font-size: 1rem;
-                line-height: 1.6;
-            }
-
-            ul li {
-                margin-bottom: 0.8rem;
-                padding-left: 1.2rem;
-            }
         }
 
         /* 其他樣式 */
@@ -652,80 +497,280 @@
             position: absolute;
             left: 0;
         }
+
+        /* 手機版優化 - 適用於 max-width: 767px */
+        @media (max-width: 767px) {
+            /* 投影片容器優化 */
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;  /* 允許垂直滾動，避免內容被裁切 */
+                justify-content: center;  /* 保持置中對齊 */
+            }
+
+            /* 字多版本容器在手機版從頂部開始，但水平置中 */
+            .slide.bunch-word-container {
+                justify-content: flex-start !important;
+                align-items: center !important;  /* 水平置中 */
+            }
+
+            /* 手機版第一頁也置中 */
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            /* 導航按鈕優化 */
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                padding: 12px 16px;  /* 增大點擊區域 */
+                font-size: 14px;
+            }
+
+            /* 標題優化 */
+            h3 {
+                width: 95%;
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+            }
+
+            h2 {
+                font-size: clamp(1rem, 3vw, 1.5rem);
+                margin-bottom: 0.8rem;
+            }
+
+            .split-layout {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .split-layout > div {
+                width: 100%;
+            }
+
+            .split-layout h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .split-layout ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            .split-layout li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
+
+            .slide.chart-slide {
+                padding: 1vw;
+                align-items: stretch;
+            }
+
+            .slide.chart-slide h3 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.chart-slide .iq-chart-container {
+                margin: 5px 0;
+                width: 100%;
+            }
+
+            .slide.chart-slide .slide-footer {
+                font-size: 0.7rem;
+                margin-top: 1vh;
+            }
+
+            .slide.video-slide {
+                padding: 1vw;
+                align-items: center !important;  /* 水平置中 */
+                justify-content: center !important;  /* 垂直置中 */
+            }
+
+            .slide.video-slide h2 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px 0;
+                width: 90%;              /* 手機版 90% 寬度 */
+                max-width: 450px;        /* 最大 450px */
+            }
+
+            .homework-slide {
+                padding: 1vh 1vw;
+                align-items: flex-start;
+            }
+
+            .homework-slide h2 {
+                font-size: clamp(1rem, 2.5vw, 1.2rem);
+                margin-bottom: 0.8vh;
+            }
+
+            .homework-slide .homework-content {
+                font-size: 0.75rem;
+                line-height: 1.3;
+                padding: 0 0.3rem;
+            }
+
+            .homework-slide .homework-content pre {
+                font-size: 0.5rem;
+                line-height: 1.2;
+                padding: 8px;
+                margin: 0.4rem 0;
+            }
+
+            .homework-slide .homework-content pre code {
+                font-size: 0.5rem;
+            }
+
+            /* 字多版本響應式樣式 */
+            .bunch-word-container {
+                padding: 2vh 3vw;  /* 增加 padding 確保內容不貼邊 */
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1rem, 2.8vw, 1.3rem);
+                margin-bottom: 2vh;  /* 增加標題下方間距 */
+                margin-top: 1vh;     /* 增加標題上方間距 */
+            }
+
+            .bunch-word-container .homework-content {
+                font-size: 1.2rem;              /* 放大 1.5 倍：0.8rem × 1.5 */
+                line-height: 1.4;
+                padding: 0 0.3rem;
+            }
+
+            .bunch-word-container .homework-content h4 {
+                font-size: 1.35rem;             /* 放大 1.5 倍：0.9rem × 1.5 */
+                line-height: 1.3;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content p {
+                font-size: 1.2rem;              /* 放大 1.5 倍：0.8rem × 1.5 */
+                line-height: 1.4;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content pre {
+                font-size: 0.9rem;              /* 放大 1.5 倍：0.6rem × 1.5 */
+                line-height: 1.3;
+                padding: 10px;
+                margin: 0.8rem 0;
+            }
+
+            .bunch-word-container .homework-content pre code {
+                font-size: 0.9rem;              /* 放大 1.5 倍：0.6rem × 1.5 */
+            }
+
+            /* 手機版 ul, li 優化 */
+            ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            ul li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
+
+            /* 手機版確保普通投影片置中對齊 */
+            .slide:not(.chart-slide):not(.video-slide):not(.homework-slide):not(.bunch-word-container) {
+                justify-content: center !important;
+                align-items: center !important;
+            }
+        }
+
+        /* 手機版設計原則：
+        1. 內容可滾動：使用 overflow-y: auto 確保內容完整顯示
+        2. 第一頁置中：標題頁使用 justify-content: center 和 overflow-y: hidden
+        3. 其他頁面從頂部開始：長內容頁面使用 justify-content: flex-start 支援滾動
+        4. 增大觸控區域：按鈕和連結使用較大的 padding
+        5. 單欄佈局：複雜內容改為垂直排列
+        6. 減少間距：適當縮小 padding 和 margin 以節省空間
+        7. 優化字體大小：使用 clamp() 確保文字在小螢幕上可讀
+        */
+
+        /* 確保普通投影片置中對齊 */
+        .slide:not(.chart-slide):not(.video-slide):not(.homework-slide):not(.bunch-word-container) {
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        /* 隱藏單一投影片（保留版面寬度，避免位移錯亂） */
+        .slide[data-hidden="true"] {
+            visibility: hidden;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
 <div class="slides-container" id="slides-container">
     <section class="slide">
-        <div>
-            <h1>AI 人性與自我意識</h1>
-            <p class="slide-subtitle">20250916</p>
-        </div>
+        <h1>AI 人性與自我意識</h1>
+        <h2>20250916</h2>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>點名、分組</h2>
-            <p>隨機分組</p>
-            <p>四組一組六人</p>
-        </div>
+        <h3>點名、分組</h3>
+        <p>隨機分組</p>
+        <p>四組一組六人</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>評分方式</h2>
-
-                <p>作業（+ 課堂參與程度）+ 期中作業 70%</p>
-                <p>期末 30%</p>
-
-        </div>
+        <h3>評分方式</h3>
+        <p>作業（+ 課堂參與程度）+ 期中作業 70%</p>
+        <p>期末 30%</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>調課時間調查</h2>
-            <p>第 15 週，週四早上 08:00 - 09:50</p>
-        </div>
+        <h3>調課時間調查</h3>
+        <p>第 15 週，週四早上 08:00 - 09:50</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>學工程、先懂原理，</h2>
-            <h2>了解 AI ，先了解你自己。</h2>
-            <p style="margin-top: 40px; font-size: 1.5rem;">提示詞工程 > 理解 AI 的基本原理 > 如何寫好提示詞具體做法 > 最後一代的敲鍵寫程式</p>
-        </div>
+        <h3>學工程、先懂原理，</h3>
+        <h3>了解 AI ，先了解你自己。</h3>
+        <p style="margin-top: 40px; font-size: 1.5rem;">提示詞工程 > 理解 AI 的基本原理 > 如何寫好提示詞具體做法 > 最後一代的敲鍵寫程式</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h4>GPT-4.5（使用人設提示）</h4>
-            <div class="chart73">73%</div>
-        </div>
+        <h4>GPT-4.5（使用人設提示）</h4>
+        <div class="chart73">73%</div>
     </section>
 
     <section class="slide">
         <div>
             <h2>小組討論（ 15 分鐘）</h2>
-            <div class="split-layout">
-                <div>
-                    <h3 style="font-size: 1.4rem;">成員分工</h3>
-                    <ul>
-                        <h6 style="font-size: 1rem;">研究 x 2</h6>
-                        <h6 style="font-size: 1rem;">筆記統整 x 2</h6>
-                        <h6 style="font-size: 1rem;">主持會議 x 1</h6>
-                        <h6 style="font-size: 1rem;">代表發言 x 1</h6>
-                    </ul>
-
-                </div>
-                <div style="width: 60%;">
-                     <h3 style="font-size: 1.4rem;">討論主題</h3>
-                    <div style="background-color: var(--bg-color); padding: 20px; border-radius: 5px; font-size: 1.1rem; line-height: 1.6; width: 100%; border: 1px solid var(--line-color);">
-                        你覺得 AI 有思考能力嗎？有智力嗎？有自我意識和人性嗎？<br>
-                        AI 展現高度「智慧」，但這是否等同於「意識」？<br>
-                        AI 現在有/沒有的理由？<br>
-                        AI 若補齊什麼會更像人？<br>
-                        如果補足了，是否就可以說 AI 有人性？
+            <div class="homework-content">
+                <div class="split-layout">
+                    <div>
+                        <h4>成員分工</h4>
+                        <ul>
+                            <li>研究 x 2</li>
+                            <li>筆記統整 x 2</li>
+                            <li>主持會議 x 1</li>
+                            <li>代表發言 x 1</li>
+                        </ul>
+                    </div>
+                    <div style="width: 60%;">
+                        <h4>討論主題</h4>
+                        <div style="background-color: var(--bg-color); padding: 20px; border-radius: 5px; font-size: 1.1rem; line-height: 1.6; width: 100%; border: 1px solid var(--line-color);">
+                            你覺得 AI 有思考能力嗎？有智力嗎？有自我意識和人性嗎？<br>
+                            AI 展現高度「智慧」，但這是否等同於「意識」？<br>
+                            AI 現在有/沒有的理由？<br>
+                            AI 若補齊什麼會更像人？<br>
+                            如果補足了，是否就可以說 AI 有人性？
+                        </div>
                     </div>
                 </div>
             </div>
@@ -733,133 +778,107 @@
     </section>
 
     <section class="slide">
-        <div>
-            <h2>跨兩組分享</h2>
-            <p>分享相同論點，不同論點，新的論點？</p>
-        </div>
+        <h3>跨兩組分享</h3>
+        <p>分享相同論點，不同論點，新的論點？</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>組別分享</h2>
-            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session)</p>
-        </div>
+        <h3>組別分享</h3>
+        <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session)</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>AI 是否有自我意識？</h2>
-            <p>智力與自我意識應分開討論。</p>
-        </div>
+        <h3>AI 是否有自我意識？</h3>
+        <p>智力與自我意識應分開討論。</p>
     </section>
 
     <section class="slide chart-slide">
-        <div>
-            <h3>AI 模型與人類智力分佈</h3>
-            <div class="iq-chart-container">
-                <div id="iq-tooltip" class="iq-tooltip"></div>
-                <div id="iq-chart"></div>
-            </div>
-             <p class="slide-footer" style="font-size: 0.8rem;">ref: https://www.trackingai.org/home</p>
+        <h3>AI 模型與人類智力分佈</h3>
+        <div class="iq-chart-container">
+            <div id="iq-tooltip" class="iq-tooltip"></div>
+            <div id="iq-chart"></div>
         </div>
+        <p class="slide-footer" style="font-size: 0.8rem;">ref: https://www.trackingai.org/home</p>
     </section>
 
     <section class="slide video-slide">
-        <div>
-            <h2>圖靈測驗 (Turing Test)</h2>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/3wLqsRLvV-c" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+        <h3>圖靈測驗 (Turing Test)</h3>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/3wLqsRLvV-c" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>圖靈測驗結果</h2>
-            <div style="margin-top:20px; display: flex; align-items: center; justify-content: center; max-width: 900px;">
-                <div class="chart73" style="font-size: 6rem; margin-right: 20px;">73%</div>
-                <p style="text-align: left; font-size: 1.3rem;">當研究人員給予 GPT-4.5 一個特定人設時，高達 73% 的提問者將 GPT-4.5 誤認為是人類！</p>
-            </div>
+        <h3>圖靈測驗結果</h3>
+        <div style="margin-top:20px; display: flex; align-items: center; justify-content: center; max-width: 900px;">
+            <div class="chart73" style="font-size: 6rem; margin-right: 20px;">73%</div>
+            <p style="text-align: left; font-size: 1.3rem;">當研究人員給予 GPT-4.5 一個特定人設時，高達 73% 的提問者將 GPT-4.5 誤認為是人類！</p>
         </div>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>然而通過圖靈測驗就真的是人了嗎？</h2>
-            <p style="margin-top: 30px;">你在跟 GPT 聊天時，"少"了什麼人味？</p>
-        </div>
+        <h3>然而通過圖靈測驗就真的是人了嗎？</h3>
+        <p style="margin-top: 30px;">你在跟 GPT 聊天時，"少"了什麼人味？</p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>AI 最常被抱怨的"不良特質"</h2>
-            <strong>是給人的「陌生感」（Uncanny）</strong>
-            <div class="pie-chart-container">
-                <div class="pie-chart"></div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #a39e93;"></div>
-                        <span>情感表達 (38.5%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #c1bcae;"></div>
-                        <span>外觀 (38.5%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #dcd9d1;"></div>
-                        <span>溝通方式 (23.1%)</span>
-                    </div>
+        <h3>AI 最常被抱怨的"不良特質"</h3>
+        <strong>是給人的「陌生感」（Uncanny）</strong>
+        <div class="pie-chart-container">
+            <div class="pie-chart"></div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #a39e93;"></div>
+                    <span>情感表達 (38.5%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #c1bcae;"></div>
+                    <span>外觀 (38.5%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #dcd9d1;"></div>
+                    <span>溝通方式 (23.1%)</span>
                 </div>
             </div>
-            <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://arxiv.org/pdf/2506.12098" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://arxiv.org/pdf/2506.12098</a></p>
         </div>
+        <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://arxiv.org/pdf/2506.12098" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://arxiv.org/pdf/2506.12098</a></p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>人類意識的普遍定義</h2>
-            <ul>
-                <li>自我意識：知道自己是誰、有獨立思想和存在</li>
-                <li>主觀經驗：對世界的感受、內心體驗</li>
-                <li>感受與情緒：喜怒哀樂、痛苦與愉悅</li>
-            </ul>
-        </div>
+        <h3>人類意識的普遍定義</h3>
+        <ul>
+            <li>自我意識：知道自己是誰、有獨立思想和存在</li>
+            <li>主觀經驗：對世界的感受、內心體驗</li>
+            <li>感受與情緒：喜怒哀樂、痛苦與愉悅</li>
+        </ul>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>自我意識 (Self-awareness)</h2>
-            <p>對自身的覺察，包括了解自己的思想、情緒、行為、動機、價值觀，以及這些因素如何影響自身與他人的互動</p>
-            <ul style="margin-top: 30px; max-width: 600px;">
-                <li><strong>認知面：</strong>自我認識</li>
-                <li><strong>情感面：</strong>自我體驗</li>
-                <li><strong>意志面：</strong>自我調控，自制自律、自我期待</li>
-            </ul>
-             <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://baike.baidu.com/item/自我意識/1800719" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://baike.baidu.com/item/自我意識/1800719</a></p>
-        </div>
+        <h3>自我意識 (Self-awareness)</h3>
+        <p>對自身的覺察，包括了解自己的思想、情緒、行為、動機、價值觀，以及這些因素如何影響自身與他人的互動</p>
+        <ul style="margin-top: 30px; max-width: 600px;">
+            <li><strong>認知面：</strong>自我認識</li>
+            <li><strong>情感面：</strong>自我體驗</li>
+            <li><strong>意志面：</strong>自我調控，自制自律、自我期待</li>
+        </ul>
+        <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://baike.baidu.com/item/自我意識/1800719" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://baike.baidu.com/item/自我意識/1800719</a></p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>AI 是否具備似人類的「主觀經驗」、「自我認知」或「感受」？</h2>
-            <p style="margin-top: 30px; border-left: 3px solid var(--accent-color); padding-left: 20px; text-align: left;">現今的關鍵區別：AI 的<strong>「模擬」</strong>與人類的<strong>「真實」</strong>體驗<br>AI 系統模仿對話，其背後是數學模型和統計預測，缺乏內在體驗。<br><span style="color: var(--accent-color); font-size: 1.2rem;">（之後的課程會介紹）</span></p>
-        </div>
+        <h3>AI 是否具備似人類的「主觀經驗」、「自我認知」或「感受」？</h3>
+        <p style="margin-top: 30px; border-left: 3px solid var(--accent-color); padding-left: 20px; text-align: left;">現今的關鍵區別：AI 的<strong>「模擬」</strong>與人類的<strong>「真實」</strong>體驗<br>AI 系統模仿對話，其背後是數學模型和統計預測，缺乏內在體驗。<br><span style="color: var(--accent-color); font-size: 1.2rem;">（之後的課程會介紹）</span></p>
     </section>
 
     <section class="slide">
-        <div>
-            <h2>但 AI 模擬出來的體驗也能是真實的體驗嗎？</h2>
-            <p style="color: var(--accent-color); margin-top: 30px;">（留給大家）</p>
-        </div>
+        <h3>但 AI 模擬出來的體驗也能是真實的體驗嗎？</h3>
+        <p style="color: var(--accent-color); margin-top: 30px;">（留給大家）</p>
     </section>
 
     <section class="slide video-slide">
-        <div>
-            <h2>人類從小就開始建構自我與世界的認知</h2>
-            <p>(Piaget 物體恆常理論)</p>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/gnArvcWaH6I" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+        <h3>人類從小就開始建構自我與世界的認知</h3>
+        <p>(Piaget 物體恆常理論)</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/gnArvcWaH6I" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </section>
 

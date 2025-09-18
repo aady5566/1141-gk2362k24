@@ -39,13 +39,14 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
-            padding: 5vw;
+            padding: 40px 60px;
             text-align: center;
             position: relative;
             overflow-y: auto;
             box-sizing: border-box;
+            font-size: 1.5rem;
         }
 
         .slide:first-child {
@@ -53,79 +54,27 @@
             overflow-y: hidden;
         }
 
-        h1 {
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 1rem;
+        .slide h1, .slide h2, .slide h3 {
+            color: var(--highlight-color);
+            font-weight: normal;
+            margin-bottom: 20px;
         }
 
-        h2 {
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
-            font-weight: 300;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-        }
+        .slide h1 { font-size: 4rem; }
+        .slide h2 { font-size: 3rem; }
+        .slide h3 { font-size: 2rem; }
 
-        h3 {
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-            font-weight: 300;
-            color: var(--text-color);
-            margin-bottom: 4vh;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 1rem;
-            width: 80%;
-            max-width: 800px;
-        }
-
-        h4 {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            font-weight: 400;
-            color: var(--accent-color);
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 0.3rem;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 1rem;
+        .slide p, .slide li {
+            font-size: 1.8rem;
             line-height: 1.6;
-            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-            max-width: 80ch;
+            max-width: 800px;
         }
 
         .slide-subtitle {
             color: #888;
-            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-size: 1.8rem;
             font-weight: 300;
             margin-top: -1rem;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-            max-width: 800px;
-        }
-
-        ul li {
-            margin-bottom: 15px;
-            position: relative;
-            padding-left: 25px;
-            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-            line-height: 1.6;
-        }
-
-        ul li::before {
-            content: '•';
-            color: var(--accent-color);
-            font-weight: bold;
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
-            position: absolute;
-            left: 0;
         }
 
         .nav {
@@ -163,22 +112,39 @@
             opacity: 1;
         }
 
-
-        .split-layout {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            width: 100%;
-            max-width: 1000px;
+        /* 圖表投影片特殊樣式 */
+        .slide.chart-slide {
+            padding: 2vw;
+            align-items: stretch;
         }
 
-        .split-layout > div {
-            width: 45%;
+        .slide.chart-slide h3 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+        }
+
+        .slide.chart-slide .iq-chart-container {
+            width: 100%;
+            max-width: none;
+            margin: 10px 0;
+        }
+
+        /* 影片投影片特殊樣式 */
+        .slide.video-slide {
+            padding: 2vw;
+            align-items: stretch;
+        }
+
+        .slide.video-slide h2 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
         }
 
         .video-container {
-            width: 60%;
-            max-width: 300px;
+            width: 80%;
+            max-width: 800px;
             height: auto;
             aspect-ratio: 16 / 9;
             margin-top: 20px;
@@ -191,124 +157,15 @@
             border: none;
         }
 
-        .chart73 {
-            font-size: 10rem;
-            font-weight: bold;
-            color: var(--highlight-color);
-            margin: 20px 0;
-            line-height: 1;
-        }
-
-        .infographic {
-            border: 1px solid var(--line-color);
-            padding: 20px;
-            margin-top: 20px;
+        .slide.video-slide .video-container {
             width: 80%;
-            max-width: 700px;
+            max-width: 800px;
+            margin: 20px auto;
+            height: auto;
+            aspect-ratio: 16 / 9;
         }
 
-        .infographic h4 {
-            margin-top: 0;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            font-size: 1.5rem;
-        }
-
-        .infographic ul {
-            width: 100%;
-        }
-
-        .infographic li {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--line-color);
-            font-size: 1.2rem;
-        }
-
-        .infographic li:last-child {
-            border-bottom: none;
-        }
-
-        .infographic .score {
-            font-weight: bold;
-            color: var(--highlight-color);
-        }
-
-        /* 作業內容樣式 */
-        .homework-content {
-            text-align: left;
-            max-width: 900px;
-            font-size: 1.1rem;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-
-        .homework-content ul {
-            font-size: 1rem;
-            column-count: 2;
-            column-gap: 1.5rem;
-            margin: 0.8rem 0;
-            line-height: 1.4;
-        }
-
-        /* 確保作業 slide 的樣式優先 */
-        .slide.homework-slide .homework-content ul {
-            font-size: 0.28rem !important;
-            column-count: 2;
-            column-gap: 1.2rem;
-            margin: 0.6rem 0;
-            line-height: 1.3;
-        }
-
-        /* 作業 slide 中的 code 區塊樣式 */
-        .slide.homework-slide .homework-content pre {
-            background-color: var(--bg-color);
-            border: 1px solid var(--line-color);
-            border-radius: 4px;
-            padding: 10px;
-            margin: 0.5rem 0;
-            overflow-x: auto;
-            font-size: 0.7rem;
-            line-height: 1.4;
-        }
-
-        .slide.homework-slide .homework-content pre code {
-            background: none;
-            padding: 0;
-            font-size: 0.7rem;
-            color: #333;
-            white-space: pre;
-        }
-
-        /* 作業說明框樣式 */
-        .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] {
-            font-size: 1.1rem !important;
-            line-height: 1.5;
-        }
-
-        .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] strong {
-            font-size: 1.2rem !important;
-        }
-
-        .homework-content code {
-            background-color: #dcd9d1;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 1rem;
-            word-break: break-word;
-        }
-
-        .homework-content p {
-            margin-bottom: 0.8rem;
-            line-height: 1.5;
-        }
-
-        .homework-content strong {
-            font-size: 1.05rem;
-        }
-
-        /* 作業專用 slide 樣式 */
+        /* 作業投影片特殊樣式 */
         .homework-slide {
             display: flex;
             align-items: flex-start;
@@ -337,90 +194,305 @@
             margin: 0;
         }
 
-
-        .homework-slide .homework-content li {
-            margin-bottom: 0.4rem;
-            padding-left: 0.8rem;
-            break-inside: avoid;
-        }
-
-        .homework-slide .homework-content p {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 0.6rem;
-        }
-
-        .homework-slide .homework-content code {
-            font-size: 0.8rem;
-            padding: 2px 6px;
-        }
-
-        .homework-slide .homework-content strong {
-            font-size: 0.95rem;
-        }
-
-        .pie-chart-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .pie-chart {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: conic-gradient(
-                #a39e93 0% 38.5%,
-                #c1bcae 38.5% 77%,
-                #dcd9d1 77% 100%
-            );
-            margin-bottom: 20px;
-        }
-
-        .legend {
+        /* 字多版本容器樣式 */
+        .bunch-word-container {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            font-size: 1.2rem;
+            justify-content: flex-start;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border: 1px solid var(--text-color);
+        .bunch-word-container h2 {
+            font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
         }
 
-        .slide-footer {
-            position: absolute;
-            bottom: 20px;
-            font-size: 1rem;
+        .bunch-word-container .homework-content {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .bunch-word-container .homework-content h4 {
+            font-size: 1.65rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
             color: var(--accent-color);
         }
 
-        /* IQ 常態分布圖表樣式 */
-        .iq-chart-container {
-            width: 100%;
-            max-width: 1800px;
+        .bunch-word-container .homework-content p {
+            font-size: 1.425rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .bunch-word-container .homework-content pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--line-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .bunch-word-container .homework-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 1.2rem;
+            color: #333;
+            white-space: pre;
+        }
+
+        .homework-slide .homework-content pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--line-color);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            font-size: 0.7rem;
+            line-height: 1.4;
+        }
+
+        .homework-slide .homework-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.7rem;
+            color: #333;
+            white-space: pre;
+        }
+
+        @media (max-width: 767px) {
+            .iq-chart-container {
+                max-width: 100%;
+                margin: 10px 0;
+            }
+
+            #iq-chart {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #iq-chart {
+                height: 300px;
+            }
+        }
+
+        /* 手機版優化 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: flex-start;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            h3 {
+                width: 95%;
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+            }
+
+            h2 {
+                font-size: clamp(1rem, 3vw, 1.5rem);
+                margin-bottom: 0.8rem;
+            }
+
+            .split-layout {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .split-layout > div {
+                width: 100%;
+            }
+
+            .split-layout h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .split-layout ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            .split-layout li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
+
+            .slide.chart-slide {
+                padding: 1vw;
+                align-items: stretch;
+            }
+
+            .slide.chart-slide h3 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.chart-slide .iq-chart-container {
+                margin: 5px 0;
+                width: 100%;
+            }
+
+            .slide.video-slide {
+                padding: 1vw;
+                align-items: stretch;
+            }
+
+            .slide.video-slide h2 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+                width: 100%;
+                margin-bottom: 2vh;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px auto;  /* 置中對齊 */
+                width: 90%;
+                max-width: 450px;
+            }
+
+            .homework-slide {
+                padding: 1vh 1vw;
+                align-items: flex-start;
+            }
+
+            .homework-slide h2 {
+                font-size: clamp(1rem, 2.5vw, 1.2rem);
+                margin-bottom: 0.8vh;
+            }
+
+            .homework-slide .homework-content {
+                font-size: 0.75rem;
+                line-height: 1.3;
+                padding: 0 0.3rem;
+            }
+
+            .homework-slide .homework-content pre {
+                font-size: 0.5rem;
+                line-height: 1.2;
+                padding: 8px;
+                margin: 0.4rem 0;
+            }
+
+            .homework-slide .homework-content pre code {
+                font-size: 0.5rem;
+            }
+
+            /* 字多版本響應式樣式 */
+            .bunch-word-container {
+                padding: 1vh 1vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1rem, 2.8vw, 1.3rem);
+                margin-bottom: 1vh;
+            }
+
+            .bunch-word-container .homework-content {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                padding: 0 0.3rem;
+            }
+
+            .bunch-word-container .homework-content h4 {
+                font-size: 1.35rem;
+                line-height: 1.3;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content p {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                margin-bottom: 0.8rem;
+            }
+
+            .bunch-word-container .homework-content pre {
+                font-size: 0.9rem;
+                line-height: 1.3;
+                padding: 10px;
+                margin: 0.8rem 0;
+            }
+
+            .bunch-word-container .homework-content pre code {
+                font-size: 0.9rem;
+            }
+
+            /* 手機版 ul, li 優化 */
+            ul {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            ul li {
+                margin-bottom: 0.8rem;
+                padding-left: 1.2rem;
+            }
+        }
+
+        /* 其他樣式 */
+        .split-layout {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .chart73 {
+            font-size: 10rem;
+            font-weight: bold;
+            color: var(--highlight-color);
             margin: 20px 0;
+            line-height: 1;
+        }
+
+        .iq-chart-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 20px 0;
+            min-height: 500px;
         }
 
         #iq-chart {
             width: 100%;
             height: 500px;
             margin-bottom: 20px;
-        }
-
-        /* 隱藏數據列表 */
-        .iq-data-list {
-            display: none;
         }
 
         /* SVG 圖表樣式 */
@@ -509,536 +581,78 @@
             font-size: 13px;
         }
 
-        @media (max-width: 767px) {
-            .iq-chart-container {
-                max-width: 100%;
-                margin: 10px 0;
-            }
-
-            #iq-chart {
-                height: 350px;
-            }
+        .pie-chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
         }
 
-        @media (max-width: 480px) {
-            #iq-chart {
-                height: 300px;
-            }
+        .pie-chart {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #a39e93 0% 38.5%,
+                #c1bcae 38.5% 77%,
+                #dcd9d1 77% 100%
+            );
+            margin-bottom: 20px;
         }
 
-        /* 圖表投影片特殊樣式 - 加寬處理 */
-        .slide.chart-slide {
-            padding: 2vw;
-            align-items: stretch;
+        .legend {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-size: 1.2rem;
         }
 
-        .slide.chart-slide h3 {
-            width: 100%;
-            max-width: none;
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid var(--text-color);
+        }
+
+        .slide-footer {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 10px;
             text-align: center;
         }
 
-        .slide.chart-slide .iq-chart-container {
-            width: 100%;
-            max-width: none;
-            margin: 10px 0;
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
         }
 
-        /* 影片投影片特殊樣式 - 加寬處理 */
-        .slide.video-slide {
-            padding: 2vw;
-            align-items: stretch;
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            line-height: 1.6;
         }
 
-        .slide.video-slide h2 {
-            width: 100%;
-            max-width: none;
-            text-align: center;
-        }
-
-        .slide.video-slide .video-container {
-            width: 90%;
-            max-width: 450px;
-            margin: 20px auto;
-            height: auto;
-            aspect-ratio: 16 / 9;
-        }
-
-        @media (max-width: 767px) {
-            .slide.chart-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.chart-slide h3 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.chart-slide .iq-chart-container {
-                margin: 5px 0;
-                width: 100%;
-            }
-
-            .slide.chart-slide .slide-footer {
-                font-size: 0.7rem;
-                margin-top: 1vh;
-            }
-
-            .slide.video-slide {
-                padding: 1vw;
-                align-items: stretch;
-            }
-
-            .slide.video-slide h2 {
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-                width: 100%;
-                margin-bottom: 2vh;
-            }
-
-            .slide.video-slide .video-container {
-                margin: 10px 0;
-                width: 90%;
-                max-width: 450px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .slide.chart-slide {
-                padding: 0.5vw;
-            }
-
-            .slide.chart-slide h3 {
-                font-size: clamp(1rem, 5vw, 1.5rem);
-                margin-bottom: 1vh;
-            }
-
-            .slide.video-slide {
-                padding: 0.5vw;
-            }
-
-            .slide.video-slide h2 {
-                font-size: clamp(1rem, 5vw, 1.5rem);
-                margin-bottom: 1vh;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .slide {
-                padding: 3vw;
-                overflow-y: auto;
-                justify-content: flex-start;
-            }
-
-            .slide:first-child {
-                justify-content: center;
-                overflow-y: hidden;
-            }
-
-            .nav {
-                width: 95%;
-                left: 2.5%;
-            }
-
-            .nav-btn {
-                padding: 12px 16px;
-                font-size: 14px;
-            }
-
-            .split-layout {
-                flex-direction: column;
-                gap: 2rem;
-            }
-
-            .split-layout > div {
-                width: 100%;
-            }
-
-            h3 {
-                width: 95%;
-                font-size: clamp(1.2rem, 4vw, 1.8rem);
-            }
-
-            h2 {
-                font-size: clamp(1rem, 3vw, 1.5rem);
-                margin-bottom: 0.8rem;
-            }
-
-            /* 手機版作業頁面優化 */
-            .slide .homework-content {
-                max-width: 100%;
-                font-size: 0.85rem;
-                padding: 0 0.5rem;
-                line-height: 1.4;
-            }
-
-            .slide .homework-content ul {
-                column-count: 1;
-                font-size: 0.8rem;
-                line-height: 1.4;
-                margin: 0.8rem 0;
-            }
-
-            .slide .homework-content li {
-                margin-bottom: 0.6rem;
-                padding-left: 1rem;
-            }
-
-            .slide .homework-content code {
-                font-size: 0.75rem;
-                padding: 2px 4px;
-                word-break: break-all;
-            }
-
-            .slide .homework-content p {
-                font-size: 0.85rem;
-                line-height: 1.4;
-                margin-bottom: 0.8rem;
-            }
-
-            .slide .homework-content strong {
-                font-size: 0.9rem;
-            }
-
-            /* 手機版作業專用 slide 樣式 */
-            .homework-slide {
-                padding: 1vh 1vw;
-                align-items: flex-start;
-            }
-
-            .homework-slide h2 {
-                font-size: clamp(1rem, 2.5vw, 1.2rem);
-                margin-bottom: 0.8vh;
-            }
-
-            .homework-slide .homework-content {
-                font-size: 0.75rem;
-                line-height: 1.3;
-                padding: 0 0.3rem;
-            }
-
-            .homework-slide .homework-content ul {
-                font-size: 0.23rem !important;
-                column-count: 1;
-                line-height: 1.2;
-                margin: 0.5rem 0;
-            }
-
-            .homework-slide .homework-content li {
-                margin-bottom: 0.3rem;
-                padding-left: 0.6rem;
-            }
-
-            .homework-slide .homework-content p {
-                font-size: 0.75rem;
-                line-height: 1.3;
-                margin-bottom: 0.5rem;
-            }
-
-            .homework-slide .homework-content code {
-                font-size: 0.65rem;
-                padding: 1px 3px;
-            }
-
-            .homework-slide .homework-content strong {
-                font-size: 0.8rem;
-            }
-
-            /* 手機版作業 slide 中的 code 區塊樣式 */
-            .slide.homework-slide .homework-content pre {
-                background-color: var(--bg-color);
-                border: 1px solid var(--line-color);
-                border-radius: 4px;
-                padding: 8px;
-                margin: 0.4rem 0;
-                overflow-x: auto;
-                font-size: 0.5rem;
-                line-height: 1.2;
-            }
-
-            .slide.homework-slide .homework-content pre code {
-                background: none;
-                padding: 0;
-                font-size: 0.5rem;
-                color: #333;
-                white-space: pre;
-            }
-
-            /* 手機版作業說明框樣式 */
-            .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] {
-                font-size: 0.9rem !important;
-                line-height: 1.4;
-                padding: 12px !important;
-            }
-
-            .slide.homework-slide .homework-content p[style*="background-color: #e8e5dc"] strong {
-                font-size: 1rem !important;
-            }
-
-            /* 手機版圓餅圖優化 */
-            .pie-chart-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-            }
-
-            .pie-chart {
-                width: 250px;
-                height: 250px;
-            }
-
-            .legend {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .legend-item {
-                font-size: 1rem;
-                margin-bottom: 0.8rem;
-            }
-
-            .legend-color {
-                width: 16px;
-                height: 16px;
-                margin-right: 8px;
-            }
-
-            /* 手機版小組討論優化 */
-            .split-layout h3 {
-                font-size: 1.2rem;
-                margin-bottom: 1rem;
-            }
-
-            .split-layout ul {
-                font-size: 1rem;
-                line-height: 1.6;
-            }
-
-            .split-layout li {
-                margin-bottom: 0.8rem;
-                padding-left: 1.2rem;
-            }
+        ul li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            position: absolute;
+            left: 0;
         }
     </style>
-</head>
-<body>
-
-<div class="slides-container" id="slides-container">
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 人性與自我意識</title>
-<style>
-    :root {
-        --bg-color: #f4f1ea;
-        --text-color: #4a4a4a;
-        --accent-color: #a39e93;
-        --border-color: #dcd9d1;
-        --highlight-color: #8c867b;
-    }
-
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background-color: var(--bg-color);
-        font-family: Calibri, 'Segoe UI', 'San Francisco', sans-serif;
-        color: var(--text-color);
-    }
-
-    .slides-container {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        transition: transform 0.5s ease-in-out;
-    }
-
-    .slide {
-        min-width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 40px 60px;
-        position: relative;
-        text-align: center;
-        font-size: 1.5rem;
-    }
-
-    .slide h1, .slide h2, .slide h3 {
-        color: var(--highlight-color);
-        font-weight: normal;
-        margin-bottom: 20px;
-    }
-
-    .slide h1 { font-size: 4rem; }
-    .slide h2 { font-size: 3rem; }
-    .slide h3 { font-size: 2rem; }
-
-    .slide p, .slide li {
-        font-size: 1.8rem;
-        line-height: 1.6;
-        max-width: 800px;
-    }
-
-    .slide ul {
-        list-style-type: none;
-        padding: 0;
-        text-align: left;
-    }
-
-    .slide ul li {
-        margin-bottom: 15px;
-        position: relative;
-        padding-left: 25px;
-    }
-
-    .slide ul li::before {
-        content: '•';
-        color: var(--accent-color);
-        font-weight: bold;
-        display: inline-block;
-        width: 1em;
-        margin-left: -1em;
-        position: absolute;
-        left: 0;
-    }
-
-    .slide-footer {
-        position: absolute;
-        bottom: 20px;
-        font-size: 1rem;
-        color: var(--accent-color);
-    }
-
-    .nav-arrow {
-        position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: rgba(255, 255, 255, 0.5);
-        border: 1px solid var(--border-color);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 2rem;
-        color: var(--accent-color);
-        user-select: none;
-        transition: background-color 0.3s;
-    }
-    .nav-arrow:hover {
-        background-color: rgba(255, 255, 255, 0.8);
-    }
-
-    #prev { left: 20px; }
-    #next { right: 20px; }
-
-    .split-layout {
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-start;
-        width: 100%;
-    }
-    .split-layout > div {
-        width: 45%;
-    }
-    .video-container {
-        width: 80%;
-        max-width: 800px;
-        height: auto;
-        aspect-ratio: 16 / 9;
-        margin-top: 20px;
-        border: 1px solid var(--border-color);
-    }
-    .video-container iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-
-    .chart73 {
-        font-size: 10rem;
-        font-weight: bold;
-        color: var(--highlight-color);
-        margin: 20px 0;
-        line-height: 1;
-    }
-
-    .infographic {
-        border: 1px solid var(--border-color);
-        padding: 20px;
-        margin-top: 20px;
-        width: 80%;
-        max-width: 700px;
-    }
-    .infographic h4 {
-        margin-top: 0;
-        border-bottom: 2px solid var(--accent-color);
-        padding-bottom: 10px;
-        font-size: 1.5rem;
-    }
-    .infographic ul {
-        width: 100%;
-    }
-    .infographic li {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 1.2rem;
-    }
-    .infographic li:last-child {
-        border-bottom: none;
-    }
-    .infographic .score {
-        font-weight: bold;
-        color: var(--highlight-color);
-    }
-
-    .pie-chart-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 20px;
-    }
-    .pie-chart {
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        background: conic-gradient(
-            #a39e93 0% 38.5%,
-            #c1bcae 38.5% 77%,
-            #dcd9d1 77% 100%
-        );
-        margin-bottom: 20px;
-    }
-    .legend {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        font-size: 1.2rem;
-    }
-    .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .legend-color {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-        border: 1px solid var(--text-color);
-    }
-</style>
 </head>
 <body>
 
@@ -1052,20 +666,19 @@
 
     <section class="slide">
         <div>
-            <h2>分組討論</h2>
+            <h2>點名、分組</h2>
             <p>隨機分組</p>
-            <p>四組一組六人，按座位坐</p>
-            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(點名閒聊)</p>
+            <p>四組一組六人</p>
         </div>
     </section>
 
     <section class="slide">
         <div>
             <h2>評分方式</h2>
-            <ul>
-                <li>作業（+ 課堂參與程度）+ 期中作業 70%</li>
-                <li>期末 30%</li>
-            </ul>
+
+                <p>作業（+ 課堂參與程度）+ 期中作業 70%</p>
+                <p>期末 30%</p>
+
         </div>
     </section>
 
@@ -1080,7 +693,7 @@
         <div>
             <h2>學工程、先懂原理，</h2>
             <h2>了解 AI ，先了解你自己。</h2>
-            <p style="margin-top: 40px; font-size: 1.5rem;">提示詞工程 > 理解 AI 的基本原理 > 如何寫好提示詞具體做法</p>
+            <p style="margin-top: 40px; font-size: 1.5rem;">提示詞工程 > 理解 AI 的基本原理 > 如何寫好提示詞具體做法 > 最後一代的敲鍵寫程式</p>
         </div>
     </section>
 
@@ -1098,13 +711,14 @@
                 <div>
                     <h3 style="font-size: 1.4rem;">成員分工</h3>
                     <ul>
-                        <li>研究 x2</li>
-                        <li>筆記統整 x2</li>
-                        <li>主持會議 x1</li>
-                        <li>代表發言 x1</li>
+                        <h6 style="font-size: 1rem;">研究 x 2</h6>
+                        <h6 style="font-size: 1rem;">筆記統整 x 2</h6>
+                        <h6 style="font-size: 1rem;">主持會議 x 1</h6>
+                        <h6 style="font-size: 1rem;">代表發言 x 1</h6>
                     </ul>
+
                 </div>
-                <div style="width: 100%;">
+                <div style="width: 60%;">
                      <h3 style="font-size: 1.4rem;">討論主題</h3>
                     <div style="background-color: var(--bg-color); padding: 20px; border-radius: 5px; font-size: 1.1rem; line-height: 1.6; width: 100%; border: 1px solid var(--line-color);">
                         你覺得 AI 有思考能力嗎？有智力嗎？有自我意識和人性嗎？<br>
@@ -1128,7 +742,7 @@
     <section class="slide">
         <div>
             <h2>組別分享</h2>
-            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session?)</p>
+            <p style="color: var(--accent-color); font-size: 1.2rem; margin-top: 30px;">(next session)</p>
         </div>
     </section>
 
@@ -1172,7 +786,7 @@
     <section class="slide">
         <div>
             <h2>然而通過圖靈測驗就真的是人了嗎？</h2>
-            <p style="margin-top: 30px;">你在跟 GPT 聊天時，你覺得他"少"了什麼人味？</p>
+            <p style="margin-top: 30px;">你在跟 GPT 聊天時，"少"了什麼人味？</p>
         </div>
     </section>
 
@@ -1197,7 +811,7 @@
                     </div>
                 </div>
             </div>
-            <p class="slide-footer" style="font-size: 0.8rem;">ref: https://arxiv.org/pdf/2506.12098</p>
+            <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://arxiv.org/pdf/2506.12098" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://arxiv.org/pdf/2506.12098</a></p>
         </div>
     </section>
 
@@ -1205,9 +819,9 @@
         <div>
             <h2>人類意識的普遍定義</h2>
             <ul>
-                <li><strong>自我意識：</strong>知道自己是誰、有獨立思想和存在。</li>
-                <li><strong>主觀經驗：</strong>對世界的感受、內心體驗。</li>
-                <li><strong>感受與情緒：</strong>喜怒哀樂、痛苦與愉悅。</li>
+                <li>自我意識：知道自己是誰、有獨立思想和存在</li>
+                <li>主觀經驗：對世界的感受、內心體驗</li>
+                <li>感受與情緒：喜怒哀樂、痛苦與愉悅</li>
             </ul>
         </div>
     </section>
@@ -1221,13 +835,13 @@
                 <li><strong>情感面：</strong>自我體驗</li>
                 <li><strong>意志面：</strong>自我調控，自制自律、自我期待</li>
             </ul>
-             <p class="slide-footer" style="font-size: 0.8rem;">ref: https://baike.baidu.com/item/自我意識/1800719</p>
+             <p class="slide-footer" style="font-size: 0.8rem;">ref: <a href="https://baike.baidu.com/item/自我意識/1800719" target="_blank" style="color: var(--accent-color); text-decoration: underline;">https://baike.baidu.com/item/自我意識/1800719</a></p>
         </div>
     </section>
 
     <section class="slide">
         <div>
-            <h2>AI 系統是否具備類似人類的「主觀經驗」、「自我認知」或「感受」？</h2>
+            <h2>AI 是否具備似人類的「主觀經驗」、「自我認知」或「感受」？</h2>
             <p style="margin-top: 30px; border-left: 3px solid var(--accent-color); padding-left: 20px; text-align: left;">現今的關鍵區別：AI 的<strong>「模擬」</strong>與人類的<strong>「真實」</strong>體驗<br>AI 系統模仿對話，其背後是數學模型和統計預測，缺乏內在體驗。<br><span style="color: var(--accent-color); font-size: 1.2rem;">（之後的課程會介紹）</span></p>
         </div>
     </section>
@@ -1249,7 +863,7 @@
         </div>
     </section>
 
-    <section class="slide homework-slide">
+    <section class="slide bunch-word-container">
         <div>
             <h2>週二作業</h2>
             <div class="homework-content">
@@ -1302,6 +916,13 @@
             const absoluteIndex = allSlides.indexOf(targetSlide);
             const offset = -absoluteIndex * 100;
             slidesContainer.style.transform = `translateX(${offset}%)`;
+
+            // 如果切換到圖表投影片，初始化圖表
+            if (targetSlide.classList.contains('chart-slide')) {
+                setTimeout(() => {
+                    initializeIQChart();
+                }, 100);
+            }
         }
 
         nextBtn.addEventListener('click', () => {
@@ -1324,7 +945,11 @@
     });
 
     // IQ 常態分布圖表功能
-    document.addEventListener('DOMContentLoaded', () => {
+    let chartInitialized = false;
+
+    function initializeIQChart() {
+        if (chartInitialized) return;
+
         const allData = [
             { name: 'Gemini 2.5 Pro', score: 136, color: 'rgba(120, 120, 91, 0.8)' },
             { name: 'mon OpenAl GPT 5 Thinking', score: 133, color: 'rgba(163, 163, 128, 0.8)' },
@@ -1538,16 +1163,13 @@
             tooltip.classList.remove('visible');
         }
 
-        // 初始化圖表
-        createChart();
-
-        // 響應式調整
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(createChart, 250);
-        });
-    });
+        // 延遲創建圖表以確保容器已渲染
+        setTimeout(() => {
+            createChart();
+            chartInitialized = true;
+        }, 200);
+    }
 </script>
+
 </body>
 </html>
