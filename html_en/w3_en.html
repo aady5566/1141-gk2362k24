@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentals of Machine Learning and Deep Learning</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+:root {
+    --bg-color: #F4F2EF;        /* Main background color - warm off-white */
+    --text-color: #5a5a5a;      /* Main text color - dark gray */
+    --accent-color: #78785b;    /* Accent color - low-saturation olive green */
+    --line-color: #d1d1c2;      /* Border line color - light gray */
+    --highlight-color: #8c867b; /* Highlight color - medium gray */
+    --font-family: 'Calibri', 'Noto Sans TC', sans-serif;  /* Font */
+}
+
+/* Low-saturation color scheme */
+:root {
+    --color-primary: rgba(120, 120, 91, 0.7);      /* Primary color */
+    --color-secondary: rgba(163, 163, 128, 0.7);   /* Secondary color */
+    --color-accent: rgba(180, 120, 120, 0.7);      /* Accent color */
+    --color-success: rgba(120, 150, 120, 0.7);     /* Success color */
+    --color-info: rgba(120, 140, 160, 0.7);        /* Info color */
+    --color-warning: rgba(160, 140, 180, 0.7);     /* Warning color */
+}
+
+/* Main title - for slide main titles */
+h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+/* Subtitle - for slide subtitles */
+h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+}
+
+/* Content title - for slide content block titles */
+h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 4vh;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 1rem;
+    width: 80%;
+    max-width: 800px;
+}
+
+/* Subheading - for subheadings within content blocks */
+h4 {
+    font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+    font-weight: 400;
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 0.3rem;
+}
+
+/* h5 title */
+h5 {
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    font-weight: 400;
+    color: var(--accent-color);
+    margin-bottom: 0.6rem;
+}
+
+/* Body text */
+p {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    font-size: 1.5rem;
+    max-width: 80ch; /* Limit paragraph width for readability */
+}
+
+/* Slide subtitle */
+.slide-subtitle {
+    color: #888;
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-top: -1rem;
+}
+
+/* Slides container */
+.slides-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Single slide */
+.slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    /* Vertical centering */
+    align-items: center;        /* Horizontal centering */
+    padding: 5vw;              /* Responsive padding */
+    text-align: center;
+    position: relative;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-size: 1.5rem;         /* Base font size */
+}
+
+/* Center the first slide (title slide) */
+.slide:first-child {
+    justify-content: center;
+    overflow-y: hidden; /* No scrolling on the first slide */
+}
+
+.nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 98%;
+    left: 1%;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1002;  /* Ensure it's above the sidebar */
+    pointer-events: none;
+}
+
+.nav-btn {
+    pointer-events: all;
+    background: none;
+    border: 1px solid var(--line-color);
+    color: var(--accent-color);
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.4;
+}
+
+.nav-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    opacity: 1;
+}
+
+/* Sidebar container */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: var(--font-family, 'Calibri', 'Noto Sans TC', sans-serif);
+}
+
+/* Sidebar toggle button (hamburger menu) */
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background: #4d4d3b;
+    border-radius: 4px;
+    padding: 6px;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+    background: #3a3a2c;
+    transform: translateY(-2px);
+}
+
+.sidebar-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+/* Sidebar menu */
+.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-color);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-menu.active {
+    left: 0;
+}
+
+/* Sidebar header area */
+.sidebar-header {
+    background: #4d4d3b;
+    color: #ffffff;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* Sidebar content area */
+.sidebar-content {
+    padding: 1rem 0;
+}
+
+/* Sidebar item */
+.sidebar-item {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-item:hover {
+    background: rgba(120, 120, 91, 0.1);
+    color: #4d4d3b;
+    transform: translateX(5px);
+}
+
+.sidebar-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Text-heavy container - for slides with a lot of content */
+.bunch-word-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;  /* Horizontal centering */
+    justify-content: flex-start !important;     /* Start from the top */
+    padding: 1.5vh 2vw;
+    overflow-y: auto;               /* Scrollable */
+    text-align: left;
+    height: 100%;                   /* Fill the entire slide */
+    box-sizing: border-box;
+}
+
+.bunch-word-container > div {
+    width: 100%;
+    max-width: 1200px;              /* Wider than homework-slide */
+    margin: 0;
+}
+
+.bunch-word-container h2 {
+    font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    margin-bottom: 1.5vh;
+    text-align: center;
+    width: 100%;
+    color: var(--highlight-color);
+}
+
+.bunch-word-container .homework-content {
+    font-size: 1.65rem;             /* Moderate font size */
+    line-height: 1.5;
+    max-width: 100%;
+    margin: 0;
+}
+
+.bunch-word-container .homework-content h4 {
+    font-size: 1.95rem;             /* Smaller than h2, but larger than p */
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.bunch-word-container .homework-content p {
+    font-size: 1.5rem;              /* Standard p font size */
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+/* Video slide special styles */
+.slide.video-slide {
+    padding: 2vw;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.slide.video-slide h3 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.video-container {
+    width: 80%;                  /* 80% width */
+    max-width: 800px;           /* Max 800px */
+    height: auto;
+    aspect-ratio: 16 / 9;       /* 16:9 aspect ratio */
+    margin-top: 20px;
+    border: 1px solid var(--line-color);
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Embedded content styles */
+.embedded-content {
+    width: 100%;
+    height: 600px; /* Fixed height to ensure visibility */
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa; /* Add background color for debugging */
+    border: 2px solid #e9ecef; /* Add border for debugging */
+}
+
+.embedded-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background-color: white;
+}
+
+.video-placeholder {
+    border: 2px dashed var(--accent-color);
+    padding: 2rem;
+    width: 80%;
+    max-width: 700px;
+}
+
+.video-placeholder .play-icon {
+    font-size: 4rem;
+    color: var(--accent-color);
+}
+
+/* Chart slide special styles */
+.slide.chart-slide {
+    padding: 2vw;
+    align-items: stretch;
+}
+
+.slide.chart-slide h3 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.bar-chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.chart {
+    width: 50%;
+    max-width: 400px;
+    border-left: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding: 1rem 0 0 1rem;
+}
+
+.bar-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.bar-label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.bar {
+    height: 25px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 0 2px 2px 0;
+}
+
+.chart-image {
+    width: 35%;
+    max-width: 280px;
+    height: auto;
+    border: 1px solid var(--highlight-color);
+    padding: 0.5rem;
+    background-color: #fff;
+}
+
+.chart-image-placeholder {
+    width: 100%;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--highlight-color);
+    color: var(--accent-color);
+    font-style: italic;
+}
+
+/* Homework slide styles */
+.homework-slide {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2vh 2vw;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.homework-slide > div {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0;
+}
+
+.homework-slide h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    margin-bottom: 1vh;
+    text-align: center;
+}
+
+.homework-slide .homework-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    max-width: 100%;
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    /* Slide container optimization */
+    .slide {
+        padding: 3vw;
+        overflow-y: auto;
+        justify-content: center;
+    }
+
+    /* Center first slide on mobile too */
+    .slide:first-child {
+        justify-content: center;
+        overflow-y: hidden;
+    }
+
+    /* Navigation button optimization */
+    .nav {
+        width: 95%;
+        left: 2.5%;
+        z-index: 1002;
+    }
+
+    .nav-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    /* Title optimization */
+    h1 {
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+    }
+
+    h2 {
+        font-size: clamp(2rem, 4.5vw, 2.5rem);
+        margin-bottom: 0.8rem;
+    }
+
+    h3 {
+        width: 95%;
+        font-size: clamp(1.6rem, 3.8vw, 2rem);
+    }
+
+    h4 {
+        font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+    }
+
+    h5 {
+        font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+    }
+
+    p {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    /* Layout adjustments */
+    .two-columns, .bunch-word-container {
+        grid-template-columns: 1fr;
+    }
+
+    .two-columns > div {
+        width: 100%;
+    }
+
+    .bar-chart-container {
+        flex-direction: column;
+    }
+
+    .chart, .chart-image {
+        width: 90%;
+    }
+
+    /* Video slide mobile optimization */
+    .slide.video-slide .video-container {
+        margin: 10px 0;
+        width: 90%;
+        max-width: 450px;
+    }
+
+    /* Text-heavy container mobile optimization */
+    .bunch-word-container {
+        padding: 2vh 3vw;
+    }
+
+    .bunch-word-container h2 {
+        font-size: clamp(1rem, 2.8vw, 1.3rem);
+        margin-bottom: 2vh;
+        margin-top: 1vh;
+    }
+
+    .bunch-word-container .homework-content {
+        font-size: 1.2rem;              /* Smaller than mobile h2 */
+        line-height: 1.4;
+        padding: 0 0.3rem;
+    }
+
+    .bunch-word-container .homework-content h4 {
+        font-size: 1.4rem;              /* Smaller than mobile h2, but larger than p */
+        line-height: 1.3;
+        margin-bottom: 0.8rem;
+    }
+
+    .bunch-word-container .homework-content p {
+        font-size: 1.1rem;              /* Smaller than mobile h2 */
+        line-height: 1.4;
+        margin-bottom: 0.8rem;
+    }
+
+    /* Sidebar mobile optimization */
+    .sidebar-toggle {
+        top: 0.5rem;
+        left: 0.5rem;
+        width: 28px;
+        height: 28px;
+        padding: 5px;
+    }
+
+    .sidebar-toggle span {
+        width: 16px;
+        height: 2px;
+    }
+
+    .sidebar-menu {
+        width: 260px;
+    }
+
+    .sidebar-item {
+        padding: 0.7rem 1.2rem;
+    }
+
+    .sidebar-text {
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .slide {
+        padding: 4vw;
+    }
+
+    h1 {
+        font-size: 3.5rem;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    .two-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 3vw;
+    }
+
+    .video-container {
+        width: 75%;
+        max-width: 700px;
+    }
+}
+
+/* Ensure normal slides are centered */
+.slide:not(.chart-slide):not(.video-slide):not(.homework-slide):not(.bunch-word-container) {
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Align text-heavy container to the top */
+.slide.bunch-word-container {
+    justify-content: flex-start !important;
+    align-items: center !important;
+}
+
+</style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title Page -->
+        <section class="slide">
+            <h1>Fundamentals of Machine Learning and Deep Learning</h1>
+            <p class="slide-subtitle">2025-09-23</p>
+        </section>
+
+        <!-- Slide 2: A Shift in Problem-Solving -->
+        <section class="slide">
+            <h2>A Shift in Problem-Solving: Instruction → Inference</h2>
+            <div class="content-grid">
+                <div class="content-section">
+                    <h4>Traditional Programming (i.e., calculators)</h4>
+                    <p>Input → Human-Defined Rules → Output</p>
+                </div>
+                <div class="content-section">
+                    <h4>Machine Learning</h4>
+                    <p>Provide Massive Data → Discover Rules</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Main Types of Machine Learning -->
+        <section class="slide">
+            <h2>Main Types of Machine Learning</h2>
+            <div class="content-grid">
+                <div class="content-section">
+                    <h4>Supervised Learning</h4>
+                    <p><strong>Data Type:</strong> Uses "labeled" data for training, meaning each input has a corresponding correct output or answer.</p>
+                    <p><strong>Goal:</strong> To learn the mapping function between input and output data to predict the output for new, unseen data.</p>
+                    <p><strong>Example Application:</strong> Predicting flight times (output) based on past weather conditions (input).</p>
+                </div>
+                <div class="content-section">
+                    <h4>Unsupervised Learning</h4>
+                    <p><strong>Data Type:</strong> Uses unlabeled, raw data for training.</p>
+                    <p><strong>Goal:</strong> To explore the data and discover hidden patterns, structures, or relationships, rather than predicting a specific output.</p>
+                    <p><strong>Example Application:</strong> Finding similarities in customer groups (clustering) or identifying new associations in unlabeled data.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Interactive Machine Learning Demo -->
+        <section class="slide">
+            <div class="embedded-content">
+                <iframe src="../gen_stuff/w3-supervised-learning.html"
+                        title="Interactive Supervised Learning Demo"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+                </iframe>
+            </div>
+        </section>
+
+        <!-- Slide 5: Interactive Unsupervised Learning Demo -->
+        <section class="slide">
+            <div class="embedded-content">
+                <iframe src="../gen_stuff/w3-unsupervised-learning.html"
+                        title="Interactive Unsupervised Learning Demo"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+                </iframe>
+            </div>
+        </section>
+
+        <!-- Slide 6: Introduction to Deep Learning -->
+        <section class="slide">
+            <h2>So, What is Deep Learning?</h2>
+        </section>
+
+        <!-- Slide 7: Deep Learning Explained -->
+        <section class="slide">
+            <h2>Deep Learning</h2>
+            <div class="content-section">
+                <p><strong>Relationship with Machine Learning:</strong> It is a subset of machine learning, belonging to a specific class of machine learning models.</p>
+                <p><strong>Characteristics:</strong> Uses multi-layered neural networks (similar to the human brain's structure) to learn complex patterns in data.</p>
+                <p><strong>Example Application:</strong> Deep learning models can perform supervised learning tasks, like image recognition, as well as unsupervised learning to extract valuable information from large amounts of unlabeled data.</p>
+            </div>
+        </section>
+
+        <!-- Slide 8: Introduction to Generative AI -->
+        <section class="slide">
+            <h2>And... What is Generative AI?</h2>
+        </section>
+
+        <!-- Slide 9: Generative AI Explained -->
+        <section class="slide">
+            <h2>Generative AI</h2>
+            <p>Generative AI is a branch of deep learning technology that can learn patterns from data and generate new content, including text, images, sound, and more. (More details in the next class.)</p>
+        </section>
+
+        <!-- Slide 10: Core of Machine Learning -->
+        <section class="slide">
+            <h2>The Core of Machine Learning:</h2>
+            <div class="content-section">
+                <p><strong>Supervised Learning</strong> & <strong>Unsupervised Learning</strong></p>
+                <p>The choice of technical path reflects whether we want to "validate known answers" or "explore unknown structures" in the data.</p>
+            </div>
+        </section>
+
+        <!-- Slide 11: Key Questions -->
+        <section class="slide">
+            <h2>Key Questions</h2>
+            <p>How do we balance "guidance" versus "exploration" when training an AI with a "test paper with standard answers" (Supervised Learning) to solve known problems, compared to exploring the unknown and correlations in a "vast library without answers" (Unsupervised Learning)? And what are the risks?</p>
+        </section>
+
+        <!-- Slide 12: Discussion in Different Scenarios -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>Discussion in Different Scenarios</h2>
+                <div class="homework-content">
+                    <h4>1. The World of Personalized Music:</h4>
+                    <p>How does Spotify recommend music to you? One way is supervised: you "like" songs (providing clear labels), and the system finds and recommends songs with similar musical features. Another way is unsupervised: the system analyzes the listening data of hundreds of millions of users worldwide, automatically "clustering" people with similar tastes, and then recommends songs that your group likes but you haven't heard yet (e.g., "Discover Weekly"). Which method makes it easier to break out of your filter bubble and discover new music genres? And which method might pull you deeper in?</p>
+
+                    <h4>2. Coupang's E-commerce Marketing Strategy:</h4>
+                    <p>Coupang wants to understand its customers. A supervised approach is to conduct satisfaction surveys, having customers rate items like "price," "service," and "quality" on a scale of 1-5 (providing clear labels), and then analyzing which aspect has the lowest score. An unsupervised approach is to directly analyze hundreds of thousands of raw customer reviews, where the AI automatically clusters the comments and might discover an unexpected complaint theme, such as "excessive, non-eco-friendly packaging" or "poor quality of free gifts," which weren't options in the original survey. Which method can solve known problems? Which can discover unknown ones?</p>
+
+                    <h4>3. Combating Financial Fraud:</h4>
+                    <p>How do banks detect credit card fraud? The supervised method is to use past transaction records marked as "fraudulent" and "normal" to train a model. When a new transaction comes in, the model determines the probability of it being fraudulent. But if a completely new fraud technique appears, the model might not recognize it. The unsupervised "Anomaly Detection" method, on the other hand, first learns what a "normal" transaction pattern is (a large cluster). Any transaction that doesn't fit this pattern, regardless of the technique, is marked as suspicious. Which method is better at stopping known enemies? Which is better at dealing with unknown threats?</p>
+
+                    <h4>4. Insights into Urban Safety:</h4>
+                    <p>A police department wants to prevent crime. The supervised method is to analyze data marked with "crime location" and "time" to predict the next crime hotspot. But this relies entirely on "reported" data. The unsupervised method is to analyze anonymous communication or traffic flow data in the city to find areas of "abnormal gathering" or "sudden pattern changes." This could be an undiscovered black market or just a flash mob. How should we weigh the opportunities and risks of misinterpretation that come with this type of exploration?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Unseen Risks -->
+        <section class="slide">
+            <h2>Unseen Risks: From "Entrenched Bias" to "False Discoveries"</h2>
+        </section>
+
+        <!-- Slide 14: Supervised Risk -->
+        <section class="slide">
+            <h3>Supervised Risk - The Bias Problem</h3>
+            <p>AI learns from biased historical data, not only replicating but also amplifying these biases. Principle: Garbage in, garbage out.</p>
+        </section>
+
+        <!-- Slide 15: Bias Problem Chart -->
+        <section class="slide chart-slide">
+            <h3>Disparity in AI Recognition Error Rates</h3>
+            <div class="iq-chart-container">
+                <canvas id="biasChart" width="400" height="200"></canvas>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                <img src="../pic/w3-p1.jpg" alt="Gender Shades Study Image" class="slide-image" style="max-width: 600px; margin-left: 20px;">
+            </div>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">ref: (MIT) Media Lab's "Gender Shades" study (Joy Buolamwini)</p>
+        </section>
+
+        <!-- Slide 16: Unsupervised Risk -->
+        <section class="slide">
+            <h3>Unsupervised Risk - Difficulty of Interpretation and Spurious Correlations</h3>
+            <p>The "patterns" found by unsupervised learning do not necessarily have real-world significance. It might discover that ice cream sales and drowning incidents are highly correlated. (Correlation does not equal causation).</p>
+        </section>
+
+        <!-- Slide 17: Introduction to Reinforcement Learning -->
+        <section class="slide">
+            <h2>There's Also "Reinforcement Learning"</h2>
+            <h3>(Reinforcement Learning, RL)</h3>
+            <div class="content-section">
+                <p>It doesn't require label comparison, nor does it simply discover patterns from data spontaneously like unsupervised learning.</p>
+                <p>It learns strategies to achieve goals progressively through interaction with an environment, based on rewards or punishments for its actions. (Much like humans)</p>
+            </div>
+        </section>
+
+        <!-- Slide 18: Reinforcement Learning Video -->
+        <section class="slide video-slide">
+            <h3>Using Reinforcement Learning to Beat Pokémon</h3>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/DcYLT37ImBY?start=0&end=280"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- Slide 19: Exam -->
+        <section class="slide">
+            <h1>Exam?</h1>
+        </section>
+
+        <!-- Slide 20: Class Assignment -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>Class Assignment: AI Detective in Daily Life</h2>
+                <div class="homework-content">
+                    <p style="background-color: #e8e5dc; padding: 15px; border-radius: 8px; font-size: 1.1rem; line-height: 1.5;">
+                        <strong>Google Form Link: <a href="https://forms.gle/P2L7kzKGpUHpTxbq6" target="_blank" style="color: #78785b; text-decoration: underline;">https://forms.gle/P2L7kzKGpUHpTxbq6</a></strong><br><br>
+                        <strong>Please submit by Thursday, 9/25, at 23:59</strong><br><br>
+                        <strong>Brief Description:</strong> Please find an AI application in your daily life and answer the following questions.
+                    </p>
+
+                    <h4>1. Which AI application did you find?</h4>
+                    <p>(e.g., YouTube's video recommendation system, Instagram's story filters, Google Maps' estimated time of arrival, Shopee's "You Might Also Like" products)</p>
+
+                    <h4>2. Briefly describe how this AI application works. What is it "learning"?</h4>
+                    <p>(e.g., It learns which videos I've watched and for how long to recommend new videos I might like.)</p>
+
+                    <h4>3. What "benefits" has this AI application brought you?</h4>
+                    <p>(e.g., It saves me time searching for videos, helps me discover new interests, makes my photos look better.)</p>
+
+                    <h4>4. Based on the concepts learned in class (e.g., bias, black box, trust), consider a "potential risk" or "negative impact" this AI application might have.</h4>
+                    <p>(e.g., It might trap me in a "filter bubble," where I only see content I agree with, narrowing my perspective. Or, beauty filters might exacerbate appearance anxiety.)</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">‹</button>
+        <button id="next" class="nav-btn">›</button>
+    </div>
+
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slidesContainer = document.querySelector('.slides-container');
+            const allSlides = Array.from(document.querySelectorAll('.slide'));
+            const visibleSlides = allSlides.filter(s => s.dataset.hidden !== 'true');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+
+            let currentIndex = 0; // index within visibleSlides
+
+            function showSlideByIndex(index) {
+                const total = visibleSlides.length;
+                if (total === 0) return;
+
+                if (index >= total) {
+                    currentIndex = 0;
+                } else if (index < 0) {
+                    currentIndex = total - 1;
+                } else {
+                    currentIndex = index;
+                }
+
+                const targetSlide = visibleSlides[currentIndex];
+                const absoluteIndex = allSlides.indexOf(targetSlide);
+                const offset = -absoluteIndex * 100;
+                slidesContainer.style.transform = `translateX(${offset}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                showSlideByIndex(currentIndex + 1);
+            });
+
+            prevBtn.addEventListener('click', () => {
+                showSlideByIndex(currentIndex - 1);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    showSlideByIndex(currentIndex + 1);
+                } else if (e.key === 'ArrowLeft') {
+                    showSlideByIndex(currentIndex - 1);
+                }
+            });
+
+            // Touch swipe support
+            let startX = 0;
+            let startY = 0;
+            let isScrolling = false;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isScrolling = false;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!startX || !startY) return;
+
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                const diffX = startX - currentX;
+                const diffY = startY - currentY;
+
+                // Determine if it's a horizontal swipe
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    isScrolling = true;
+                    e.preventDefault(); // Prevent page scrolling
+                }
+            });
+
+            document.addEventListener('touchend', (e) => {
+                if (!startX || !startY || !isScrolling) return;
+
+                const endX = e.changedTouches[0].clientX;
+                const diffX = startX - endX;
+                const threshold = 50; // Swipe threshold
+
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX > 0) {
+                        // Swipe left, next slide
+                        showSlideByIndex(currentIndex + 1);
+                    } else {
+                        // Swipe right, previous slide
+                        showSlideByIndex(currentIndex - 1);
+                    }
+                }
+
+                startX = 0;
+                startY = 0;
+                isScrolling = false;
+            });
+
+            // Global chart settings
+            Chart.defaults.color = '#5a5a5a';
+            Chart.defaults.borderColor = '#d1d1c2';
+            Chart.defaults.font.family = "'Calibri', 'Noto Sans TC', sans-serif";
+            Chart.defaults.plugins.legend.position = 'bottom';
+            Chart.defaults.maintainAspectRatio = false;
+
+            // Color palette
+            const colorPalette = {
+                primary: 'rgba(120, 120, 91, 0.7)',
+                secondary: 'rgba(163, 163, 128, 0.7)',
+                accent: 'rgba(180, 120, 120, 0.7)',
+                success: 'rgba(120, 150, 120, 0.7)',
+                info: 'rgba(120, 140, 160, 0.7)',
+                warning: 'rgba(160, 140, 180, 0.7)'
+            };
+
+            // Initialize bias chart
+            const biasCtx = document.getElementById('biasChart');
+            if (biasCtx) {
+                new Chart(biasCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Lighter-Skinned Males', 'Darker-Skinned Females'],
+                        datasets: [{
+                            label: 'Recognition Error Rate (%)',
+                            data: [0.5, 34.7],
+                            backgroundColor: [
+                                colorPalette.primary,
+                                colorPalette.accent
+                            ],
+                            borderColor: [
+                                'rgba(120, 120, 91, 1)',
+                                'rgba(180, 120, 120, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 40,
+                                title: {
+                                    display: true,
+                                    text: 'Error Rate (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Group'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initial setup
+            showSlideByIndex(0);
+        });
+    </script>
+</body>
+</html>

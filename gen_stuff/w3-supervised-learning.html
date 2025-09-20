@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>監督式學習：健康飲食稽查員</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --panel-color: #ffffff;
+            --primary-text: #5a5a5a;
+            --secondary-text: #8c867b;
+            --healthy-color: #789678;
+            --unhealthy-color: #b47878;
+            --border-color: #d1d1c2;
+            --restart-btn-color: #78785b;
+        }
+        body {
+            font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel {
+            background-color: var(--panel-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+        header { text-align: center; } /* Make header center-aligned */
+        h1, h2 {
+            text-align: center;
+            margin: 0 0 15px 0;
+        }
+        h1 { font-size: 2em; color: var(--primary-text); }
+        h2 { font-size: 1.5em; color: var(--secondary-text); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .food-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+        .food-item .icon { font-size: 4em; }
+        .food-item .name { font-weight: bold; margin-top: 5px; }
+        .food-item .label {
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .healthy { border-color: var(--healthy-color); background-color: #eaf6ec; }
+        .healthy .label { background-color: var(--healthy-color); }
+
+        .unhealthy { border-color: var(--unhealthy-color); background-color: #fbebee; }
+        .unhealthy .label { background-color: var(--unhealthy-color); }
+
+        #testing-area .food-item {
+            cursor: pointer;
+            border: 2px dashed #9fb3c8;
+            background-color: #f8fafc;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            font-size: 1.1em;
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #btn-healthy { background-color: var(--healthy-color); }
+        #btn-unhealthy { background-color: var(--unhealthy-color); margin-left: 15px; }
+
+        /* === NEW STYLE FOR RESTART BUTTON === */
+        #restart-btn {
+            background-color: var(--restart-btn-color);
+            font-size: 1em;
+            padding: 10px 20px;
+            display: none; /* Hide by default */
+            margin: 15px auto 0; /* Center it */
+        }
+
+        #feedback {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none; /* Initially hidden */
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.2em; }
+            .food-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+            .food-item .icon { font-size: 3em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>監督式學習：健康飲食稽查員</h1>
+        <p style="color: var(--secondary-text);">你的任務是學習分辨食物的類別，並對新食物做出正確的分類判斷。</p>
+
+    </header>
+
+    <div class="panel" id="training-area">
+        <h2>第一步：訓練 AI (學習標籤)</h2>
+        <p>這是我們的訓練資料庫。AI 會從這些有明確標籤（健康／不健康）的範例中學習規律。</p>
+        <div class="food-grid" id="training-grid">
+            </div>
+    </div>
+
+    <div class="panel" id="testing-area">
+        <h2>第二步：預測 (分類新食物)</h2>
+        <p>訓練完成！現在，請根據學到的知識，對下面這個「未標籤」的食物進行分類：</p>
+        <div class="food-grid" id="testing-grid">
+            </div>
+        <div class="button-container">
+            <button id="btn-healthy">歸類為「健康」</button>
+            <button id="btn-unhealthy">歸類為「不健康」</button>
+        </div>
+        <div id="feedback"></div>
+        <button id="restart-btn">重新開始一局</button>
+    </div>
+</div>
+
+<script>
+    const foodDatabase = [
+        { name: '蘋果', icon: '🍎', isHealthy: true, reason: '富含纖維和維生素。' },
+        { name: '披薩', icon: '🍕', isHealthy: false, reason: '通常高油、高鹽。' },
+        { name: '綠花椰', icon: '🥦', isHealthy: true, reason: '是營養豐富的蔬菜。' },
+        { name: '甜甜圈', icon: '🍩', isHealthy: false, reason: '高糖、高脂肪的點心。' },
+        { name: '胡蘿蔔', icon: '🥕', isHealthy: true, reason: '富含 β-胡蘿蔔素。' },
+        { name: '薯條', icon: '🍟', isHealthy: false, reason: '油炸食品，熱量高。' },
+        { name: '香蕉', icon: '🍌', isHealthy: true, reason: '提供鉀和能量。'},
+        { name: '汽水', icon: '🥤', isHealthy: false, reason: '含糖量非常高。'}
+    ];
+
+    const trainingGrid = document.getElementById('training-grid');
+    const testingGrid = document.getElementById('testing-grid');
+    const btnHealthy = document.getElementById('btn-healthy');
+    const btnUnhealthy = document.getElementById('btn-unhealthy');
+    const feedbackEl = document.getElementById('feedback');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let currentTestItem = null;
+
+    function createFoodItemHTML(food, showLabel) {
+        const type = food.isHealthy ? 'healthy' : 'unhealthy';
+        return `
+            <div class="food-item ${showLabel ? type : ''}">
+                <div class="icon">${food.icon}</div>
+                <div class="name">${food.name}</div>
+                ${showLabel ? `<div class="label">${food.isHealthy ? '健康' : '不健康'}</div>` : ''}
+            </div>
+        `;
+    }
+
+    function initialize() {
+        // 隨機選擇訓練和測試項目
+        const shuffled = [...foodDatabase].sort(() => 0.5 - Math.random());
+        const trainingItems = shuffled.slice(0, 6);
+        currentTestItem = shuffled[6];
+
+        // 1. 渲染訓練區
+        trainingGrid.innerHTML = trainingItems.map(food => createFoodItemHTML(food, true)).join('');
+
+        // 2. 渲染測試區
+        testingGrid.innerHTML = createFoodItemHTML(currentTestItem, false);
+
+        // 3. 重置回饋和按鈕
+        feedbackEl.style.display = 'none';
+        restartBtn.style.display = 'none';
+        btnHealthy.disabled = false;
+        btnUnhealthy.disabled = false;
+    }
+
+    function checkAnswer(userChoiceIsHealthy) {
+        btnHealthy.disabled = true;
+        btnUnhealthy.disabled = true;
+
+        const isCorrect = (userChoiceIsHealthy === currentTestItem.isHealthy);
+
+        feedbackEl.style.display = 'block';
+        restartBtn.style.display = 'block';
+
+        if (isCorrect) {
+            feedbackEl.textContent = `正確！AI 判斷 ${currentTestItem.name} 是 ${currentTestItem.isHealthy ? '健康' : '不健康'} 的，因為它 ${currentTestItem.reason} 這就是監督式學習：根據已知的標籤做出準確預測。`;
+            feedbackEl.style.color = '#155724';
+            feedbackEl.style.backgroundColor = '#d4edda';
+            feedbackEl.style.borderColor = '#c3e6cb';
+        } else {
+            feedbackEl.textContent = `錯誤！AI 根據訓練資料判斷，${currentTestItem.name} 應該是 ${currentTestItem.isHealthy ? '健康' : '不健康'} 的，因為它 ${currentTestItem.reason} 模型需要更多、更好的標籤數據來學習。`;
+            feedbackEl.style.color = '#721c24';
+            feedbackEl.style.backgroundColor = '#f8d7da';
+            feedbackEl.style.borderColor = '#f5c6cb';
+        }
+    }
+
+    btnHealthy.addEventListener('click', () => checkAnswer(true));
+    btnUnhealthy.addEventListener('click', () => checkAnswer(false));
+    restartBtn.addEventListener('click', initialize);
+
+    // 初始啟動
+    initialize();
+</script>
+
+</body>
+</html>

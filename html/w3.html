@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機器學習、深度學習基本原理</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+:root {
+    --bg-color: #F4F2EF;        /* 主背景色 - 溫暖的米白色 */
+    --text-color: #5a5a5a;      /* 主文字色 - 深灰色 */
+    --accent-color: #78785b;    /* 強調色 - 低飽和橄欖綠 */
+    --line-color: #d1d1c2;      /* 邊框線色 - 淺灰色 */
+    --highlight-color: #8c867b; /* 高亮色 - 中灰色 */
+    --font-family: 'Calibri', 'Noto Sans TC', sans-serif;  /* 字體 */
+}
+
+/* 低飽和度配色方案 */
+:root {
+    --color-primary: rgba(120, 120, 91, 0.7);      /* 主色 */
+    --color-secondary: rgba(163, 163, 128, 0.7);   /* 次色 */
+    --color-accent: rgba(180, 120, 120, 0.7);      /* 強調色 */
+    --color-success: rgba(120, 150, 120, 0.7);     /* 成功色 */
+    --color-info: rgba(120, 140, 160, 0.7);        /* 資訊色 */
+    --color-warning: rgba(160, 140, 180, 0.7);     /* 警告色 */
+}
+
+/* 主標題 - 用於投影片主標題 */
+h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+/* 次標題 - 用於投影片副標題 */
+h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+}
+
+/* 內容標題 - 用於投影片內容區塊標題 */
+h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 4vh;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 1rem;
+    width: 80%;
+    max-width: 800px;
+}
+
+/* 小標題 - 用於內容區塊內的小標題 */
+h4 {
+    font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+    font-weight: 400;
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 0.3rem;
+}
+
+/* h5 標題 */
+h5 {
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    font-weight: 400;
+    color: var(--accent-color);
+    margin-bottom: 0.6rem;
+}
+
+/* 內文 */
+p {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    font-size: 1.5rem;
+    max-width: 80ch; /* 限制段落寬度以提高可讀性 */
+}
+
+/* 投影片副標題 */
+.slide-subtitle {
+    color: #888;
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-top: -1rem;
+}
+
+/* 投影片容器 */
+.slides-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* 單一投影片 */
+.slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    /* 垂直置中 */
+    align-items: center;        /* 水平置中 */
+    padding: 5vw;              /* 響應式 padding */
+    text-align: center;
+    position: relative;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-size: 1.5rem;         /* 基礎字體大小 */
+}
+
+/* 第一頁（標題頁）置中顯示 */
+.slide:first-child {
+    justify-content: center;
+    overflow-y: hidden; /* 第一頁不需要滾動 */
+}
+
+.nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 98%;
+    left: 1%;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1002;  /* 確保在側邊欄之上 */
+    pointer-events: none;
+}
+
+.nav-btn {
+    pointer-events: all;
+    background: none;
+    border: 1px solid var(--line-color);
+    color: var(--accent-color);
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.4;
+}
+
+.nav-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    opacity: 1;
+}
+
+/* 側邊欄容器 */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: var(--font-family, 'Calibri', 'Noto Sans TC', sans-serif);
+}
+
+/* 側邊欄切換按鈕（漢堡選單） */
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background: #4d4d3b;
+    border-radius: 4px;
+    padding: 6px;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+    background: #3a3a2c;
+    transform: translateY(-2px);
+}
+
+.sidebar-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+/* 側邊欄選單 */
+.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-color);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-menu.active {
+    left: 0;
+}
+
+/* 側邊欄標題區域 */
+.sidebar-header {
+    background: #4d4d3b;
+    color: #ffffff;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* 側邊欄內容區域 */
+.sidebar-content {
+    padding: 1rem 0;
+}
+
+/* 側邊欄選項 */
+.sidebar-item {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--line-color);
+}
+
+.sidebar-item:hover {
+    background: rgba(120, 120, 91, 0.1);
+    color: #4d4d3b;
+    transform: translateX(5px);
+}
+
+.sidebar-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* 遮罩層 */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 字多版本容器 - 專門處理內容較多的投影片 */
+.bunch-word-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;  /* 水平置中 */
+    justify-content: flex-start !important;     /* 從頂部開始 */
+    padding: 1.5vh 2vw;
+    overflow-y: auto;               /* 可滾動 */
+    text-align: left;
+    height: 100%;                   /* 填滿整個投影片 */
+    box-sizing: border-box;
+}
+
+.bunch-word-container > div {
+    width: 100%;
+    max-width: 1200px;              /* 比 homework-slide 更寬 */
+    margin: 0;
+}
+
+.bunch-word-container h2 {
+    font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    margin-bottom: 1.5vh;
+    text-align: center;
+    width: 100%;
+    color: var(--highlight-color);
+}
+
+.bunch-word-container .homework-content {
+    font-size: 1.65rem;             /* 適中的字體大小 */
+    line-height: 1.5;
+    max-width: 100%;
+    margin: 0;
+}
+
+.bunch-word-container .homework-content h4 {
+    font-size: 1.95rem;             /* 比 h2 小，但比 p 大 */
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.bunch-word-container .homework-content p {
+    font-size: 1.5rem;              /* 標準 p 字體大小 */
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+/* 影片投影片特殊樣式 */
+.slide.video-slide {
+    padding: 2vw;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.slide.video-slide h3 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.video-container {
+    width: 80%;                  /* 80% 寬度 */
+    max-width: 800px;           /* 最大 800px */
+    height: auto;
+    aspect-ratio: 16 / 9;       /* 16:9 長寬比 */
+    margin-top: 20px;
+    border: 1px solid var(--line-color);
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 嵌入式內容樣式 */
+.embedded-content {
+    width: 100%;
+    height: 600px; /* 固定高度，確保可見 */
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa; /* 添加背景色以便除錯 */
+    border: 2px solid #e9ecef; /* 添加邊框以便除錯 */
+}
+
+.embedded-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background-color: white;
+}
+
+.video-placeholder {
+    border: 2px dashed var(--accent-color);
+    padding: 2rem;
+    width: 80%;
+    max-width: 700px;
+}
+
+.video-placeholder .play-icon {
+    font-size: 4rem;
+    color: var(--accent-color);
+}
+
+/* 圖表投影片特殊樣式 */
+.slide.chart-slide {
+    padding: 2vw;
+    align-items: stretch;
+}
+
+.slide.chart-slide h3 {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}
+
+.bar-chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.chart {
+    width: 50%;
+    max-width: 400px;
+    border-left: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding: 1rem 0 0 1rem;
+}
+
+.bar-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.bar-label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.bar {
+    height: 25px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 0 2px 2px 0;
+}
+
+.chart-image {
+    width: 35%;
+    max-width: 280px;
+    height: auto;
+    border: 1px solid var(--highlight-color);
+    padding: 0.5rem;
+    background-color: #fff;
+}
+
+.chart-image-placeholder {
+    width: 100%;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--highlight-color);
+    color: var(--accent-color);
+    font-style: italic;
+}
+
+/* 作業專用 slide 樣式 */
+.homework-slide {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2vh 2vw;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.homework-slide > div {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0;
+}
+
+.homework-slide h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    margin-bottom: 1vh;
+    text-align: center;
+}
+
+.homework-slide .homework-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    max-width: 100%;
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    /* 投影片容器優化 */
+    .slide {
+        padding: 3vw;
+        overflow-y: auto;
+        justify-content: center;
+    }
+
+    /* 手機版第一頁也置中 */
+    .slide:first-child {
+        justify-content: center;
+        overflow-y: hidden;
+    }
+
+    /* 導航按鈕優化 */
+    .nav {
+        width: 95%;
+        left: 2.5%;
+        z-index: 1002;
+    }
+
+    .nav-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    /* 標題優化 */
+    h1 {
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+    }
+
+    h2 {
+        font-size: clamp(2rem, 4.5vw, 2.5rem);
+        margin-bottom: 0.8rem;
+    }
+
+    h3 {
+        width: 95%;
+        font-size: clamp(1.6rem, 3.8vw, 2rem);
+    }
+
+    h4 {
+        font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+    }
+
+    h5 {
+        font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+    }
+
+    p {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    /* 佈局調整 */
+    .two-columns, .bunch-word-container {
+        grid-template-columns: 1fr;
+    }
+
+    .two-columns > div {
+        width: 100%;
+    }
+
+    .bar-chart-container {
+        flex-direction: column;
+    }
+
+    .chart, .chart-image {
+        width: 90%;
+    }
+
+    /* 影片投影片手機版優化 */
+    .slide.video-slide .video-container {
+        margin: 10px 0;
+        width: 90%;
+        max-width: 450px;
+    }
+
+    /* 字多版本容器手機版優化 */
+    .bunch-word-container {
+        padding: 2vh 3vw;
+    }
+
+    .bunch-word-container h2 {
+        font-size: clamp(1rem, 2.8vw, 1.3rem);
+        margin-bottom: 2vh;
+        margin-top: 1vh;
+    }
+
+    .bunch-word-container .homework-content {
+        font-size: 1.2rem;              /* 比手機版 h2 小 */
+        line-height: 1.4;
+        padding: 0 0.3rem;
+    }
+
+    .bunch-word-container .homework-content h4 {
+        font-size: 1.4rem;              /* 比手機版 h2 小，但比 p 大 */
+        line-height: 1.3;
+        margin-bottom: 0.8rem;
+    }
+
+    .bunch-word-container .homework-content p {
+        font-size: 1.1rem;              /* 比手機版 h2 小 */
+        line-height: 1.4;
+        margin-bottom: 0.8rem;
+    }
+
+    /* 側邊欄手機版優化 */
+    .sidebar-toggle {
+        top: 0.5rem;
+        left: 0.5rem;
+        width: 28px;
+        height: 28px;
+        padding: 5px;
+    }
+
+    .sidebar-toggle span {
+        width: 16px;
+        height: 2px;
+    }
+
+    .sidebar-menu {
+        width: 260px;
+    }
+
+    .sidebar-item {
+        padding: 0.7rem 1.2rem;
+    }
+
+    .sidebar-text {
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .slide {
+        padding: 4vw;
+    }
+
+    h1 {
+        font-size: 3.5rem;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    .two-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 3vw;
+    }
+
+    .video-container {
+        width: 75%;
+        max-width: 700px;
+    }
+}
+
+/* 確保普通投影片置中對齊 */
+.slide:not(.chart-slide):not(.video-slide):not(.homework-slide):not(.bunch-word-container) {
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* 字多版本容器置頂對齊 */
+.slide.bunch-word-container {
+    justify-content: flex-start !important;
+    align-items: center !important;
+}
+
+</style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- 投影片 1: 標題頁 -->
+        <section class="slide">
+            <h1>機器學習、深度學習基本原理</h1>
+            <p class="slide-subtitle">2025-09-23</p>
+        </section>
+
+        <!-- 投影片 2: 解決問題的思維轉變 -->
+        <section class="slide">
+            <h2>解決問題的思維轉變：指令 ➞ 推論</h2>
+            <div class="content-grid">
+                <div class="content-section">
+                    <h4>傳統程式設計（就是計算機啦）</h4>
+                    <p>輸入 ➞ 人類規則 ➞ 輸出</p>
+                </div>
+                <div class="content-section">
+                    <h4>機器學習 (Machine Learning)</h4>
+                    <p>提供大量資料 ➞ 找到規則</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 3: 機器學習的主要類型 -->
+        <section class="slide">
+            <h2>機器學習的主要類型</h2>
+            <div class="content-grid">
+                <div class="content-section">
+                    <h4>監督式學習 (Supervised Learning)</h4>
+                    <p><strong>資料類型：</strong> 使用帶有「標籤」的資料進行訓練，即每個輸入資料都有對應的正確輸出或答案。</p>
+                    <p><strong>目標：</strong> 學習輸入資料與輸出資料之間的映射關係，以便在遇到新數據時能預測其輸出結果。</p>
+                    <p><strong>應用範例：</strong> 根據過去的天氣狀況（輸入）預測未來的航班時間（輸出）。</p>
+                </div>
+                <div class="content-section">
+                    <h4>非監督式學習 (Unsupervised Learning)</h4>
+                    <p><strong>資料類型：</strong> 使用未帶有標籤的原始資料進行訓練。</p>
+                    <p><strong>目標：</strong> 探索資料並在其中發現隱藏的模式、結構或關係，而不是預測特定的輸出。</p>
+                    <p><strong>應用範例：</strong> 尋找顧客群體中的相似性（分群），或識別未標記資料中的新關聯。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 4: 機器學習互動體驗 -->
+        <section class="slide">
+            <div class="embedded-content">
+                <iframe src="../gen_stuff/w3-supervised-learning.html"
+                        title="監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+                </iframe>
+            </div>
+        </section>
+
+        <!-- 投影片 5: 非監督式學習互動體驗 -->
+        <section class="slide">
+            <div class="embedded-content">
+                <iframe src="../gen_stuff/w3-unsupervised-learning.html"
+                        title="非監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+                </iframe>
+            </div>
+        </section>
+
+        <!-- 投影片 6: 深度學習介紹 -->
+        <section class="slide">
+            <h2>那深度學習 (Deep Learning) 又是什麼？</h2>
+        </section>
+
+        <!-- 投影片 7: 深度學習詳解 -->
+        <section class="slide">
+            <h2>深度學習(Deep Learning)</h2>
+            <div class="content-section">
+                <p><strong>與機器學習的關係：</strong> 是機器學習的一個子集，屬於一類特定的機器學習模型。</p>
+                <p><strong>特點：</strong> 使用多層神經網路（類似人類大腦結構）來學習資料中的複雜模式。</p>
+                <p><strong>應用範例：</strong> 深度學習模型可以執行監督式學習任務，如圖像識別，也可以進行非監督式學習，從大量的未標記資料中提取有價值的資訊。</p>
+            </div>
+        </section>
+
+        <!-- 投影片 8: 生成式 AI 介紹 -->
+        <section class="slide">
+            <h2>那…生成式 AI (Generative AI) 又是什麼？</h2>
+        </section>
+
+        <!-- 投影片 9: 生成式 AI 詳解 -->
+        <section class="slide">
+            <h2>生成式 AI</h2>
+            <p>生成式 AI 是基於深度學習的技術分支，可以學習數據中的模式並生成新的內容，涵蓋文本、圖像、聲音等多種形式。（細節下堂課再介紹。）</p>
+        </section>
+
+        <!-- 投影片 10: 機器學習核心總結 -->
+        <section class="slide">
+            <h2>機器學習的核心：</h2>
+            <div class="content-section">
+                <p><strong>監督式學習 (Supervised Learning)</strong> 與 <strong>非監督式學習 (Unsupervised Learning)</strong></p>
+                <p>技術路徑的選擇，更反映了我們想從數據中獲得什麼是「驗證已知的答案」，還是「探索未知的結構」</p>
+            </div>
+        </section>
+
+        <!-- 投影片 11: 關鍵問題 -->
+        <section class="slide">
+            <h2>關鍵問題</h2>
+            <p>「有標準答案的考卷」（監督式學習）來訓練 AI 解決已知的問題，比起「沒有答案的浩瀚圖書館」（非監督式學習）中探索未知和關聯性，如何在「指導」與「探索」之間的權衡？又有哪些風險？</p>
+        </section>
+
+        <!-- 投影片 12: 不同情境下的探討 -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>不同情境下的探討</h2>
+                <div class="homework-content">
+                    <h4>1. 個人化的音樂世界：</h4>
+                    <p>Spotify 如何為你推薦音樂？一種方式是監督式：你按了「喜歡」的歌曲（提供了明確標籤），系統就去尋找音樂特徵相似的歌曲推薦給你。另一種是非監督式：系統分析全球數億用戶的收聽數據，將品味相似的人自動「分群 (Clustering)」，然後把你那一群人喜歡、但你還沒聽過的歌推薦給你（例如「每週新發現」）。哪一種方式更容易讓你跳出同溫層，發現全新的音樂類型？哪一種方式又可能讓你越陷越深？</p>
+
+                    <h4>2. 酷澎電商的行銷策略：</h4>
+                    <p>酷澎網站想了解顧客。監督式做法是，進行滿意度問卷，讓顧客在「價格」、「服務」、「品質」等項目上打 1-5 分（給予明確標籤），然後分析哪個環節分數最低。非監督式做法是，直接分析數十萬條顧客的原始評論文字，AI 自動將評論分群，可能會發現一個從未想過的顧客抱怨主題，例如「包裝過度不環保」或「贈品品質太差」，這在原本的問卷中根本沒有這個選項。哪種方法能解決已知的問題？哪種能發現未知的問題？</p>
+
+                    <h4>3. 打擊金融詐騙：</h4>
+                    <p>銀行如何偵測盜刷？監督式方法是，利用過去所有被標記為「盜刷」和「正常」的交易紀錄來訓練模型，當一筆新交易進來時，模型會判斷其為盜刷的機率。但如果出現一種全新的詐騙手法，模型可能就認不出來。非監督式的「異常偵測 (Anomaly Detection)」則是，模型先學習什麼是「正常」的交易模式（一個龐大的群體），任何不符合這個模式的交易，無論手法為何，都會被標記為可疑。哪種方法更擅長防堵已知的敵人？哪種更能應對未知的威脅？</p>
+
+                    <h4>4. 城市安全的洞察：</h4>
+                    <p>警察局想預防犯罪。監督式方法是，分析過去標記有「犯罪地點」和「時間」的數據，來預測下一個犯罪熱點。但這完全依賴於「有報案」的數據。非監督式方法則是，分析城市裡匿名的通訊或交通流量數據，找出「異常聚集」或「模式突然改變」的區域，這可能是一個未被發現的地下交易市場，也可能只是一場快閃活動。我們該如何權衡這種探索帶來的機會與誤判的風險？</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 13: 看不見的風險 -->
+        <section class="slide">
+            <h2>看不見的風險：從「偏見的固化」到「虛假的發現」</h2>
+        </section>
+
+        <!-- 投影片 14: 監督式風險 -->
+        <section class="slide">
+            <h3>監督式風險 - 偏見問題（The Bias Problem)</h3>
+            <p>AI 從有偏見的歷史數據中學習，不僅會複製，更會放大這些偏見。原則：垃圾進，垃圾出。</p>
+        </section>
+
+        <!-- 投影片 15: 偏見問題圖表 -->
+        <section class="slide chart-slide">
+            <h3>AI 辨識錯誤率差異</h3>
+            <div class="iq-chart-container">
+                <canvas id="biasChart" width="400" height="200"></canvas>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                <img src="../pic/w3-p1.jpg" alt="Gender Shades 研究圖片" class="slide-image" style="max-width: 600px; margin-left: 20px;">
+            </div>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">ref: （MIT）Media Lab 的《Gender Shades》研究（Joy Buolamwini）</p>
+        </section>
+
+        <!-- 投影片 16: 非監督式風險 -->
+        <section class="slide">
+            <h3>非監督式風險 - 詮釋的困難與虛假關聯</h3>
+            <p>非監督式學習找到的「模式」不一定具有現實意義。它可能會發現冰淇淋銷量和溺水人數呈現高度正相關。（相關不等於因果）。</p>
+        </section>
+
+        <!-- 投影片 17: 強化學習介紹 -->
+        <section class="slide">
+            <h2>還有一種「強化學習」</h2>
+            <h3>(Reinforcement Learning, RL)</h3>
+            <div class="content-section">
+                <p>不需要標籤比對，也不像非監督學習單純從數據自發發現模式。</p>
+                <p>透過環境互動，根據行為得到的獎勵或懲罰來漸進地學習達成目標的策略。（就跟人類很像）</p>
+            </div>
+        </section>
+
+        <!-- 投影片 18: 強化學習影片 -->
+        <section class="slide video-slide">
+            <h3>用強化學習來通關玩寶可夢</h3>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/DcYLT37ImBY?start=0&end=280"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- 投影片 19: 考試 -->
+        <section class="slide">
+            <h1>考試？</h1>
+        </section>
+
+        <!-- 投影片 20: 課堂作業 -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>課堂作業：生活中的 AI 偵探</h2>
+                <div class="homework-content">
+                    <p style="background-color: #e8e5dc; padding: 15px; border-radius: 8px; font-size: 1.1rem; line-height: 1.5;">
+                        <strong>google form 連結：<a href="https://forms.gle/P2L7kzKGpUHpTxbq6" target="_blank" style="color: #78785b; text-decoration: underline;">https://forms.gle/P2L7kzKGpUHpTxbq6</a></strong><br><br>
+                        <strong>請於 9/25 周四 23:59 前完成提交</strong><br><br>
+                        <strong>簡短說明：</strong> 請找出一個生活中的 AI 應用，並回答以下問題。
+                    </p>
+
+                    <h4>1. 你發現了哪個 AI 應用？</h4>
+                    <p>(例如：YouTube 的影片推薦系統、Instagram 的限時動態濾鏡、Google Maps 的預估到達時間、蝦皮的「猜你喜歡」商品)</p>
+
+                    <h4>2. 簡要描述這個 AI 應用是如何運作的？它在「學習」什麼？</h4>
+                    <p>(例如：它學習我看過哪些影片、停留多久，來推薦我可能喜歡的新影片。)</p>
+
+                    <h4>3. 這個 AI 應用為你帶來了什麼「好處」？</h4>
+                    <p>(例如：節省我尋找影片的時間、讓我發現新的興趣、讓我的照片更好看。)</p>
+
+                    <h4>4. 根據課堂上學到的概念（如：偏見、黑盒子、信任），思考這個 AI 應用可能存在的一個「潛在風險」或「負面影響」？</h4>
+                    <p>(例如：它可能讓我陷入「同溫層」，只看見我想看的內容，視野越來越窄。或是，美顏濾鏡可能加劇了容貌焦慮。)</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">‹</button>
+        <button id="next" class="nav-btn">›</button>
+    </div>
+
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slidesContainer = document.querySelector('.slides-container');
+            const allSlides = Array.from(document.querySelectorAll('.slide'));
+            const visibleSlides = allSlides.filter(s => s.dataset.hidden !== 'true');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+
+            let currentIndex = 0; // index within visibleSlides
+
+            function showSlideByIndex(index) {
+                const total = visibleSlides.length;
+                if (total === 0) return;
+
+                if (index >= total) {
+                    currentIndex = 0;
+                } else if (index < 0) {
+                    currentIndex = total - 1;
+                } else {
+                    currentIndex = index;
+                }
+
+                const targetSlide = visibleSlides[currentIndex];
+                const absoluteIndex = allSlides.indexOf(targetSlide);
+                const offset = -absoluteIndex * 100;
+                slidesContainer.style.transform = `translateX(${offset}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                showSlideByIndex(currentIndex + 1);
+            });
+
+            prevBtn.addEventListener('click', () => {
+                showSlideByIndex(currentIndex - 1);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    showSlideByIndex(currentIndex + 1);
+                } else if (e.key === 'ArrowLeft') {
+                    showSlideByIndex(currentIndex - 1);
+                }
+            });
+
+            // 觸控滑動支援
+            let startX = 0;
+            let startY = 0;
+            let isScrolling = false;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isScrolling = false;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!startX || !startY) return;
+
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                const diffX = startX - currentX;
+                const diffY = startY - currentY;
+
+                // 判斷是否為水平滑動
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    isScrolling = true;
+                    e.preventDefault(); // 防止頁面滾動
+                }
+            });
+
+            document.addEventListener('touchend', (e) => {
+                if (!startX || !startY || !isScrolling) return;
+
+                const endX = e.changedTouches[0].clientX;
+                const diffX = startX - endX;
+                const threshold = 50; // 滑動閾值
+
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX > 0) {
+                        // 向左滑動，下一張投影片
+                        showSlideByIndex(currentIndex + 1);
+                    } else {
+                        // 向右滑動，上一張投影片
+                        showSlideByIndex(currentIndex - 1);
+                    }
+                }
+
+                startX = 0;
+                startY = 0;
+                isScrolling = false;
+            });
+
+            // 全域圖表設定
+            Chart.defaults.color = '#5a5a5a';
+            Chart.defaults.borderColor = '#d1d1c2';
+            Chart.defaults.font.family = "'Calibri', 'Noto Sans TC', sans-serif";
+            Chart.defaults.plugins.legend.position = 'bottom';
+            Chart.defaults.maintainAspectRatio = false;
+
+            // 顏色調色板
+            const colorPalette = {
+                primary: 'rgba(120, 120, 91, 0.7)',
+                secondary: 'rgba(163, 163, 128, 0.7)',
+                accent: 'rgba(180, 120, 120, 0.7)',
+                success: 'rgba(120, 150, 120, 0.7)',
+                info: 'rgba(120, 140, 160, 0.7)',
+                warning: 'rgba(160, 140, 180, 0.7)'
+            };
+
+            // 初始化偏見圖表
+            const biasCtx = document.getElementById('biasChart');
+            if (biasCtx) {
+                new Chart(biasCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['淺膚色男性', '深膚色女性'],
+                        datasets: [{
+                            label: '辨識錯誤率 (%)',
+                            data: [0.5, 34.7],
+                            backgroundColor: [
+                                colorPalette.primary,
+                                colorPalette.accent
+                            ],
+                            borderColor: [
+                                'rgba(120, 120, 91, 1)',
+                                'rgba(180, 120, 120, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 40,
+                                title: {
+                                    display: true,
+                                    text: '錯誤率 (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '族群'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initial setup
+            showSlideByIndex(0);
+        });
+    </script>
+</body>
+</html>

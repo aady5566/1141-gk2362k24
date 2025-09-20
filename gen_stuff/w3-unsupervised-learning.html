@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非監督式學習：夜市美食策展人</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --panel-color: #ffffff;
+            --primary-text: #5a5a5a;
+            --secondary-text: #8c867b;
+            --accent-color: #78785b;
+            --border-color: #d1d1c2;
+        }
+        body {
+            font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel {
+            background-color: var(--panel-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+        h1, h2 {
+            text-align: center;
+            margin: 0 0 15px 0;
+        }
+        h1 { font-size: 2em; color: var(--primary-text); }
+        h2 { font-size: 1.5em; color: var(--secondary-text); }
+
+        #market-space {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background-color: #faf6f1;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            margin-top: 15px;
+            touch-action: none; /* For mobile dragging */
+        }
+        .stall {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            border-radius: 8px;
+            background-color: var(--panel-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: grab;
+            user-select: none;
+            border: 2px solid var(--border-color);
+        }
+        .stall.dragging {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(1.1);
+            z-index: 1000;
+        }
+        .stall .icon { font-size: 2.5em; }
+        .stall .name { font-weight: bold; font-size: 0.9em; }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            font-size: 1.1em;
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            background-color: var(--accent-color);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        #analysis-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #faf6f1;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            #market-space { height: 400px; }
+            .stall .icon { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>非監督式學習：夜市美食策展人</h1>
+        <p style="text-align:center; color: var(--secondary-text);">你來到一個全新的夜市，這裡沒有任何標示。請拖曳攤位，將你認為相似的放在一起，自行定義出美食區！</p>
+    </header>
+
+    <div class="panel">
+        <h2>第一步：探索與分群 (自行找出結構)</h2>
+        <div id="market-space">
+            </div>
+    </div>
+
+    <div class="panel">
+        <h2>第二步：分析與詮釋 (為群體賦予意義)</h2>
+        <p>當你完成分群後，點擊下方按鈕，讓 AI 分析你的分群結果，看看你發現了哪些隱藏的美食主題！</p>
+        <div class="button-container">
+            <button id="analyze-btn">分析我的美食地圖</button>
+        </div>
+        <div id="analysis-result">
+            <p>分析結果將顯示於此...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const foodStalls = [
+        // Hidden properties: cuisine, type
+        { name: '壽司', icon: '🍣', cuisine: '日式', type: '主食' },
+        { name: '拉麵', icon: '🍜', cuisine: '日式', type: '主食' },
+        { name: '章魚燒', icon: '🐙', cuisine: '日式', type: '點心' },
+        { name: '牛排', icon: '🥩', cuisine: '西式', type: '主食' },
+        { name: '義大利麵', icon: '🍝', cuisine: '西式', type: '主食' },
+        { name: '漢堡', icon: '🍔', cuisine: '西式', type: '主食' },
+        { name: '玉米片', icon: ' nachos', icon: '🌮', cuisine: '墨西哥', type: '點心' },
+        { name: '墨西哥捲', icon: '🌯', cuisine: '墨西哥', type: '主食' },
+        { name: '珍珠奶茶', icon: '🧋', cuisine: '台式', type: '飲料' },
+        { name: '雞排', icon: '🍗', cuisine: '台式', type: '點心' },
+        { name: '臭豆腐', icon: '🍢', cuisine: '台式', type: '點心' },
+    ];
+
+    const marketSpace = document.getElementById('market-space');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const analysisResult = document.getElementById('analysis-result');
+    let stalls = [];
+
+    function initializeStalls() {
+        marketSpace.innerHTML = '';
+        stalls = foodStalls.map(stallData => {
+            const el = document.createElement('div');
+            el.className = 'stall';
+            el.innerHTML = `<div class="icon">${stallData.icon}</div><div class="name">${stallData.name}</div>`;
+
+            const marketRect = marketSpace.getBoundingClientRect();
+            const x = Math.random() * (marketRect.width - 60);
+            const y = Math.random() * (marketRect.height - 60);
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+
+            marketSpace.appendChild(el);
+
+            return { ...stallData, element: el };
+        });
+
+        makeAllDraggable();
+    }
+
+    function makeAllDraggable() {
+        stalls.forEach(stall => {
+            let active = false;
+            let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+            const dragStart = (e) => {
+                stall.element.classList.add('dragging');
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+                active = true;
+            };
+
+            const drag = (e) => {
+                if (active) {
+                    e.preventDefault();
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+
+                    const marketRect = marketSpace.getBoundingClientRect();
+                    const stallWidth = stall.element.offsetWidth;
+                    const stallHeight = stall.element.offsetHeight;
+                    const originalLeft = parseFloat(stall.element.style.left);
+                    const originalTop = parseFloat(stall.element.style.top);
+
+                    const minX = -originalLeft;
+                    const maxX = marketRect.width - originalLeft - stallWidth;
+                    const minY = -originalTop;
+                    const maxY = marketRect.height - originalTop - stallHeight;
+
+                    currentX = Math.max(minX, Math.min(currentX, maxX));
+                    currentY = Math.max(minY, Math.min(currentY, maxY));
+
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    setTranslate(currentX, currentY, stall.element);
+                }
+            };
+
+            const dragEnd = () => {
+                stall.element.classList.remove('dragging');
+                initialX = currentX;
+                initialY = currentY;
+                active = false;
+            };
+
+            stall.element.addEventListener("mousedown", dragStart, false);
+            document.addEventListener("mouseup", dragEnd, false);
+            document.addEventListener("mousemove", drag, false);
+
+            stall.element.addEventListener("touchstart", dragStart, false);
+            document.addEventListener("touchend", dragEnd, false);
+            document.addEventListener("touchmove", drag, {passive: false});
+        });
+    }
+
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+        // Simple clustering based on proximity
+        const CLUSTER_THRESHOLD = 150; // pixels
+        let clusters = [];
+        let assignedStalls = new Set();
+
+        stalls.forEach(s1 => {
+            if (assignedStalls.has(s1.name)) return;
+
+            let currentCluster = [s1];
+            assignedStalls.add(s1.name);
+
+            stalls.forEach(s2 => {
+                if (!assignedStalls.has(s2.name)) {
+                    const rect1 = s1.element.getBoundingClientRect();
+                    const rect2 = s2.element.getBoundingClientRect();
+                    const distance = Math.hypot(rect1.x - rect2.x, rect1.y - rect2.y);
+
+                    if (distance < CLUSTER_THRESHOLD) {
+                        currentCluster.push(s2);
+                        assignedStalls.add(s2.name);
+                    }
+                }
+            });
+            clusters.push(currentCluster);
+        });
+
+        // Interpret and display results
+        let htmlResult = `<h3>AI 分析了你的美食地圖：</h3>`;
+        htmlResult += `<p>你將 ${stalls.length} 個攤位分成了 <strong>${clusters.length}</strong> 個主要的美食區。這是一種非監督式學習，重點在於你如何賦予這些群體意義：</p><ul>`;
+
+        clusters.forEach((cluster, index) => {
+            const cuisineCounts = {};
+            cluster.forEach(stall => {
+                cuisineCounts[stall.cuisine] = (cuisineCounts[stall.cuisine] || 0) + 1;
+            });
+
+            // Find dominant cuisine
+            let dominantCuisine = '綜合';
+            let maxCount = 0;
+            for (const cuisine in cuisineCounts) {
+                if (cuisineCounts[cuisine] > maxCount) {
+                    maxCount = cuisineCounts[cuisine];
+                    dominantCuisine = cuisine;
+                }
+            }
+
+            htmlResult += `<li><strong>美食區 ${index + 1}</strong> (包含 ${cluster.length} 個攤位): AI 推測這可能是「<strong>${dominantCuisine}主題區</strong>」。<br><small>成員: ${cluster.map(s => s.name).join(', ')}</small></li>`;
+        });
+
+        htmlResult += `</ul><p>看到了嗎？即使沒有標準答案，數據中的結構也能被「發現」。這就是非監督式學習的魅力！</p>`;
+        analysisResult.innerHTML = htmlResult;
+    });
+
+    initializeStalls();
+
+</script>
+
+</body>
+</html>
