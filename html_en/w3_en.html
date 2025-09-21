@@ -34,6 +34,11 @@
     --color-success: rgba(120, 150, 120, 0.7);     /* Success color */
     --color-info: rgba(120, 140, 160, 0.7);        /* Info color */
     --color-warning: rgba(160, 140, 180, 0.7);     /* Warning color */
+    /* Additional wabi-sabi color palette */
+    --color-earth: rgba(139, 125, 107, 0.7);       /* Earth color - warm earth brown */
+    --color-stone: rgba(152, 144, 136, 0.7);       /* Stone color - stable gray stone */
+    --color-moss: rgba(108, 128, 108, 0.7);        /* Moss color - natural moss green */
+    --color-mist: rgba(168, 160, 152, 0.7);        /* Mist color - hazy mist gray */
 }
 
 /* Main title - for slide main titles */
@@ -332,6 +337,12 @@ p {
     margin-bottom: 1rem;
 }
 
+.bunch-word-container .homework-content p a {
+    color: var(--color-earth);                 /* Use earth tone as link color */
+    text-decoration: underline;
+    font-weight: 500;                          /* Slightly bold link text */
+}
+
 /* Video slide special styles */
 .slide.video-slide {
     padding: 2vw;
@@ -598,6 +609,12 @@ p {
         margin-bottom: 0.8rem;
     }
 
+    .bunch-word-container .homework-content p a {
+        color: var(--color-earth);                 /* Use earth tone as link color */
+        text-decoration: underline;
+        font-weight: 500;                          /* Slightly bold link text */
+    }
+
     /* Sidebar mobile optimization */
     .sidebar-toggle {
         top: 0.5rem;
@@ -849,14 +866,51 @@ p {
             <h1>Exam?</h1>
         </section>
 
-        <!-- Slide 20: Class Assignment -->
+        <!-- Slide 20: Course Resources Compilation -->
         <section class="slide bunch-word-container">
             <div>
-                <h2>Class Assignment: AI Detective in Daily Life</h2>
+                <h2>Course Resources Compilation (Chinese & English)</h2>
+                <div class="homework-content">
+                    <h4>Traditional Chinese Resources</h4>
+
+                    <h5>Classic Online Courses:</h5>
+                    <p><a href="https://www.youtube.com/playlist?list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49" target="_blank">[NTU Prof. Hung-yi Lee - Machine Learning Series (YouTube)]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.coursera.org/learn/ntumlone-machine-learning-foundations" target="_blank">[NTU Prof. Hsuan-Tien Lin - Machine Learning Foundations (Coursera)]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.youtube.com/playlist%3Flist%3DPL_i2O55pT28Ld2C02sIu_F_A9gajC1s4a" target="_blank">[NTU Prof. Hsuan-Tien Lin - Machine Learning Foundations (YouTube)]</a></p>
+
+                    <h5>Recommended Readings:</h5>
+                    <p>[Classic Textbook: "Machine Learning" (Watermelon Book) - Zhou Zhihua]</p>
+
+                    <h4>English Resources</h4>
+
+                    <h5>In-depth Literature (Papers & Books):</h5>
+                    <p><a href="https://www.deeplearningbook.org/" target="_blank">[Bible-level Textbook: "Deep Learning" by Ian Goodfellow, et al.]</a></p>
+                    <p><a href="https://arxiv.org/abs/1606.03490" target="_blank">[Counter-argument Paper: "The Mythos of Model Interpretability" by Zachary C. Lipton]</a></p>
+                    <p>[Counter-argument Book: "Weapons of Math Destruction" by Cathy O'Neil]</p>
+
+                    <h5>Research & Trends (Blogs & Journals):</h5>
+                    <p><a href="https://ai.googleblog.com/" target="_blank">[Google AI Blog: Latest AI research from Google]</a></p>
+                    <p><a href="https://deepmind.google/blog" target="_blank">[DeepMind Blog: Research results from top AI labs]</a></p>
+                    <p><a href="https://distill.pub/" target="_blank">[Distill.pub: Journal that explains complex ML concepts through visualization]</a></p>
+
+                    <h5>Case Studies:</h5>
+                    <p><a href="https://www.google.com/search?q=https://ai.googleblog.com/2018/10/improving-detection-of-metastatic.html" target="_blank">[Case - Performance Breakthrough: Google AI improves breast cancer detection]</a></p>
+                    <p><a href="https://www.reuters.com/article/us-amazon-com-jobs-automation-insight/amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK08G" target="_blank">[Case - Bias Amplification: Reuters reports on Amazon AI recruiting tool bias]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.youtube.com/watch%3Fv%3Dgg7WjuFsVXA" target="_blank">[Case - Scientific Leap: DeepMind official video about AlphaFold]</a></p>
+                    <p><a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" target="_blank">[Case - Social Alarm: ProPublica's "Machine Bias" investigation of COMPAS algorithm]</a></p>
+                    <p><a href="https://thispersondoesnotexist.com/" target="_blank">[Case - Concept Embodiment: This Person Does Not Exist (GAN application)]</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 21: Class Assignment -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>Assignment 3</h2>
                 <div class="homework-content">
                     <h3 style="background-color: #e8e5dc; padding: 15px; border-radius: 8px; font-size: 1.1rem; line-height: 1.5;">
                         <strong><a href="https://forms.gle/P2L7kzKGpUHpTxbq6" target="_blank" style="color: #78785b; text-decoration: underline;">[Assignment Form Link - Click Here!]</a></strong><br><br>
-                        <strong>Please submit by Thursday, 9/25, at 23:59</strong><br><br>
+                        <strong>Please submit by Sunday, 9/28, at 23:59</strong><br><br>
                         <strong>Brief Description:</strong> Please find an AI application in your daily life and answer the following questions.
                     </h3>
 
@@ -926,53 +980,7 @@ p {
                 }
             });
 
-            // Touch swipe support
-            let startX = 0;
-            let startY = 0;
-            let isScrolling = false;
-
-            document.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                isScrolling = false;
-            });
-
-            document.addEventListener('touchmove', (e) => {
-                if (!startX || !startY) return;
-
-                const currentX = e.touches[0].clientX;
-                const currentY = e.touches[0].clientY;
-                const diffX = startX - currentX;
-                const diffY = startY - currentY;
-
-                // Determine if it's a horizontal swipe
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    isScrolling = true;
-                    e.preventDefault(); // Prevent page scrolling
-                }
-            });
-
-            document.addEventListener('touchend', (e) => {
-                if (!startX || !startY || !isScrolling) return;
-
-                const endX = e.changedTouches[0].clientX;
-                const diffX = startX - endX;
-                const threshold = 50; // Swipe threshold
-
-                if (Math.abs(diffX) > threshold) {
-                    if (diffX > 0) {
-                        // Swipe left, next slide
-                        showSlideByIndex(currentIndex + 1);
-                    } else {
-                        // Swipe right, previous slide
-                        showSlideByIndex(currentIndex - 1);
-                    }
-                }
-
-                startX = 0;
-                startY = 0;
-                isScrolling = false;
-            });
+            // Touch swipe functionality disabled - only button and keyboard controls remain
 
             // Global chart settings
             Chart.defaults.color = '#5a5a5a';

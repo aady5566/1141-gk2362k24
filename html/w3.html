@@ -34,6 +34,11 @@
     --color-success: rgba(120, 150, 120, 0.7);     /* 成功色 */
     --color-info: rgba(120, 140, 160, 0.7);        /* 資訊色 */
     --color-warning: rgba(160, 140, 180, 0.7);     /* 警告色 */
+    /* 新增侘寂風調色盤 */
+    --color-earth: rgba(139, 125, 107, 0.7);       /* 大地色 - 溫暖的土褐色 */
+    --color-stone: rgba(152, 144, 136, 0.7);       /* 石色 - 沉穩的灰石色 */
+    --color-moss: rgba(108, 128, 108, 0.7);        /* 苔色 - 自然的青苔綠 */
+    --color-mist: rgba(168, 160, 152, 0.7);        /* 霧色 - 朦朧的霧灰色 */
 }
 
 /* 主標題 - 用於投影片主標題 */
@@ -305,7 +310,7 @@ p {
 }
 
 .bunch-word-container h2 {
-    font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    font-size: clamp(1.8rem, 3.5vw, 2.2rem);  /* 最大字體 - 主標題 */
     margin-bottom: 1.5vh;
     text-align: center;
     width: 100%;
@@ -320,16 +325,31 @@ p {
 }
 
 .bunch-word-container .homework-content h4 {
-    font-size: 1.95rem;             /* 比 h2 小，但比 p 大 */
+    font-size: clamp(1.4rem, 2.8vw, 1.8rem);  /* 次標題 - 比 h2 小 */
+    font-weight: 700;                          /* 加粗體 */
     line-height: 1.4;
     margin-bottom: 1rem;
     color: var(--accent-color);
 }
 
+.bunch-word-container .homework-content h5 {
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);  /* 小標題 - 比 h4 小 */
+    font-weight: 700;                          /* 加粗體 */
+    line-height: 1.3;
+    margin-bottom: 0.8rem;
+    color: var(--accent-color);
+}
+
 .bunch-word-container .homework-content p {
-    font-size: 1.5rem;              /* 標準 p 字體大小 */
+    font-size: clamp(1rem, 1.8vw, 1.3rem);    /* 內容文字 - 最小字體 */
     line-height: 1.5;
     margin-bottom: 1rem;
+}
+
+.bunch-word-container .homework-content p a {
+    color: var(--color-earth);                 /* 使用 earth 色調作為連結顏色 */
+    text-decoration: underline;
+    font-weight: 500;                          /* 稍微加粗連結文字 */
 }
 
 /* 影片投影片特殊樣式 */
@@ -575,27 +595,41 @@ p {
     }
 
     .bunch-word-container h2 {
-        font-size: clamp(1rem, 2.8vw, 1.3rem);
+        font-size: clamp(1.3rem, 3vw, 1.6rem);   /* 手機版最大字體 - 主標題 */
         margin-bottom: 2vh;
         margin-top: 1vh;
     }
 
     .bunch-word-container .homework-content {
-        font-size: 1.2rem;              /* 比手機版 h2 小 */
+        font-size: 1.2rem;              /* 適中的字體大小 */
         line-height: 1.4;
         padding: 0 0.3rem;
     }
 
     .bunch-word-container .homework-content h4 {
-        font-size: 1.4rem;              /* 比手機版 h2 小，但比 p 大 */
+        font-size: clamp(1.1rem, 2.5vw, 1.4rem); /* 手機版次標題 - 比 h2 小 */
+        font-weight: 700;                          /* 加粗體 */
         line-height: 1.3;
         margin-bottom: 0.8rem;
     }
 
+    .bunch-word-container .homework-content h5 {
+        font-size: clamp(1rem, 2.2vw, 1.2rem);   /* 手機版小標題 - 比 h4 小 */
+        font-weight: 700;                          /* 加粗體 */
+        line-height: 1.2;
+        margin-bottom: 0.6rem;
+    }
+
     .bunch-word-container .homework-content p {
-        font-size: 1.1rem;              /* 比手機版 h2 小 */
+        font-size: clamp(0.9rem, 1.8vw, 1.1rem); /* 手機版內容文字 - 最小字體 */
         line-height: 1.4;
         margin-bottom: 0.8rem;
+    }
+
+    .bunch-word-container .homework-content p a {
+        color: var(--color-earth);                 /* 使用 earth 色調作為連結顏色 */
+        text-decoration: underline;
+        font-weight: 500;                          /* 稍微加粗連結文字 */
     }
 
     /* 側邊欄手機版優化 */
@@ -849,14 +883,51 @@ p {
             <h1>考試？</h1>
         </section>
 
-        <!-- 投影片 20: 課堂作業 -->
+        <!-- 投影片 20: 課程相關資源彙整 -->
         <section class="slide bunch-word-container">
             <div>
-                <h2>課堂作業：生活中的 AI 偵探</h2>
+                <h2>課程相關資源彙整 (中英)</h2>
+                <div class="homework-content">
+                    <h4>繁體中文資源 (Traditional Chinese Resources)</h4>
+
+                    <h5>經典線上課程 (Online Courses):</h5>
+                    <p><a href="https://www.youtube.com/playlist?list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49" target="_blank">[台大李宏毅教授 - 機器學習系列課程 (YouTube)]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.coursera.org/learn/ntumlone-machine-learning-foundations" target="_blank">[台大林軒田教授 - 機器學習基石 (Coursera)]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.youtube.com/playlist%3Flist%3DPL_i2O55pT28Ld2C02sIu_F_A9gajC1s4a" target="_blank">[台大林軒田教授 - 機器學習基石 (YouTube)]</a></p>
+
+                    <h5>推薦閱讀 (Readings):</h5>
+                    <p>[經典教科書: 《機器學習》(西瓜書) - 周志華]</p>
+
+                    <h4>英文資源 (English Resources)</h4>
+
+                    <h5>深入文獻 (Papers & Books):</h5>
+                    <p><a href="https://www.deeplearningbook.org/" target="_blank">[聖經級教科書: "Deep Learning" by Ian Goodfellow, et al.]</a></p>
+                    <p><a href="https://arxiv.org/abs/1606.03490" target="_blank">[反面論點論文: "The Mythos of Model Interpretability" by Zachary C. Lipton]</a></p>
+                    <p>[反面論點書籍: 《Weapons of Math Destruction》 by Cathy O'Neil]</p>
+
+                    <h5>野史研究與趨勢 (Blogs & Journals):</h5>
+                    <p><a href="https://ai.googleblog.com/" target="_blank">[Google AI Blog: 來自Google的最新AI研究]</a></p>
+                    <p><a href="https://deepmind.google/blog" target="_blank">[DeepMind Blog: 頂尖AI實驗室的研究成果]</a></p>
+                    <p><a href="https://distill.pub/" target="_blank">[Distill.pub: 以視覺化方式解釋複雜ML概念的期刊]</a></p>
+
+                    <h5>實際案例 (Case Studies):</h5>
+                    <p><a href="https://www.google.com/search?q=https://ai.googleblog.com/2018/10/improving-detection-of-metastatic.html" target="_blank">[案例 - 性能超越: Google AI 改善乳腺癌檢測]</a></p>
+                    <p><a href="https://www.reuters.com/article/us-amazon-com-jobs-automation-insight/amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK08G" target="_blank">[案例 - 偏見放大: 路透社報導亞馬遜AI招聘工具偏見]</a></p>
+                    <p><a href="https://www.google.com/search?q=https://www.youtube.com/watch%3Fv%3Dgg7WjuFsVXA" target="_blank">[案例 - 科學躍進: DeepMind 關於 AlphaFold 的官方影片]</a></p>
+                    <p><a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" target="_blank">[案例 - 社會警鐘: ProPublica 對 COMPAS 演算法的 "Machine Bias" 調查]</a></p>
+                    <p><a href="https://thispersondoesnotexist.com/" target="_blank">[案例 - 概念體現: This Person Does Not Exist (GAN應用)]</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 21: 課堂作業 -->
+        <section class="slide bunch-word-container">
+            <div>
+                <h2>作業三</h2>
                 <div class="homework-content">
                     <h3 style="background-color: #e8e5dc; padding: 15px; border-radius: 8px; font-size: 1.1rem; line-height: 1.5;">
                         <strong><a href="https://forms.gle/P2L7kzKGpUHpTxbq6" target="_blank" style="color: #78785b; text-decoration: underline;">[作業表單超連結請按此！]</a></strong><br><br>
-                        <strong>請於 9/25 周四 23:59 前完成提交</strong><br><br>
+                        <strong>請於 9/28 周日 23:59 前完成提交</strong><br><br>
                         <strong>簡短說明：</strong> 請找出一個生活中的 AI 應用，並回答以下問題。
                     </h3>
 
