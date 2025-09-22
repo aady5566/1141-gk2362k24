@@ -49,7 +49,7 @@
             max-width: 800px;
             background-color: var(--container-bg);
             border: 4px solid var(--container-border);
-            box-shadow: 
+            box-shadow:
                 inset -4px -4px 0px 0px var(--shadow-dark),
                 inset 4px 4px 0px 0px var(--shadow-light);
             padding: 24px;
@@ -86,7 +86,7 @@
             margin-bottom: 20px;
             resize: vertical;
         }
-        
+
         textarea {
             min-height: 150px;
         }
@@ -107,13 +107,13 @@
             text-shadow: 2px 2px #000000;
             background-color: var(--button-bg);
             border: 3px solid var(--container-border);
-            box-shadow: 
+            box-shadow:
                 inset -3px -3px 0px 0px var(--shadow-dark),
                 inset 3px 3px 0px 0px var(--shadow-light);
             cursor: pointer;
             text-align: center;
         }
-        
+
         .action-button:hover {
             background-color: var(--button-hover-bg);
         }
@@ -122,7 +122,7 @@
             box-shadow: inset 2px 2px 0px 0px var(--shadow-dark);
             transform: translateY(2px);
         }
-        
+
         #result-container {
             margin-top: 24px;
             display: grid;
@@ -133,7 +133,7 @@
         .group-card {
             background-color: var(--container-bg);
             border: 3px solid var(--container-border);
-            box-shadow: 
+            box-shadow:
                 inset -3px -3px 0px 0px var(--shadow-dark),
                 inset 3px 3px 0px 0px var(--shadow-light);
             padding: 15px;
@@ -164,17 +164,36 @@
 
     <div class="container">
         <h1>Random Group</h1>
-        
+
         <div class="controls">
             <h2>輸入名單:</h2>
-            <textarea id="name-list" placeholder="例如：
-史提夫
-艾莉克斯
-苦力怕
-終界龍"></textarea>
+            <textarea id="name-list">1170730515
+1180730501
+1180730502
+1180730503
+1180730504
+1180730505
+1180730506
+1180730507
+1180730508
+1180730509
+1180730510
+1180730511
+1180730512
+1180730513
+1180730514
+1180730515
+1180730516
+1180730517
+1180730518
+1180730519
+1180730520
+1180730521
+1180730522
+1180730523</textarea>
 
             <h2>輸入分組數</h2>
-            <input id="group-count" type="number" value="2" min="1">
+            <input id="group-count" type="number" value="4" min="1">
         </div>
 
         <button id="generate-btn" class="action-button">開始分組 !</button>
@@ -222,7 +241,7 @@
 
             // 3. 核心分組邏輯
             shuffleArray(names); // 將名單順序隨機打亂
-            
+
             // 建立空的群組陣列
             const groups = Array.from({ length: groupCount }, () => []);
 
@@ -234,7 +253,7 @@
             // 4. 渲染結果到畫面上
             displayResults(groups);
         }
-        
+
         function displayResults(groups) {
             // 清空舊的結果
             resultContainer.innerHTML = '';
