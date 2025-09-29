@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 核心概念導覽：從機器學習到生成式 AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, vertical scrolling journey designed for educational flow. It starts with a hero section, then sequentially introduces Machine Learning (now with supervised/unsupervised tabs), Deep Learning, and Generative AI (with a real Gemini API call) in dedicated, interactive sections. A final summary visualizes their relationship. This narrative structure is chosen over a dashboard because the goal is to guide a beginner through related concepts step-by-step, making complex information digestible and engaging. User flow is primarily linear scrolling, with top navigation for quick access. -->
+    <!-- Visualization & Content Choices:
+        1. Report Info: ML is like teaching a child to recognize cats/dogs. Goal: Inform & Engage. Viz/Method: Interactive HTML/CSS "image" classification game with buttons. Interaction: User clicks a button to classify an icon, receiving instant feedback. Justification: This makes the abstract concept of "pattern recognition" tangible and memorable. Library/Method: Vanilla JS, HTML, Tailwind.
+        2. Report Info: Supervised vs. Unsupervised Learning. Goal: Compare & Inform. Viz/Method: A clean tabbed interface. Interaction: User clicks tabs to switch between detailed explanations of each learning type. Justification: Allows for direct comparison of concepts within the same context, reinforcing understanding. Library/Method: Vanilla JS, HTML, Tailwind.
+        3. Report Info: DL as a complex ML model. Goal: Organize & Inform. Viz/Method: A simplified neural network diagram built with HTML/CSS divs. Interaction: Hovering over nodes reveals tooltips explaining their function. Justification: Visualizes the layered structure of DL. Library/Method: Vanilla JS, HTML, Tailwind.
+        4. Report Info: GenAI as a creative "intern". Goal: Demonstrate & Engage. Viz/Method: An interactive chat interface that calls the Gemini API. Interaction: User selects a prompt and clicks a button, which triggers a live API call to generate and display new content. Justification: Provides a real, powerful demonstration of GenAI's capabilities, moving beyond simulation. Library/Method: Vanilla JS (Fetch API).
+        5. Report Info: Relationship between ML, DL, and GenAI. Goal: Summarize & Organize. Viz/Method: An updated nested block diagram. Interaction: Hovering over each block provides a summary definition. Justification: Clearly illustrates the hierarchical and subset relationships for a final, consolidated understanding. Library/Method: Vanilla JS, HTML, Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .tab-btn {
+            transition: all 0.3s ease-in-out;
+        }
+        .tab-btn.active {
+            border-color: #0ea5e9; /* sky-500 */
+            color: #0c4a6e; /* sky-900 */
+            background-color: #e0f2fe; /* sky-100 */
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 smooth-scroll">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-sky-800">
+                AI 探索之旅
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#ml" class="text-slate-600 hover:text-sky-600 transition-colors duration-300">機器學習</a>
+                <a href="#dl" class="text-slate-600 hover:text-sky-600 transition-colors duration-300">深度學習</a>
+                <a href="#genai" class="text-slate-600 hover:text-sky-600 transition-colors duration-300">生成式 AI</a>
+                <a href="#summary" class="text-slate-600 hover:text-sky-600 transition-colors duration-300">總覽</a>
+            </div>
+            <div class="md:hidden">
+                <select id="mobile-nav" class="bg-slate-100 border border-slate-300 rounded-md p-2 text-slate-700">
+                    <option value="#home">首頁</option>
+                    <option value="#ml">機器學習</option>
+                    <option value="#dl">深度學習</option>
+                    <option value="#genai">生成式 AI</option>
+                    <option value="#summary">總覽</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+
+        <section id="home" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-sky-900 leading-tight">解密人工智慧</h1>
+            <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl">從學習規律到創造內容，讓我們用最生活化的方式，帶您一探機器學習、深度學習與生成式 AI 的奧秘。</p>
+            <a href="#ml" class="mt-8 px-8 py-3 bg-sky-600 text-white font-semibold rounded-full shadow-lg hover:bg-sky-700 transition-transform duration-300 transform hover:scale-105">
+                啟程探索
+            </a>
+        </section>
+
+        <section id="ml" class="py-16 md:py-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-sky-800">核心概念一：機器學習 (ML)</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">讓機器學會舉一反三</p>
+            </div>
+            <div class="prose max-w-4xl mx-auto text-slate-700 mb-12">
+                <p>機器學習的核心精神，是讓電腦系統能夠在沒有明確程式指令下，透過學習資料來執行任務。它旨在從大量數據中識別模式、趨勢，並做出準確的預測或分類。這就像我們教一個小孩辨識貓狗，透過不斷給他看範例，讓他自己「歸納」出特徵與「規律」。</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-semibold text-center mb-4">主要學習類型</h3>
+                    <div class="border-b border-slate-200 mb-4">
+                        <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                            <button id="tab-supervised" class="tab-btn active whitespace-nowrap py-3 px-1 border-b-4 font-medium text-lg">
+                                監督式學習
+                            </button>
+                            <button id="tab-unsupervised" class="tab-btn whitespace-nowrap py-3 px-1 border-b-4 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-medium text-lg">
+                                非監督式學習
+                            </button>
+                        </nav>
+                    </div>
+                    <div>
+                        <div id="content-supervised" class="tab-content active fade-in">
+                            <h4 class="font-bold text-sky-800 text-lg mb-2">使用「有標籤」的資料</h4>
+                            <p class="text-slate-600 mb-4">每個輸入資料都有對應的「正確答案」，像帶著標準答案的練習冊。</p>
+                            <strong class="text-slate-800">目標：</strong>
+                            <p class="text-slate-600 mb-3">學習輸入與輸出之間的對應關係，以便預測新資料的結果。</p>
+                            <strong class="text-slate-800">範例：</strong>
+                            <p class="text-slate-600">根據過去的天氣狀況（輸入）和對應的航班延誤記錄（標籤），來預測未來航班是否會準時（輸出）。</p>
+                        </div>
+                        <div id="content-unsupervised" class="tab-content fade-in">
+                           <h4 class="font-bold text-amber-800 text-lg mb-2">使用「沒有標籤」的資料</h4>
+                           <p class="text-slate-600 mb-4">只有一堆原始資料，沒有現成的答案，像一本沒有註解的古文書。</p>
+                           <strong class="text-slate-800">目標：</strong>
+                           <p class="text-slate-600 mb-3">在資料中探索並發現隱藏的模式、結構或群體。</p>
+                           <strong class="text-slate-800">範例：</strong>
+                           <p class="text-slate-600">分析顧客的購買紀錄，自動將行為相似的顧客分為不同群體（分群），以進行精準行銷。</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-semibold text-center mb-4">互動體驗：教 AI 辨識動物</h3>
+                    <p class="text-sm text-center text-slate-500 mb-4">這就是一個「監督式學習」的簡單例子！</p>
+                    <div id="ml-game-display" class="text-8xl text-center p-8 bg-slate-100 rounded-xl my-4 flex justify-center items-center h-48">
+                        <span>🐱</span>
+                    </div>
+                    <p id="ml-game-feedback" class="text-center h-6 mb-4 font-medium">&nbsp;</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="ml-cat-btn" class="w-full py-3 px-6 bg-amber-500 text-white font-bold rounded-lg shadow hover:bg-amber-600 transition-all duration-300 transform hover:scale-105">這是 貓 🐱</button>
+                        <button id="ml-dog-btn" class="w-full py-3 px-6 bg-cyan-600 text-white font-bold rounded-lg shadow hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105">這是 狗 🐶</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dl" class="py-16 md:py-24 bg-slate-100 -mx-6 px-6 rounded-3xl">
+            <div class="container mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-sky-800">更進一步：深度學習 (DL)</h2>
+                    <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">模仿大腦，學得更深</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 flex flex-col justify-center items-center h-full">
+                        <h3 class="text-xl font-semibold text-center mb-6">簡化神經網路示意圖</h3>
+                        <div class="relative w-full h-64 flex justify-between items-center px-4">
+                            <div class="flex flex-col justify-around h-full">
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-sky-200 text-sky-800" data-tooltip="輸入層：接收原始資料，如圖片的像素。">I-1</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-sky-200 text-sky-800" data-tooltip="輸入層：接收原始資料，如圖片的像素。">I-2</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-sky-200 text-sky-800" data-tooltip="輸入層：接收原始資料，如圖片的像素。">I-3</div>
+                            </div>
+                            <div class="flex flex-col justify-around h-full">
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-slate-200 text-slate-800" data-tooltip="隱藏層：提取特徵，如邊緣、形狀、紋理。">H1</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-slate-200 text-slate-800" data-tooltip="隱藏層：提取特徵，如邊緣、形狀、紋理。">H2</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-slate-200 text-slate-800" data-tooltip="隱藏層：提取特徵，如邊緣、形狀、紋理。">H3</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-slate-200 text-slate-800" data-tooltip="隱藏層：提取特徵，如邊緣、形狀、紋理。">H4</div>
+                            </div>
+                            <div class="flex flex-col justify-around h-full">
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-amber-200 text-amber-800" data-tooltip="輸出層：做出最終判斷，如「貓」或「狗」。">O-1</div>
+                               <div class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer bg-amber-200 text-amber-800" data-tooltip="輸出層：做出最終判斷，如「貓」或「狗」。">O-2</div>
+                            </div>
+                        </div>
+                         <div id="tooltip" class="absolute bg-slate-800 text-white text-xs rounded py-1 px-2 pointer-events-none opacity-0 transition-opacity"></div>
+                    </div>
+                    <div class="prose max-w-none text-slate-700">
+                        <p>深度學習是<strong>機器學習的一個子集</strong>，它的靈感來自人類大腦的神經網路結構。</p>
+                        <p>它使用由許多「層」組成的「人工神經網路」來學習。每一層都負責學習一種不同層次的特徵（如點、線、面到具體物件），這種分層、抽象的學習方式，讓 AI 能夠處理非常複雜的資訊。</p>
+                        <p>深度學習是一種強大的技術，它既可以執行<strong>監督式學習</strong>任務（如圖像識別），也能進行<strong>非監督式學習</strong>，從大量的未標記資料中提取有價值的資訊。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="genai" class="py-16 md:py-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-sky-800">核心概念二：生成式 AI (GenAI)</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">AI 的創造力</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="prose max-w-none text-slate-700">
+                    <p>如果說傳統的機器學習是個很會「歸納整理」的學生，那麼生成式 AI (GenAI) 就是一位學習了全世界知識、充滿創造力的「超級實習生」。</p>
+                    <p>它通常基於複雜的深度學習模型，不僅僅是辨識或分類資料，而是基於它學到的龐大知識庫，根據您的指令去「創造」出全新的、前所未見的內容。從撰寫文案、創作詩歌、產生程式碼，到繪製圖片，生成式 AI 正在徹底改變我們創造內容與互動的方式。</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-semibold text-center mb-4">互動體驗：呼叫 Gemini 實習生</h3>
+                    <div class="bg-slate-100 p-4 rounded-lg min-h-[220px] flex flex-col">
+                        <div id="genai-chatbox" class="flex-grow space-y-2 overflow-y-auto" style="max-height: 250px;">
+                             <div class="p-3 bg-sky-100 text-sky-900 rounded-lg self-start max-w-xs mr-auto">
+                                <span>你好！請從下方選擇一個任務，我將為您生成內容。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="genai-prompt-select" class="block text-sm font-medium text-slate-700 mb-2">選擇一個指令：</label>
+                        <select id="genai-prompt-select" class="w-full p-2 border border-slate-300 rounded-md">
+                            <option value="poem">寫一首關於星空的短詩</option>
+                            <option value="slogan">為一家新開的咖啡店想個標語</option>
+                            <option value="plan">規劃一個週末的台北一日遊</option>
+                        </select>
+                        <button id="genai-btn" class="mt-4 w-full py-3 px-6 bg-sky-600 text-white font-bold rounded-lg shadow hover:bg-sky-700 transition-all duration-300 transform hover:scale-105 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                            <span class="btn-text">生成內容</span>
+                            <span class="btn-spinner hidden animate-spin">●</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="summary" class="py-16 md:py-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-sky-800">觀念總結：它們的關係</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">一個層層遞進、不斷演化的家族</p>
+            </div>
+            <div class="w-full max-w-5xl mx-auto p-4">
+                <div class="summary-box bg-sky-100 border-2 border-sky-300 rounded-3xl p-6 md:p-8 transition-all duration-300">
+                    <h3 class="text-xl md:text-2xl font-bold text-sky-900">機器學習 (Machine Learning)</h3>
+                    <p class="mt-2 text-sky-800">AI 的基礎領域，讓電腦從資料中學習。主要分為「監督式」與「非監督式」兩大類型。</p>
+
+                    <div class="mt-6 summary-box bg-sky-200/80 border-2 border-sky-400 rounded-2xl p-4 md:p-6 transition-all duration-300">
+                        <h4 class="text-lg md:text-xl font-bold text-sky-900">深度學習 (Deep Learning)</h4>
+                        <p class="mt-1 text-sky-800">是機器學習的子集，使用複雜的多層神經網路。此技術可應用於監督式和非監督式學習任務，處理更複雜的模式。</p>
+
+                        <div class="mt-6 summary-box bg-amber-100/80 border-2 border-amber-400 rounded-2xl p-4 md:p-6 transition-all duration-300">
+                            <h5 class="text-lg md:text-xl font-bold text-amber-900">生成式 AI (Generative AI)</h5>
+                            <p class="mt-1 text-amber-800">通常基於大型深度學習模型，專注於「創造」全新的內容，而不僅是分析或預測。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 text-center py-6">
+        <p>&copy; 2025 AI 概念探索. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                const targetId = e.target.value;
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+
+            const navLinks = document.querySelectorAll('header a[href^="#"]');
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            const mlTabs = {
+                buttons: [document.getElementById('tab-supervised'), document.getElementById('tab-unsupervised')],
+                contents: [document.getElementById('content-supervised'), document.getElementById('content-unsupervised')],
+                init() {
+                    this.buttons.forEach((btn, index) => {
+                        btn.addEventListener('click', () => this.activateTab(index));
+                    });
+                },
+                activateTab(activeIndex) {
+                    this.buttons.forEach((btn, index) => {
+                        btn.classList.toggle('active', index === activeIndex);
+                    });
+                    this.contents.forEach((content, index) => {
+                        content.classList.toggle('active', index === activeIndex);
+                    });
+                }
+            };
+            mlTabs.init();
+
+            const mlGame = {
+                display: document.getElementById('ml-game-display'),
+                feedback: document.getElementById('ml-game-feedback'),
+                catBtn: document.getElementById('ml-cat-btn'),
+                dogBtn: document.getElementById('ml-dog-btn'),
+                items: [
+                    { icon: '🐱', type: 'cat' }, { icon: '🐶', type: 'dog' },
+                    { icon: '🐈', type: 'cat' }, { icon: '🐕', type: 'dog' },
+                    { icon: '🐩', type: 'dog' }, { icon: '😺', type: 'cat' },
+                ],
+                currentIndex: 0,
+                init() {
+                    this.render();
+                    this.catBtn.addEventListener('click', () => this.checkAnswer('cat'));
+                    this.dogBtn.addEventListener('click', () => this.checkAnswer('dog'));
+                },
+                render() {
+                    this.display.innerHTML = `<span>${this.items[this.currentIndex].icon}</span>`;
+                    this.feedback.textContent = '\u00A0';
+                },
+                checkAnswer(answer) {
+                    if (this.items[this.currentIndex].type === answer) {
+                        this.feedback.textContent = '正確！AI 學到了一點！';
+                        this.feedback.className = 'text-center h-6 mb-4 font-medium text-green-600';
+                    } else {
+                        this.feedback.textContent = '不對喔，再試一次！';
+                        this.feedback.className = 'text-center h-6 mb-4 font-medium text-red-600';
+                    }
+                    this.currentIndex = (this.currentIndex + 1) % this.items.length;
+                    setTimeout(() => this.render(), 1200);
+                }
+            };
+            mlGame.init();
+
+            const dlDiagramNodes = document.querySelectorAll('#dl [data-tooltip]');
+            const tooltip = document.getElementById('tooltip');
+            dlDiagramNodes.forEach(node => {
+                node.addEventListener('mouseenter', (e) => {
+                    tooltip.textContent = e.target.getAttribute('data-tooltip');
+                    tooltip.style.opacity = 1;
+                    const nodeRect = e.target.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    tooltip.style.left = `${nodeRect.left + (nodeRect.width / 2) - (tooltipRect.width / 2)}px`;
+                    tooltip.style.top = `${nodeRect.top - tooltipRect.height - 5}px`;
+                });
+                node.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = 0;
+                });
+            });
+
+            const genAI = {
+                select: document.getElementById('genai-prompt-select'),
+                btn: document.getElementById('genai-btn'),
+                chatbox: document.getElementById('genai-chatbox'),
+                btnText: document.querySelector('#genai-btn .btn-text'),
+                btnSpinner: document.querySelector('#genai-btn .btn-spinner'),
+                prompts: {
+                    poem: "請用繁體中文寫一首關於夜晚星空的四行短詩。",
+                    slogan: "請用繁體中文，為一家新開的、強調手沖與溫暖氛圍的咖啡店，想一個有創意的標語。",
+                    plan: "請用繁體中文，規劃一個適合年輕人的週末台北一日遊行程，包含至少三個景點與餐飲建議。"
+                },
+                init() {
+                    this.btn.addEventListener('click', () => this.generate());
+                },
+                addMessage(content, sender = 'bot') {
+                    const messageWrapper = document.createElement('div');
+                    messageWrapper.className = `p-3 rounded-lg max-w-xs fade-in ${
+                        sender === 'bot' ? 'bg-slate-200 text-slate-800 ml-auto' : 'bg-sky-100 text-sky-900 mr-auto'
+                    }`;
+                    messageWrapper.innerHTML = `<span>${content.replace(/\n/g, '<br>')}</span>`;
+                    this.chatbox.appendChild(messageWrapper);
+                    this.chatbox.scrollTop = this.chatbox.scrollHeight;
+                },
+                setLoading(isLoading) {
+                    this.btn.disabled = isLoading;
+                    this.btnText.classList.toggle('hidden', isLoading);
+                    this.btnSpinner.classList.toggle('hidden', !isLoading);
+                },
+                async generate() {
+                    const selectedKey = this.select.value;
+                    const userPrompt = this.prompts[selectedKey];
+                    if (!userPrompt) return;
+
+                    this.setLoading(true);
+                    this.addMessage("好的，請稍候...", "bot");
+
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }]
+                    };
+
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                           throw new Error(`HTTP 錯誤! 狀態: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        const candidate = result.candidates?.[0];
+                        const text = candidate?.content?.parts?.[0]?.text;
+
+                        if (text) {
+                            this.addMessage(text, 'bot');
+                        } else {
+                           this.addMessage('抱歉，無法生成內容。請稍後再試。', 'bot');
+                        }
+
+                    } catch (error) {
+                        console.error("Gemini API 呼叫失敗:", error);
+                        this.addMessage('發生錯誤，請檢查主控台訊息。', 'bot');
+                    } finally {
+                        this.setLoading(false);
+                    }
+                }
+            };
+            genAI.init();
+
+            const summaryBoxes = document.querySelectorAll('.summary-box');
+            summaryBoxes.forEach(box => {
+                box.addEventListener('mouseenter', () => box.classList.add('shadow-xl', 'scale-105'));
+                box.addEventListener('mouseleave', () => box.classList.remove('shadow-xl', 'scale-105'));
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多頭注意力視覺化</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-success: rgba(120, 150, 120, 0.7);
+            --color-info: rgba(120, 140, 160, 0.7);
+            --color-warning: rgba(160, 140, 180, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            color: var(--text-color);
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .control-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .control-btn:hover {
+            background: var(--highlight-color);
+        }
+
+        .control-btn.active {
+            background: var(--color-accent);
+        }
+
+        .visualization {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .input-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            border: 2px solid var(--line-color);
+            min-width: 400px;
+        }
+
+        .input-tokens {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .token {
+            background: var(--color-primary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .token:hover {
+            transform: scale(1.1);
+        }
+
+        .heads-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .head {
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid var(--line-color);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .head.active {
+            border-color: var(--color-accent);
+            background: rgba(180, 120, 120, 0.1);
+            transform: scale(1.05);
+        }
+
+        .head-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .head-description {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .attention-matrix {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .attention-cell {
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .attention-cell.high {
+            background: var(--color-accent);
+        }
+
+        .attention-cell.medium {
+            background: var(--color-secondary);
+        }
+
+        .attention-cell.low {
+            background: var(--color-mist);
+        }
+
+        .output-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            border: 2px solid var(--line-color);
+            min-width: 400px;
+        }
+
+        .concatenation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .head-output {
+            background: var(--color-info);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .concat-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .final-output {
+            background: var(--color-success);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+
+        .explanation {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .step.active {
+            background: rgba(120, 120, 91, 0.1);
+            border-left-color: var(--color-accent);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .heads-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .head {
+                min-width: 250px;
+            }
+
+            .input-tokens {
+                gap: 5px;
+            }
+
+            .token {
+                min-width: 50px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>多頭注意力機制視覺化</h1>
+
+        <div class="controls">
+            <button class="control-btn active" onclick="startAnimation()">開始動畫</button>
+            <button class="control-btn" onclick="resetAnimation()">重置</button>
+            <button class="control-btn" onclick="toggleStepMode()">逐步模式</button>
+        </div>
+
+        <div class="visualization">
+            <!-- 輸入部分 -->
+            <div class="input-section">
+                <h3>輸入序列</h3>
+                <p>範例句子：「我 喜歡 吃 蘋果」</p>
+                <div class="input-tokens">
+                    <div class="token" data-token="我">我</div>
+                    <div class="token" data-token="喜歡">喜歡</div>
+                    <div class="token" data-token="吃">吃</div>
+                    <div class="token" data-token="蘋果">蘋果</div>
+                </div>
+            </div>
+
+            <!-- 多個注意力頭 -->
+            <div class="heads-container">
+                <div class="head" data-head="0">
+                    <div class="head-title">👨‍🏫 專家 A</div>
+                    <div class="head-description">文法結構專家</div>
+                    <div class="attention-matrix">
+                        <div class="attention-cell high" title="我→我">0.9</div>
+                        <div class="attention-cell low" title="我→喜歡">0.1</div>
+                        <div class="attention-cell low" title="我→吃">0.0</div>
+                        <div class="attention-cell low" title="我→蘋果">0.0</div>
+                        <div class="attention-cell low" title="喜歡→我">0.2</div>
+                        <div class="attention-cell high" title="喜歡→喜歡">0.8</div>
+                        <div class="attention-cell low" title="喜歡→吃">0.0</div>
+                        <div class="attention-cell low" title="喜歡→蘋果">0.0</div>
+                        <div class="attention-cell low" title="吃→我">0.1</div>
+                        <div class="attention-cell medium" title="吃→喜歡">0.3</div>
+                        <div class="attention-cell high" title="吃→吃">0.6</div>
+                        <div class="attention-cell low" title="吃→蘋果">0.0</div>
+                        <div class="attention-cell low" title="蘋果→我">0.0</div>
+                        <div class="attention-cell low" title="蘋果→喜歡">0.0</div>
+                        <div class="attention-cell low" title="蘋果→吃">0.2</div>
+                        <div class="attention-cell high" title="蘋果→蘋果">0.8</div>
+                    </div>
+                </div>
+
+                <div class="head" data-head="1">
+                    <div class="head-title">🧠 專家 B</div>
+                    <div class="head-description">語意關聯專家</div>
+                    <div class="attention-matrix">
+                        <div class="attention-cell high" title="我→我">0.7</div>
+                        <div class="attention-cell medium" title="我→喜歡">0.2</div>
+                        <div class="attention-cell low" title="我→吃">0.1</div>
+                        <div class="attention-cell low" title="我→蘋果">0.0</div>
+                        <div class="attention-cell medium" title="喜歡→我">0.4</div>
+                        <div class="attention-cell high" title="喜歡→喜歡">0.5</div>
+                        <div class="attention-cell low" title="喜歡→吃">0.1</div>
+                        <div class="attention-cell low" title="喜歡→蘋果">0.0</div>
+                        <div class="attention-cell low" title="吃→我">0.1</div>
+                        <div class="attention-cell medium" title="吃→喜歡">0.3</div>
+                        <div class="attention-cell high" title="吃→吃">0.6</div>
+                        <div class="attention-cell low" title="吃→蘋果">0.0</div>
+                        <div class="attention-cell low" title="蘋果→我">0.0</div>
+                        <div class="attention-cell low" title="蘋果→喜歡">0.1</div>
+                        <div class="attention-cell medium" title="蘋果→吃">0.2</div>
+                        <div class="attention-cell high" title="蘋果→蘋果">0.7</div>
+                    </div>
+                </div>
+
+                <div class="head" data-head="2">
+                    <div class="head-title">🔗 專家 C</div>
+                    <div class="head-description">邏輯順序專家</div>
+                    <div class="attention-matrix">
+                        <div class="attention-cell high" title="我→我">0.8</div>
+                        <div class="attention-cell low" title="我→喜歡">0.1</div>
+                        <div class="attention-cell low" title="我→吃">0.1</div>
+                        <div class="attention-cell low" title="我→蘋果">0.0</div>
+                        <div class="attention-cell low" title="喜歡→我">0.1</div>
+                        <div class="attention-cell high" title="喜歡→喜歡">0.7</div>
+                        <div class="attention-cell medium" title="喜歡→吃">0.2</div>
+                        <div class="attention-cell low" title="喜歡→蘋果">0.0</div>
+                        <div class="attention-cell low" title="吃→我">0.0</div>
+                        <div class="attention-cell low" title="吃→喜歡">0.1</div>
+                        <div class="attention-cell high" title="吃→吃">0.6</div>
+                        <div class="attention-cell medium" title="吃→蘋果">0.3</div>
+                        <div class="attention-cell low" title="蘋果→我">0.0</div>
+                        <div class="attention-cell low" title="蘋果→喜歡">0.0</div>
+                        <div class="attention-cell low" title="蘋果→吃">0.1</div>
+                        <div class="attention-cell high" title="蘋果→蘋果">0.9</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 輸出部分 -->
+            <div class="output-section">
+                <h3>🤝 三位專家整合結果</h3>
+                <div class="concatenation">
+                    <div class="head-output">👨‍🏫 文法專家</div>
+                    <div class="concat-arrow">⊕</div>
+                    <div class="head-output">🧠 語意專家</div>
+                    <div class="concat-arrow">⊕</div>
+                    <div class="head-output">🔗 邏輯專家</div>
+                </div>
+                <div class="final-output">「蘋果」= 文法賓語 + 語意食物 + 邏輯對象</div>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h3>「多位專家看書」的數學表示</h3>
+
+            <div class="step" data-step="1">
+                <strong>📚 情境：</strong> 句子「我 喜歡 吃 蘋果」需要三位專家同時分析
+            </div>
+
+            <div class="step" data-step="2">
+                <strong>👨‍🏫 專家 A（文法結構）：</strong><br>
+                <div style="margin-left: 1rem; font-family: monospace; background: rgba(120, 120, 91, 0.1); padding: 10px; border-radius: 5px;">
+                    Q<sub>A</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>A</sub><sup>Q</sup><br>
+                    K<sub>A</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>A</sub><sup>K</sup><br>
+                    <strong>專注：</strong>「喜歡」→「我」（主語關係）、「吃」→「蘋果」（動賓關係）
+                </div>
+            </div>
+
+            <div class="step" data-step="3">
+                <strong>🧠 專家 B（語意關聯）：</strong><br>
+                <div style="margin-left: 1rem; font-family: monospace; background: rgba(163, 163, 128, 0.1); padding: 10px; border-radius: 5px;">
+                    Q<sub>B</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>B</sub><sup>Q</sup><br>
+                    K<sub>B</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>B</sub><sup>K</sup><br>
+                    <strong>專注：</strong>「喜歡」↔「吃」（情感動作）、「吃」↔「蘋果」（動作對象）
+                </div>
+            </div>
+
+            <div class="step" data-step="4">
+                <strong>🔗 專家 C（邏輯順序）：</strong><br>
+                <div style="margin-left: 1rem; font-family: monospace; background: rgba(180, 120, 120, 0.1); padding: 10px; border-radius: 5px;">
+                    Q<sub>C</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>C</sub><sup>Q</sup><br>
+                    K<sub>C</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>C</sub><sup>K</sup><br>
+                    <strong>專注：</strong>「我」→「喜歡」→「吃」→「蘋果」（時間順序）
+                </div>
+            </div>
+
+            <div class="step" data-step="5">
+                <strong>🤝 整合結果：</strong><br>
+                <div style="margin-left: 1rem; font-family: monospace; background: rgba(120, 150, 120, 0.1); padding: 10px; border-radius: 5px;">
+                    MultiHead = Concat(專家A輸出, 專家B輸出, 專家C輸出) × W<sup>O</sup><br>
+                    <strong>結果：</strong>「蘋果」= 文法上的賓語 + 語意上的食物 + 邏輯上的動作對象
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let animationInterval;
+        let currentStep = 0;
+        let isStepMode = false;
+
+        function startAnimation() {
+            resetAnimation();
+            animateMultiHeadAttention();
+        }
+
+        function resetAnimation() {
+            // 清除所有動畫狀態
+            document.querySelectorAll('.head').forEach(head => {
+                head.classList.remove('active', 'pulse');
+            });
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelectorAll('.attention-cell').forEach(cell => {
+                cell.classList.remove('pulse');
+            });
+
+            if (animationInterval) {
+                clearInterval(animationInterval);
+            }
+            currentStep = 0;
+        }
+
+        function toggleStepMode() {
+            isStepMode = !isStepMode;
+            const btn = event.target;
+            btn.classList.toggle('active');
+            btn.textContent = isStepMode ? '連續模式' : '逐步模式';
+        }
+
+        function animateMultiHeadAttention() {
+            const steps = [
+                () => highlightStep(1),
+                () => highlightExperts(),
+                () => highlightExpertAnalysis(),
+                () => highlightExpertCollaboration(),
+                () => highlightFinalIntegration()
+            ];
+
+            if (isStepMode) {
+                // 逐步模式：點擊切換
+                document.addEventListener('click', function nextStep() {
+                    if (currentStep < steps.length) {
+                        steps[currentStep]();
+                        currentStep++;
+                    } else {
+                        document.removeEventListener('click', nextStep);
+                    }
+                });
+            } else {
+                // 連續模式：自動播放
+                let stepIndex = 0;
+                animationInterval = setInterval(() => {
+                    if (stepIndex < steps.length) {
+                        steps[stepIndex]();
+                        stepIndex++;
+                    } else {
+                        clearInterval(animationInterval);
+                        // 3秒後重新開始
+                        setTimeout(() => {
+                            if (!isStepMode) {
+                                animateMultiHeadAttention();
+                            }
+                        }, 3000);
+                    }
+                }, 2000);
+            }
+        }
+
+        function highlightStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
+        }
+
+        function highlightExperts() {
+            document.querySelectorAll('.head').forEach((head, index) => {
+                setTimeout(() => {
+                    head.classList.add('active', 'pulse');
+                }, index * 500);
+            });
+            highlightStep(2);
+        }
+
+        function highlightExpertAnalysis() {
+            document.querySelectorAll('.attention-cell').forEach((cell, index) => {
+                setTimeout(() => {
+                    cell.classList.add('pulse');
+                }, index * 50);
+            });
+            highlightStep(3);
+        }
+
+        function highlightExpertCollaboration() {
+            document.querySelectorAll('.head-output').forEach((output, index) => {
+                setTimeout(() => {
+                    output.classList.add('pulse');
+                }, index * 300);
+            });
+            document.querySelectorAll('.concat-arrow').forEach((arrow, index) => {
+                setTimeout(() => {
+                    arrow.classList.add('pulse');
+                }, index * 300 + 150);
+            });
+            highlightStep(4);
+        }
+
+        function highlightFinalIntegration() {
+            setTimeout(() => {
+                document.querySelector('.final-output').classList.add('pulse');
+            }, 500);
+            highlightStep(5);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加互動效果
+            document.querySelectorAll('.token').forEach(token => {
+                token.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.2)';
+                    this.style.zIndex = '10';
+                });
+                token.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.zIndex = '1';
+                });
+            });
+
+            document.querySelectorAll('.head').forEach(head => {
+                head.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

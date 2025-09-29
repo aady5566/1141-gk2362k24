@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer Core Concepts and Application Principles</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Arial', sans-serif;
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-success: rgba(120, 150, 120, 0.7);
+            --color-info: rgba(120, 140, 160, 0.7);
+            --color-warning: rgba(160, 140, 180, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+
+        /* Personality slider styles */
+        #personalitySlider {
+            background: linear-gradient(to right, #78785b, #a3a380, #b47878, #788ca0) !important;
+            height: 12px !important;
+            border-radius: 6px !important;
+            outline: none !important;
+            cursor: pointer !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+        }
+
+        #personalitySlider::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50% !important;
+            background: white !important;
+            border: 3px solid var(--accent-color) !important;
+            cursor: pointer !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slides-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            text-align: center;
+            position: relative;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1.5rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .interactive-diagram {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .math-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        a {
+            color: var(--color-earth);
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        /* Sidebar system */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background: #4d4d3b;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar-toggle:hover {
+            background: #3a3a2c;
+            transform: translateY(-2px);
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            background: #4d4d3b;
+            color: #ffffff;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .sidebar-content {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(120, 120, 91, 0.1);
+            color: #4d4d3b;
+            transform: translateX(5px);
+        }
+
+        .sidebar-text {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .game-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .game-button:hover {
+            background: var(--highlight-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar toggle button -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Sidebar menu -->
+    <div id="sidebar" class="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>Transformer Core Concepts</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="index_en.html" class="sidebar-item">
+                <span class="sidebar-text">Back to Homepage</span>
+            </a>
+            <div style="border-bottom: 2px solid var(--accent-color); margin: 0.5rem 0;"></div>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-1')">
+                <span class="sidebar-text">1. Transformer Title Page</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-2')">
+                <span class="sidebar-text">2. ML/DL/Transformer/GenAI Relationships</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-3')">
+                <span class="sidebar-text">3. Apple - Multiple Meanings Example</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4')">
+                <span class="sidebar-text">4. AI Next Word Prediction</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-5')">
+                <span class="sidebar-text">5. AI Text Generation: Probability Chain</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6')">
+                <span class="sidebar-text">6. Mathematical Principles: Logits & Softmax</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7')">
+                <span class="sidebar-text">7. QKV Core Mechanism Introduction</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-20')">
+                <span class="sidebar-text">8. QKV Math Analogy</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-8')">
+                <span class="sidebar-text">9. QKV Detailed Explanation</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-9')">
+                <span class="sidebar-text">10. Self-Attention Mechanism</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-10')">
+                <span class="sidebar-text">11. Scaled Dot-Product Attention Math</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-11')">
+                <span class="sidebar-text">12. Multi-Head Attention</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-21')">
+                <span class="sidebar-text">13. Self-Attention & Contextual Value</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-12')">
+                <span class="sidebar-text">14. Residual Connections</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-13')">
+                <span class="sidebar-text">15. Temperature Parameter</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-14')">
+                <span class="sidebar-text">16. Temperature Characteristics</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-15')">
+                <span class="sidebar-text">17. Core Questions for Reflection</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-16')">
+                <span class="sidebar-text">18. Human vs AI Attention Differences</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-17')">
+                <span class="sidebar-text">19. Brain's Limited Resource Manager</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-18')">
+                <span class="sidebar-text">20. Magic Number Game</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-19')">
+                <span class="sidebar-text">21. References</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div class="slides-container">
+        <!-- Slide 1: Title Page -->
+        <section id="slide-1" class="slide">
+            <h1>The AI Game-Changer: Transformer</h1>
+            <h3>The 2017 landmark paper <strong><a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank">"Attention is All You Need"</a></strong> debut</h3>
+            <p><strong>Completely revolutionized</strong> how artificial intelligence processes information, becoming the preferred architecture for deep learning models.</p>
+            <p>The most innovative aspect is the <strong>Self-Attention Mechanism</strong>, which can process all information in a sequence simultaneously.</p>
+        </section>
+
+        <!-- Slide 2: ML/DL/Transformer/GenAI Relationship Diagram -->
+        <section id="slide-2" class="slide">
+            <h2>Relationships Between Machine Learning, Deep Learning, Transformer, and GenAI</h2>
+            <div class="interactive-diagram">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: center;">
+                        <div style="background: var(--color-primary); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">Machine Learning</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">⊃</div>
+                        <div style="background: var(--color-secondary); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">Deep Learning</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">⊃</div>
+                        <div style="background: var(--color-accent); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">Transformer<br>Architecture</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">→</div>
+                        <div style="background: var(--color-success); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">Generative AI<br>(GenAI)</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 2rem; text-align: center; font-size: 1.2rem; color: var(--text-color);">
+                <p><strong>Transformer</strong> is the current mainstream deep learning architecture. (Traditional models like RNN can only process one word at a time)</p>
+                <p><strong>GenAI (Generative AI):</strong> ChatGPT, Google Gemini, Meta Llama are all based on Transformer architecture.</p>
+            </div>
+        </section>
+
+        <!-- Slide 3: Apple Multiple Meanings Example -->
+        <section id="slide-3" class="slide">
+            <h2>"I'm not a fan of <strong>Apple</strong>, but I love eating <strong>apples</strong>"</h2>
+            <p style="font-size: 2rem; margin-top: 3rem; color: var(--accent-color);">Same word, different contexts, different meanings</p>
+        </section>
+
+        <!-- Slide 4: AI Next Word Prediction -->
+        <section id="slide-4" class="slide">
+            <h1>AI Next Word Prediction</h1>
+            <h2>Next-Word Prediction</h2>
+        </section>
+
+        <!-- Slide 5: AI Text Generation Principle -->
+        <section id="slide-5" class="slide">
+            <h1>AI Text Generation Principle: Probability Chain</h1>
+            <p>The core principle of Transformer models: Given a text input, it predicts what the next most likely word will be.</p>
+
+            <div class="interactive-diagram" style="margin: 2rem auto; max-width: 800px;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--accent-color); margin-bottom: 1rem;">Input: "A penny saved is a penny..."</h4>
+                    <button class="game-button" onclick="showNextWordProbabilities()" style="margin: 0.5rem;">Click to see AI's next word probability predictions</button>
+                </div>
+
+                <div id="probability-display" style="display: none;">
+                    <h5 style="color: var(--highlight-color); margin-bottom: 1rem;">AI's predicted next word probability distribution:</h5>
+                    <div id="word-probabilities" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1rem 0;">
+                        <!-- Probability bars will be dynamically generated here -->
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 1rem; color: var(--text-color);">
+                        <p>AI will give the most contextually appropriate and logical next word based on the context "A penny saved is a penny earned".</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Mathematical Principles: Logits and Softmax -->
+        <section id="slide-6" class="slide">
+            <p>Transformer calculates <strong>raw scores (Logits)</strong> for each vocabulary word. Logits represent the likelihood of each word, but are not yet normalized.</p>
+            <p>The Softmax function converts raw scores into a probability distribution, ensuring all option probabilities sum to 1.</p>
+            <div class="math-container">
+                <p>Formula: Convert Logit $z_i$ to probability $P_i$:</p>
+                <div style="text-align: center; margin: 2rem 0;">
+                    $$P_i = \frac{e^{z_i}}{\sum_{j=1}^{N} e^{z_j}}$$
+                </div>
+                <p>• After conversion, all word probabilities sum to 1, determining the next word</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: QKV Core Mechanism -->
+        <section id="slide-7" class="slide">
+            <h1>Core Mechanism — Query, Key, Value (QKV)</h1>
+            <h2>QKV Analogy: Library/Web Search</h2>
+            <p>The concepts of Q, K, V are designed to simulate a "search and match" process within the model.</p>
+        </section>
+
+        <!-- Slide 8: QKV Detailed Explanation -->
+        <section id="slide-8" class="slide bunch-word-container">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+                <!-- Query (Q) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-primary); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Query (Q)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">Query</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">Intent of the question</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">Represents what the word "wants to know"</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-primary);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>Analogy:</strong> Google search engine keywords</p>
+                    </div>
+                </div>
+
+                <!-- Arrow 1 -->
+                <div style="font-size: 3rem; color: var(--accent-color); display: flex; align-items: center;">
+                    <span style="transform: rotate(0deg);">→</span>
+                </div>
+
+                <!-- Key (K) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-secondary); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Key (K)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">Key</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">Information tags</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">Represents what information other words "can provide"</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-secondary);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>Analogy:</strong> Web page titles in search results</p>
+                    </div>
+                </div>
+
+                <!-- Arrow 2 -->
+                <div style="font-size: 3rem; color: var(--accent-color); display: flex; align-items: center;">
+                    <span style="transform: rotate(0deg);">→</span>
+                </div>
+
+                <!-- Value (V) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-accent); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Value (V)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">Value</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">Actual content</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">The "content" to extract after Q finds matching K</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-accent);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>Analogy:</strong> Actual article content of web pages</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Self-Attention Mechanism -->
+        <section id="slide-9" class="slide">
+            <h1>Self-Attention Mechanism</h1>
+            <h2>Context Calculation and Importance Allocation</h2>
+            <h3>Giving each word a "global perspective"</h3>
+            <p>Self-attention mechanism is the core of Transformer blocks. It allows each word in the sequence to consider information from all other words in the sequence to redefine its own meaning.</p>
+            <p>Goal: Elevate word representations from simple word meanings to context-dependent semantic representations.</p>
+        </section>
+
+        <!-- Slide 10: Scaled Dot-Product Attention Math -->
+        <section id="slide-10" class="slide">
+            <h2>Mathematical Principle: Scaled Dot-Product Attention</h2>
+            <p>• Transformer uses "Scaled Dot-Product Attention".</p>
+            <p>• Attention score calculation ($Q K^T$): Multiply Query matrix with Key matrix transpose (dot product) to calculate similarity or correlation between all words.</p>
+            <p>• Formula:</p>
+            <div class="math-container">
+                <div style="text-align: center; margin: 2rem 0;">
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Multi-Head Attention -->
+        <section id="slide-11" class="slide">
+            <h2>Advanced Concept: Multi-Head Attention</h2>
+            <h3>Multi-angle Analysis — Let the model think like multiple experts</h3>
+            <p>• Transformer doesn't use just one self-attention mechanism, but multiple "attention heads" operating in parallel.</p>
+            <p>• Imagine reading a book with multiple experts helping you understand simultaneously:</p>
+            <p style="margin-left: 2rem;">◦ Head A: Focuses on grammatical structure (syntactic relationships).</p>
+            <p style="margin-left: 2rem;">◦ Head B: Focuses on semantic associations (word meanings).</p>
+            <p style="margin-left: 2rem;">◦ Head C: Focuses on logical order (contextual coherence).</p>
+        </section>
+
+        <!-- Slide 12: Residual Connections -->
+        <section id="slide-12" class="slide">
+            <h2>Stable Training Mechanism — Residual Connections</h2>
+            <h3>Deep Learning "Shortcuts" and Memory</h3>
+            <p>• Residual connections are key innovations in deep neural networks.</p>
+            <p>• They act like "shortcuts" set up in each layer (Transformer Block).</p>
+            <p>• When processing data, residual connections skip the original input that hasn't been modified by the current layer directly over one or more layers, and add it to the final output of that layer.</p>
+        </section>
+
+        <!-- Slide 13: Temperature Parameter -->
+        <section id="slide-13" class="slide">
+            <h2>Controlling Creativity "Temperature" — Hyperparameter Temperature</h2>
+            <h3>Temperature determines the determinism or randomness of model output</h3>
+            <p>• Temperature (T) is a hyperparameter used to control the randomness or creativity of the model when predicting the next word.</p>
+            <p>• Its value determines the shape of the probability distribution.</p>
+            <div class="math-container">
+                <p>• Model divides Logits ($z_i$) by Temperature ($T$) before Softmax:</p>
+                <div style="text-align: center; margin: 1rem 0;">
+                    $$\text{Probability} = \text{Softmax}\left(\frac{\text{Logits}}{T}\right)$$
+                    $$P_i = \frac{e^{z_i / T}}{\sum_{j=1}^{N} e^{z_j / T}}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Temperature Characteristics -->
+        <section id="slide-14" class="slide">
+            <h2>Hyperparameter "Temperature" — Low Temperature for Stability, High Temperature for Variation</h2>
+            <table class="comparison-table">
+                <tr style="background: var(--accent-color); color: white;">
+                    <th>Temperature $T$</th>
+                    <th>Characteristics/Pattern</th>
+                    <th>Effect on Probability Distribution</th>
+                    <th>Output Result</th>
+                    <th>Application Scenarios</th>
+                </tr>
+                <tr>
+                    <td>Low Temperature (T < 1)</td>
+                    <td>Deterministic</td>
+                    <td>Distribution becomes more "sharp". Differences are amplified.</td>
+                    <td>Tends to choose highest probability words. Results are predictable and consistent.</td>
+                    <td>Summarization, translation, factual Q&A (requires precision).</td>
+                </tr>
+                <tr>
+                    <td>High Temperature (T > 1)</td>
+                    <td>Randomness/Creativity</td>
+                    <td>Distribution becomes more "smooth". Differences are compressed.</td>
+                    <td>Increases chance of choosing low probability words. Output is more diverse and surprising.</td>
+                    <td>Story writing, brainstorming (requires creativity).</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Slide 15: Core Questions -->
+        <section id="slide-15" class="slide">
+            <h1>Core Questions — Differences Between Self-Attention and Human Attention?</h1>
+            <h2>AI Computing vs. Human Thinking</h2>
+            <h3>Key Question: Performance and Value Weight Allocation</h3>
+            <p>If Transformer's performance depends on how it allocates attention to determine "contextual value," then does our personal performance improvement also follow a similar "self-attention" mechanism, precisely determining the weight of "value" in our current actions or decisions?</p>
+        </section>
+
+        <!-- Slide 16: Human vs AI Attention Differences -->
+        <section id="slide-16" class="slide">
+            <h2>Difference Comparison — Fundamental Differences Between Human and AI Attention (Four Aspects)</h2>
+            <h3>AI's Parallel Computing vs. Human Brain's Biological Limitations</h3>
+            <table class="comparison-table">
+                <tr style="background: var(--accent-color); color: white;">
+                    <th>Comparison Aspect</th>
+                    <th>Human Attention (Biological System)</th>
+                    <th>Transformer Self-Attention (Artificial System)</th>
+                </tr>
+                <tr>
+                    <td>1. Capacity Limits & Processing</td>
+                    <td>Limited/Sequential. Must switch between different inputs. A solution for limited resources.</td>
+                    <td>Parallel processing. With sufficient resources, can consider all elements in sequence simultaneously. A mechanism for extracting contextual relationships.</td>
+                </tr>
+                <tr>
+                    <td>2. Attention Pathways</td>
+                    <td>Bidirectional (Top-down & Bottom-up). Driven by intent, knowledge (Top-down) and salient stimuli (Bottom-up).</td>
+                    <td>Unidirectional (Data-driven). Attention allocation completely based on training data patterns. Lacks "top-down" control mechanisms driven by goals or cognitive states.</td>
+                </tr>
+                <tr>
+                    <td>3. Intentionality & Agency</td>
+                    <td>Active/Conscious. Attention is an active decision mechanism related to individual agency.</td>
+                    <td>Passive/Mathematical construction. Model lacks intrinsic cognitive states or intentions. Its "attention" is essentially a mathematical construction for computing relationships between elements.</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Slide 17: Brain's Limited Resource Manager -->
+        <section id="slide-17" class="slide">
+            <h2>Brain's "Limited Resource Manager"</h2>
+            <h3>Definition and Function of Human Attention</h3>
+            <p>• Definition: Attention is the mind's ability to selectively grasp one of "several simultaneously possible objects or thoughts."</p>
+            <p>• Core function: This is key to flexible control of limited cognitive resources.</p>
+            <p>• Five aspects: Human attention includes selective attention (maintaining original behavior and filtering stimuli), divided attention (focusing on multiple things simultaneously), shifting attention (quickly switching focus), sustained attention (long-term focus), and focused attention (responding to external stimuli in an orderly manner).</p>
+
+            <h3>Human Attention Capacity Limits and Constraints</h3>
+            <p>• Capacity constraints: Humans are limited by finite visual range and working memory capacity. Working memory limitations are similar to the famous "Magic Number 4".</p>
+            <p>• Processing method: Due to these biological limitations, human attention must operate sequentially, requiring constant focus switching.</p>
+        </section>
+
+        <!-- Slide 18: Magic Number Game -->
+        <section id="slide-18" class="slide">
+            <h1>Magic Number</h1>
+            <div class="magic-game">
+                <h3>Test Your Working Memory Capacity</h3>
+                <p>Please remember the following number sequence, then click in order:</p>
+                <div id="game-display" style="font-size: 2rem; margin: 2rem 0; padding: 1rem; background: rgba(255,255,255,0.8); border-radius: 8px; min-height: 60px;">
+                    Click "Start Game" to begin
+                </div>
+                <div id="game-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 2rem 0;">
+                    <button class="game-button" onclick="startGame()">Start Game</button>
+                    <button class="game-button" onclick="resetGame()" style="display: none;">Restart</button>
+                </div>
+                <div id="number-buttons" style="display: none; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+                    <button class="game-button" onclick="selectNumber(1)">1</button>
+                    <button class="game-button" onclick="selectNumber(2)">2</button>
+                    <button class="game-button" onclick="selectNumber(3)">3</button>
+                    <button class="game-button" onclick="selectNumber(4)">4</button>
+                    <button class="game-button" onclick="selectNumber(5)">5</button>
+                    <button class="game-button" onclick="selectNumber(6)">6</button>
+                    <button class="game-button" onclick="selectNumber(7)">7</button>
+                    <button class="game-button" onclick="selectNumber(8)">8</button>
+                    <button class="game-button" onclick="selectNumber(9)">9</button>
+                </div>
+                <div id="game-result" style="margin-top: 2rem; font-size: 1.2rem;"></div>
+            </div>
+        </section>
+
+        <!-- Slide 19: References -->
+        <section id="slide-19" class="slide">
+            <h1>References</h1>
+            <div class="references-list">
+                <ul class="reference-list">
+                    <li>
+                        <strong>Attention Is All You Need (2017)</strong><br>
+                        <a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank">
+                            Classic Transformer Paper
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Interactive Transformer Explanation Website</strong><br>
+                        <a href="https://poloclub.github.io/transformer-explainer/" target="_blank">
+                            Visual Learning Resource
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Hands-on Programming to Understand Transformer</strong><br>
+                        <a href="https://deeplearning.neuromatch.io/tutorials/W2D5_AttentionAndTransformers/student/W2D5_Tutorial1.html" target="_blank">
+                            Implementation Tutorial Course
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Interactive Deep Dive into Transformer GPT2.0 Principles</strong><br>
+                        <a href="https://bbycroft.net/llm" target="_blank">
+                            Deep Principle Analysis
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Transformer Textbook</strong><br>
+                        <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">
+                            Illustrated Tutorial
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 20: QKV Math Analogy (Tyrant's Chef) -->
+        <section id="slide-20" class="slide bunch-word-container">
+            <div>
+                <h2>QKV Mathematical Principle: Understand It via the "Tyrant's Chef"</h2>
+                <div class="homework-content">
+                    <h4>Everyday Analogy: The Tyrant's Chef</h4>
+                    <p>Imagine you are the tyrant’s private chef and must prepare different dishes every day. Each ingredient (token) has limitless possibilities, but you handle it from three different perspectives:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 2rem 0;">
+                        <div style="background: linear-gradient(135deg, rgba(120, 120, 91, 0.8), rgba(120, 120, 91, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🔍 Query (Q)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>"What does the tyrant want today?"</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">Search objective</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, rgba(163, 163, 128, 0.8), rgba(163, 163, 128, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🏷️ Key (K)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>"What is this ingredient good for?"</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">Label being matched</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, rgba(120, 140, 160, 0.8), rgba(120, 140, 160, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🍽️ Value (V)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>"The actual dish"</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">Content to be delivered</p>
+                        </div>
+                    </div>
+
+                    <h4>Mathematical View: Three Different "Culinary Projections"</h4>
+                    <p>• Each ingredient (token embedding $X$) is like raw meat with infinite possibilities.</p>
+                    <p>• Through three distinct weight matrices, we extract different information from the same input:</p>
+
+                    <div style="background: rgba(255, 255, 255, 0.3); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border: 1px solid var(--line-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🔍 Search projection:</strong> $Q = X W_Q$ <span style="color: var(--highlight-color);">(Find what the tyrant wants)</span></p>
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🏷️ Label projection:</strong> $K = X W_K$ <span style="color: var(--highlight-color);">(Judge what each ingredient is suited for)</span></p>
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🍽️ Content projection:</strong> $V = X W_V$ <span style="color: var(--highlight-color);">(The actual content to serve)</span></p>
+                        </div>
+                    </div>
+
+                    <h4>💡 Why three projections?</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div style="background: rgba(120, 150, 120, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid rgba(120, 150, 120, 0.7);">
+                            <p style="margin: 0; font-weight: bold; color: var(--accent-color);">Precise matching</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-color);">Like a chef matching the tyrant’s desire (Q) with ingredients’ suitability (K).</p>
+                        </div>
+                        <div style="background: rgba(120, 140, 160, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid rgba(120, 140, 160, 0.7);">
+                            <p style="margin: 0; font-weight: bold; color: var(--accent-color);">Flexible use</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-color);">The same ingredient can show different properties and values under Q/K/V needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 21: Self-Attention & Contextual Value -->
+        <section id="slide-21" class="slide bunch-word-container">
+            <div>
+                <h2>Self-Attention and Contextual Value</h2>
+                <div class="homework-content">
+                    <h4>Capture semantics precisely: "Apple" no longer has only one meaning</h4>
+                    <h5>Core value: Create rich context-aware representations</h5>
+                    <p>• The key function of self-attention is to transform token embeddings into context-enriched representations.</p>
+                    <p>• In Transformers, the model can assign different meanings to the same word based on sentence context, solving traditional polysemy issues.</p>
+
+                    <h5>Case: Semantic integration</h5>
+                    <p>• Sentence 1: "I like eating <strong>apples</strong>."</p>
+                    <p>• Sentence 2: "He bought an <strong>Apple</strong> phone."</p>
+                    <p>• Process:</p>
+                    <p style="margin-left: 2rem;">1. When the Query (Q) is "Apple", it matches with Keys (K) in the sequence (e.g., "eat" or "phone").</p>
+                    <p style="margin-left: 2rem;">2. If Q–K matching shows high correlation with "phone", the model extracts brand/tech-product context from Value (V).</p>
+                    <p>• Result: The output vector is no longer a plain word meaning, but the precise semantics in the current sentence. This weighted-averaging captures long-range dependencies accurately.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 22: Quiz / Game (hidden) -->
+        <section id="slide-22" class="slide bunch-word-container" style="display: none;">
+            <div>
+                <h2>Quiz? Game?</h2>
+                <div class="homework-content">
+                    <h4>Please click the link:
+                    <a href="https://chatgpt.com/g/g-68d8ee2c7dc88191af386a6d722ac8b4-master-w4-transformer-qa" target="_blank">Enter ChatGPT Q&A Game</a>
+                    </h4>
+                    <h4>After answering, submit your responses to <a href="https://forms.gle/5YbYdcnVDqkr7nmN8" target="_blank">Google Form</a>
+                    </h4>
+                </div>
+                <h1>Time limit: 10 minutes</h1>
+
+                <div class="quiz-container" style="margin-top: 20px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">[Sample Question Set]</h3>
+
+                    <div class="quiz-question">
+                        <h4>Q1</h4>
+                        <p>What is the biggest innovation of the Transformer architecture?</p>
+                        <p>a. Introduce RNN to process long sequences</p>
+                        <p>b. Use convolutional layers instead of embeddings</p>
+                        <p>c. Self-attention mechanism that processes the whole sequence simultaneously</p>
+                        <p>d. Reduce parameters to avoid overfitting</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q2</h4>
+                        <p>Which of the following is NOT a correct characteristic of Transformer?</p>
+                        <p>a. Can process all words in a sequence in parallel</p>
+                        <p>b. Uses self-attention to capture long-range dependencies</p>
+                        <p>c. Learns weight matrices for Q, K, V through training</p>
+                        <p>d. Must process the sequence step-by-step, cannot compute in parallel</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q3</h4>
+                        <p>In next-word probability prediction, what are Logits?</p>
+                        <p>a. Model’s unnormalized scores</p>
+                        <p>b. A probability distribution summing to 1</p>
+                        <p>c. Input embeddings</p>
+                        <p>d. Attention weights</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q4</h4>
+                        <p>What does Softmax do in Transformer?</p>
+                        <p>a. Compress scores to between -1 and 1</p>
+                        <p>b. Convert all input vectors to QKV</p>
+                        <p>c. Normalize Logits into a probability distribution</p>
+                        <p>d. Increase model computation speed</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q5</h4>
+                        <p>What do Q, K, V correspond to in Transformer?</p>
+                        <p>a. Query, Key, Value</p>
+                        <p>b. Question, Answer, Result</p>
+                        <p>c. Vector, Matrix, Tensor</p>
+                        <p>d. Query, Class, Value</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q6</h4>
+                        <p>Why scale the similarity scores between Query and Key?</p>
+                        <p>a. Reduce parameter count</p>
+                        <p>b. Increase model capacity</p>
+                        <p>c. Keep Softmax inputs from being too large and causing unstable gradients</p>
+                        <p>d. Shorten training time</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q7</h4>
+                        <p>What is the main advantage of Multi-Head Attention?</p>
+                        <p>a. Capture different semantic relations from multiple angles</p>
+                        <p>b. Reduce model parameters</p>
+                        <p>c. Speed up computation</p>
+                        <p>d. Reduce training data needs</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q8</h4>
+                        <p>What is the primary function of Residual Connections in Transformer?</p>
+                        <p>a. Increase randomness</p>
+                        <p>b. Reduce computation</p>
+                        <p>c. Replace multi-head attention</p>
+                        <p>d. Ensure information flow and avoid vanishing gradients</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q9</h4>
+                        <p>When Temperature increases (T > 1), how does the output change?</p>
+                        <p>a. More random and diverse</p>
+                        <p>b. More conservative and repetitive</p>
+                        <p>c. No output</p>
+                        <p>d. Becomes deterministic</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Q10</h4>
+                        <p>Which statement correctly describes differences between Transformer and human attention?</p>
+                        <p>a. Transformer has intrinsic intent, humans don’t</p>
+                        <p>b. Human attention can parallel-process infinite information, Transformer cannot</p>
+                        <p>c. Transformer attention is data-driven, human attention is consciously guided</p>
+                        <p>d. They operate in exactly the same way</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function goToSlide(slideId) {
+            // Close sidebar
+            closeSidebar();
+
+            // Jump to specified slide
+            showSlideById(slideId);
+        }
+
+        // Global variables
+        let currentIndex = 0;
+        let slidesContainer;
+        let allSlides;
+        // Desired slide order aligned with zh version
+        const orderedSlideIds = [
+            'slide-1', // Title
+            'slide-2', // Relationships
+            'slide-3', // Apple example
+            'slide-4', // Next word
+            'slide-5', // Probability chain
+            'slide-6', // Logits & Softmax
+            'slide-7', // QKV core
+            'slide-20', // QKV math analogy (after QKV core)
+            'slide-8', // QKV detailed
+            'slide-9', // Self-Attention mechanism
+            'slide-10', // Scaled Dot-Product
+            'slide-11', // Multi-Head
+            'slide-21', // Self-Attention & Contextual Value (after Multi-Head)
+            'slide-12', // Residual
+            'slide-13', // Temperature param
+            'slide-14', // Temperature characteristics
+            'slide-15', // Core questions
+            'slide-16', // Human vs AI
+            'slide-17', // Brain limited resource manager
+            'slide-18', // Magic Number
+            'slide-19'  // References
+        ];
+
+        // Navigate to next visible slide
+        function goToNextVisibleSlide() {
+            for (let i = currentIndex + 1; i < orderedSlideIds.length; i++) {
+                const id = orderedSlideIds[i];
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    showSlideById(id);
+                    return;
+                }
+            }
+            // Wrap to the first visible slide
+            for (let i = 0; i < orderedSlideIds.length; i++) {
+                const id = orderedSlideIds[i];
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    showSlideById(id);
+                    return;
+                }
+            }
+        }
+
+        // Navigate to previous visible slide
+        function goToPrevVisibleSlide() {
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                const id = orderedSlideIds[i];
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    showSlideById(id);
+                    return;
+                }
+            }
+            // Wrap to the last visible slide
+            for (let i = orderedSlideIds.length - 1; i >= 0; i--) {
+                const id = orderedSlideIds[i];
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    showSlideById(id);
+                    return;
+                }
+            }
+        }
+
+        // Global function
+        function showSlideById(slideId) {
+            const targetSlide = document.getElementById(slideId);
+            if (!targetSlide) {
+                console.error('Slide not found:', slideId);
+                return;
+            }
+
+            // Skip hidden slides
+            if (targetSlide.style.display === 'none') {
+                console.warn('Slide is hidden:', slideId);
+                return;
+            }
+
+            // Find visual index in DOM for transform
+            const domIndex = allSlides.indexOf(targetSlide);
+            if (domIndex === -1) {
+                console.error('Slide not found in allSlides:', slideId);
+                return;
+            }
+
+            // Move to target slide based on DOM order
+            const offset = -domIndex * 100;
+            slidesContainer.style.transform = `translateX(${offset}%)`;
+
+            // Update current index based on desired order
+            const orderedIndex = orderedSlideIds.indexOf(slideId);
+            if (orderedIndex !== -1) {
+                currentIndex = orderedIndex;
+            }
+        }
+
+        // Slide navigation system
+        document.addEventListener('DOMContentLoaded', () => {
+            slidesContainer = document.querySelector('.slides-container');
+            allSlides = Array.from(document.querySelectorAll('.slide'));
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+
+            nextBtn.addEventListener('click', () => {
+                goToNextVisibleSlide();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                goToPrevVisibleSlide();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    goToNextVisibleSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    goToPrevVisibleSlide();
+                }
+            });
+
+            // Initialize: show the first visible slide according to desired order
+            for (let i = 0; i < orderedSlideIds.length; i++) {
+                const id = orderedSlideIds[i];
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    showSlideById(id);
+                    break;
+                }
+            }
+        });
+
+        function updateSlidePosition() {
+            const offset = -currentIndex * 100;
+            slidesContainer.style.transform = `translateX(${offset}%)`;
+        }
+
+        // AI text generation probability display function
+        function showNextWordProbabilities() {
+            console.log('Function called!');
+            const display = document.getElementById('probability-display');
+            const container = document.getElementById('word-probabilities');
+
+            if (!display || !container) {
+                console.error('Elements not found!', { display, container });
+                return;
+            }
+
+            // Simulate AI's predicted next word probabilities (based on common English sayings)
+            const wordProbabilities = [
+                { word: 'earned', probability: 0.45, color: '#78785b' },
+                { word: 'lost', probability: 0.20, color: '#a3a380' },
+                { word: 'spent', probability: 0.15, color: '#b47878' },
+                { word: 'found', probability: 0.12, color: '#789678' },
+                { word: 'wasted', probability: 0.08, color: '#788ca0' }
+            ];
+
+            // Clear container
+            container.innerHTML = '';
+
+            // Create probability bars
+            wordProbabilities.forEach((item, index) => {
+                const probabilityBar = document.createElement('div');
+                probabilityBar.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin: 0.5rem;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: all 0.6s ease;
+                `;
+
+                probabilityBar.innerHTML = `
+                    <div style="
+                        width: ${item.probability * 200}px;
+                        height: 30px;
+                        background: ${item.color};
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 0.9rem;
+                        margin-bottom: 0.5rem;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    ">
+                        ${item.word}
+                    </div>
+                    <div style="
+                        font-size: 0.8rem;
+                        color: #5a5a5a;
+                        font-weight: 500;
+                    ">
+                        ${(item.probability * 100).toFixed(1)}%
+                    </div>
+                `;
+
+                container.appendChild(probabilityBar);
+
+                // Delayed animation
+                setTimeout(() => {
+                    probabilityBar.style.opacity = '1';
+                    probabilityBar.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Show result area
+            display.style.display = 'block';
+            display.style.opacity = '0';
+            display.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                display.style.transition = 'all 0.6s ease';
+                display.style.opacity = '1';
+                display.style.transform = 'translateY(0)';
+            }, 200);
+        }
+
+        // Magic Number Game JavaScript
+        let gameSequence = [];
+        let currentStep = 0;
+        let gamePhase = 'waiting'; // waiting, showing, playing
+        let gameLevel = 3; // Start with 3 numbers
+        let maxLevel = 20; // Maximum level
+
+        function startGame() {
+            gameSequence = [];
+            currentStep = 0;
+            gameLevel = 3;
+            gamePhase = 'showing';
+
+            // Generate random number sequence
+            for (let i = 0; i < gameLevel; i++) {
+                gameSequence.push(Math.floor(Math.random() * 9) + 1);
+            }
+
+            document.getElementById('game-display').textContent = gameSequence.join(' ');
+            document.getElementById('game-buttons').style.display = 'none';
+            document.getElementById('number-buttons').style.display = 'flex';
+            document.getElementById('game-result').textContent = '';
+
+            // Start game after 3 seconds
+            setTimeout(() => {
+                gamePhase = 'playing';
+                document.getElementById('game-display').textContent = 'Please click numbers in order:';
+            }, 3000);
+        }
+
+        function selectNumber(num) {
+            if (gamePhase !== 'playing') return;
+
+            if (num === gameSequence[currentStep]) {
+                currentStep++;
+                document.getElementById('game-display').textContent = `Correct! Clicked ${currentStep}/${gameSequence.length}`;
+
+                if (currentStep === gameSequence.length) {
+                    // Complete current level
+                    gameLevel++;
+                    document.getElementById('game-result').textContent = `Congratulations! Completed ${gameSequence.length} number level!`;
+
+                    if (gameLevel <= maxLevel) {
+                        setTimeout(() => {
+                            startNextLevel();
+                        }, 2000);
+                    } else {
+                        // Complete all levels, stay on success screen
+                        document.getElementById('game-result').textContent = `Amazing! You completed all levels!`;
+
+                        // Show restart button
+                        document.getElementById('game-buttons').style.display = 'flex';
+                        document.querySelector('button[onclick="startGame()"]').style.display = 'none';
+                        document.querySelector('button[onclick="resetGame()"]').style.display = 'inline-block';
+
+                        // Hide number buttons
+                        document.getElementById('number-buttons').style.display = 'none';
+
+                        // Stop game
+                        gamePhase = 'completed';
+                    }
+                }
+            } else {
+                // Game failed, show correct answer and stay on failure screen
+                document.getElementById('game-display').textContent = `Wrong! Correct order is: ${gameSequence.join(' ')}`;
+                document.getElementById('game-result').textContent = `Game over! You remembered ${gameSequence.length-1} numbers.`;
+
+                // Show restart button
+                document.getElementById('game-buttons').style.display = 'flex';
+                document.querySelector('button[onclick="startGame()"]').style.display = 'none';
+                document.querySelector('button[onclick="resetGame()"]').style.display = 'inline-block';
+
+                // Hide number buttons
+                document.getElementById('number-buttons').style.display = 'none';
+
+                // Stop game
+                gamePhase = 'failed';
+            }
+        }
+
+        function startNextLevel() {
+            gameSequence = [];
+            currentStep = 0;
+            gamePhase = 'showing';
+
+            for (let i = 0; i < gameLevel; i++) {
+                gameSequence.push(Math.floor(Math.random() * 9) + 1);
+            }
+
+            document.getElementById('game-display').textContent = gameSequence.join(' ');
+            document.getElementById('game-result').textContent = `Level ${gameLevel}: Remember ${gameLevel} numbers`;
+
+            setTimeout(() => {
+                gamePhase = 'playing';
+                document.getElementById('game-display').textContent = 'Please click numbers in order:';
+            }, 3000);
+        }
+
+        function resetGame() {
+            gameSequence = [];
+            currentStep = 0;
+            gameLevel = 3;
+            gamePhase = 'waiting';
+
+            document.getElementById('game-display').textContent = 'Click "Start Game" to begin';
+            document.getElementById('game-buttons').style.display = 'flex';
+            document.querySelector('button[onclick="startGame()"]').style.display = 'inline-block';
+            document.querySelector('button[onclick="resetGame()"]').style.display = 'none';
+            document.getElementById('number-buttons').style.display = 'none';
+            document.getElementById('game-result').textContent = '';
+        }
+    </script>
+</body>
+</html>

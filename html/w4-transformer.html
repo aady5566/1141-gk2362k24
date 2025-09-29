@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer 核心概念與應用原理</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-success: rgba(120, 150, 120, 0.7);
+            --color-info: rgba(120, 140, 160, 0.7);
+            --color-warning: rgba(160, 140, 180, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+
+        /* 個性化滑桿樣式 */
+        #personalitySlider {
+            background: linear-gradient(to right, #78785b, #a3a380, #b47878, #788ca0) !important;
+            height: 12px !important;
+            border-radius: 6px !important;
+            outline: none !important;
+            cursor: pointer !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+        }
+
+        #personalitySlider::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50% !important;
+            background: white !important;
+            border: 3px solid var(--accent-color) !important;
+            cursor: pointer !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #personalitySlider::-webkit-slider-thumb:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        #personalitySlider::-moz-range-thumb {
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50% !important;
+            background: white !important;
+            border: 3px solid var(--accent-color) !important;
+            cursor: pointer !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #personalitySlider::-moz-range-thumb:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slides-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            text-align: center;
+            position: relative;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1.5rem;
+        }
+
+        .slide:first-child {
+            justify-content: center;
+            overflow-y: hidden;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+        }
+
+        .bunch-word-container .homework-content {
+            font-size: 1.65rem;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .bunch-word-container .homework-content h4 {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .bunch-word-container .homework-content h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .bunch-word-container .homework-content p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .interactive-diagram {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .math-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-table {
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--line-color);
+            font-size: 1.2rem;
+        }
+
+        .comparison-table th {
+            background: var(--accent-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .magic-game {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 2px solid var(--accent-color);
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* Summary Box 樣式 - 基於 style.md 風格 */
+        .summary-box-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .summary-box {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--line-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .summary-box.nested {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: var(--highlight-color);
+            margin: 1.5rem 0;
+        }
+
+        .summary-box.nested:hover {
+            border-color: var(--accent-color);
+        }
+
+        .summary-box h3 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-box h4 {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .summary-box h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            font-weight: 600;
+            color: var(--highlight-color);
+            margin-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.2rem;
+        }
+
+        .summary-box p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .game-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .game-button:hover {
+            background: var(--highlight-color);
+        }
+
+        /* 超連結樣式 */
+        a {
+            color: var(--color-earth);
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 6vw, 3.5rem);
+            }
+
+            h2 {
+                font-size: clamp(2rem, 4.5vw, 2.5rem);
+            }
+
+            h3 {
+                width: 95%;
+                font-size: clamp(1.6rem, 3.8vw, 2rem);
+            }
+
+            h4 {
+                font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+            }
+
+            p {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .bunch-word-container .homework-content {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                padding: 0 0.3rem;
+            }
+
+            /* 參考文獻手機版樣式 */
+            .references-list {
+                width: 100%;
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 0 1rem;
+                text-align: left;
+            }
+
+            .reference-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .reference-list li {
+                margin-bottom: 1rem;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 8px;
+                border: 1px solid var(--line-color);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            .reference-list li strong {
+                font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+                font-weight: 700;
+                color: var(--accent-color);
+                display: block;
+                margin-bottom: 0.3rem;
+                line-height: 1.3;
+            }
+
+            .reference-list li a {
+                color: var(--color-earth);
+                text-decoration: underline;
+                font-weight: 500;
+                font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+                line-height: 1.4;
+                word-break: break-word;
+            }
+
+            .reference-list li a:hover {
+                color: var(--accent-color);
+                text-decoration: none;
+            }
+
+        }
+
+        /* 參考文獻無編號樣式 - 桌面版 */
+        .references-list {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: left;
+        }
+
+        .reference-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .reference-list li {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .reference-list li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .reference-list li strong {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            font-weight: 700;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .reference-list li a {
+            color: var(--color-earth);
+            text-decoration: underline;
+            font-weight: 500;
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .reference-list li a:hover {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        /* 平板電腦版參考文獻樣式 */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .references-list {
+                padding: 0 1.5rem;
+            }
+
+            .reference-list li {
+                padding: 1.2rem;
+                margin-bottom: 1.2rem;
+            }
+
+            .reference-list li strong {
+                font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            }
+
+            .reference-list li a {
+                font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+            }
+        }
+
+        /* 側邊欄系統 */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background: #4d4d3b;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar-toggle:hover {
+            background: #3a3a2c;
+            transform: translateY(-2px);
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            background: #4d4d3b;
+            color: #ffffff;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .sidebar-content {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(120, 120, 91, 0.1);
+            color: #4d4d3b;
+            transform: translateX(5px);
+        }
+
+        .sidebar-text {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 滑桿樣式 - 使用 style.md 中的藍色系 */
+        #scaling-factor::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(120, 140, 160, 0.9); /* style.md 中的 info-color */
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #scaling-factor::-webkit-slider-thumb:hover {
+            background: rgba(120, 140, 160, 1);
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #scaling-factor::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(120, 140, 160, 0.9);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #scaling-factor::-moz-range-thumb:hover {
+            background: rgba(120, 140, 160, 1);
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 滑桿軌道樣式 */
+        #scaling-factor::-webkit-slider-track {
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(120, 140, 160, 0.2);
+        }
+
+        #scaling-factor::-moz-range-track {
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(120, 140, 160, 0.2);
+            border: none;
+        }
+
+        /* 句子中的下一個詞樣式 */
+        #next-word-display {
+            transition: all 0.3s ease;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            background: rgba(120, 140, 160, 0.1);
+            border: 1px solid rgba(120, 140, 160, 0.3);
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+
+        /* 手機版側邊欄優化 */
+        @media (max-width: 767px) {
+            .sidebar-toggle {
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 28px;
+                height: 28px;
+                padding: 5px;
+            }
+
+            .sidebar-toggle span {
+                width: 16px;
+                height: 2px;
+            }
+
+            .sidebar-menu {
+                width: 260px;
+            }
+
+            .sidebar-item {
+                padding: 0.7rem 1.2rem;
+            }
+
+            .sidebar-text {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄切換按鈕 -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- 側邊欄選單 -->
+    <div id="sidebar" class="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>Transformer 核心概念</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="../index.html" class="sidebar-item">
+                <span class="sidebar-text">回首頁</span>
+            </a>
+            <div style="border-bottom: 2px solid var(--accent-color); margin: 0.5rem 0;"></div>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-1')">
+                <span class="sidebar-text">1. Transformer 標題頁</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-2')">
+                <span class="sidebar-text">2. ML/DL/Transformer/GenAI 關係</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-3')">
+                <span class="sidebar-text">3. 蘋果一詞多義例子</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4')">
+                <span class="sidebar-text">4. AI 下一個詞預測</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-5')">
+                <span class="sidebar-text">5. AI 文字生成原理：機率接龍</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6')">
+                <span class="sidebar-text">6. 數學原理：Logits 與 Softmax</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7')">
+                <span class="sidebar-text">7. QKV 核心機制介紹</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-8')">
+                <span class="sidebar-text">8. QKV 機制詳細說明</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-9')">
+                <span class="sidebar-text">9. QKV 詳細說明</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-10')">
+                <span class="sidebar-text">10. QKV 數學原理與價值</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-11')">
+                <span class="sidebar-text">11. 自我注意力機制</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-12')">
+                <span class="sidebar-text">12. 縮放點積注意力數學原理</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-13')">
+                <span class="sidebar-text">13. 自我注意力與上下文價值</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-14')">
+                <span class="sidebar-text">14. 多頭注意力機制</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-15')">
+                <span class="sidebar-text">15. 殘差連接</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-16')">
+                <span class="sidebar-text">16. Temperature 參數</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-17')">
+                <span class="sidebar-text">17. Temperature 特性比較</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-18')">
+                <span class="sidebar-text">18. 核心問題思考</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-19')">
+                <span class="sidebar-text">19. 人機注意力差異比較</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-20')">
+                <span class="sidebar-text">20. 大腦的有限資源管理器</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-21')">
+                <span class="sidebar-text">21. Magic N 遊戲體驗</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-22')">
+                <span class="sidebar-text">22. 文獻參考</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 遮罩層 -->
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div class="slides-container">
+
+        <!-- 投影片 1: 標題頁 -->
+        <section id="slide-1" class="slide">
+            <h1>深度學習 AI 的變革者: Transformer</h1>
+            <h3>2017年經典論文<strong><a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank">《Attention is All You Need》</a></strong>首秀</h3>
+            <p><strong>徹底改變</strong>了人工智慧處理資訊的方式，成為深度學習模型（Deep Learning）的首選架構。</p>
+            <p>最創新的部分在於「<strong>自我注意力機制</strong>」（Self-Attention Mechanism），能夠一次處理序列中的所有資訊。</p>
+        </section>
+
+        <!-- 投影片 2: 機器學習關係圖 -->
+        <section id="slide-2" class="slide">
+            <h2>機器學習、深度學習、Transformer, GenAI 的關係</h2>
+            <div class="interactive-diagram">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: center;">
+                        <div style="background: var(--color-primary); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">機器學習<br>(Machine Learning)</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">⊃</div>
+                        <div style="background: var(--color-secondary); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">深度學習<br>(Deep Learning)</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">⊃</div>
+                        <div style="background: var(--color-accent); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">Transformer<br>架構</div>
+                        <div style="font-size: 2rem; color: var(--accent-color);">→</div>
+                        <div style="background: var(--color-success); padding: 1rem; border-radius: 8px; color: white; font-weight: bold;">生成式 AI<br>(GenAI)</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 2rem; text-align: center; font-size: 1.2rem; color: var(--text-color);">
+                <p><strong>Transformer</strong> 是當前主流深度學習架構。（傳統模型（如RNN）一次只能處理一個詞）</p>
+                <p><strong>GenAI (生成式 AI)：</strong> ChatGPT、Google Gemini、Meta Llama，都是基於 Transformer 架構。</p>
+            </div>
+        </section>
+
+        <!-- 投影片 3: AI 概念關係圖 -->
+        <section id="slide-3" class="slide">
+            <div class="interactive-diagram">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="summary-box-container">
+                        <div class="summary-box">
+                            <h4>機器學習</h4>
+                            <p>讓電腦從資料中學習。包含但不限於「監督式」與「非監督式」兩大類型。</p>
+
+                            <div class="summary-box nested">
+                                <h4>深度學習 (Deep Learning)</h4>
+                                <p>是機器學習的子集，使用複雜的多層神經網路。此技術可應用於監督式和非監督式學習任務，處理更複雜的模式。</p>
+
+                                <div class="summary-box nested">
+                                    <h5>生成式 AI (Generative AI)</h5>
+                                    <p>通常基於大型深度學習模型，專注於「創造」全新的內容，而不僅是分析或預測。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 投影片 4: 蘋果例子 -->
+        <section id="slide-4" class="slide">
+            <h2>「我不是<strong>蘋果</strong>的粉絲，但我喜歡吃<strong>蘋果</strong>」</h2>
+            <p style="font-size: 2rem; margin-top: 3rem; color: var(--accent-color);">同一個詞，不同的語境，不同的意義</p>
+        </section>
+
+        <!-- 投影片 5: AI 下一個詞預測 -->
+        <section id="slide-5" class="slide">
+            <h1>AI 下一個詞的預測</h1>
+            <h2>Next-Word Prediction</h2>
+        </section>
+
+        <!-- 投影片 6: AI 文字生成原理 -->
+        <section id="slide-6" class="slide">
+            <h1>AI 文字生成原理：機率接龍</h1>
+            <p>Transformer 模型核心原則：給定一段文字輸入，它會預測接下來最可能出現的下一個詞是什麼。</p>
+
+            <div class="interactive-diagram" style="margin: 2rem auto; max-width: 800px;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--accent-color); margin-bottom: 1rem;">輸入：「無心插柳柳..」</h4>
+                    <button class="game-button" onclick="showNextWordProbabilities()" style="margin: 0.5rem;">點擊查看 AI 預測的下一個詞機率</button>
+                </div>
+
+                <div id="probability-display" style="display: none;">
+                    <h5 style="color: var(--highlight-color); margin-bottom: 1rem;">AI 預測的下一個詞機率分佈：</h5>
+                    <div id="word-probabilities" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1rem 0;">
+                        <!-- 機率條會在這裡動態生成 -->
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 1rem; color: var(--text-color);">
+                        <p>AI 會根據上下文「無心插柳柳成蔭」的語境，給出最符合詩意和邏輯的下一個詞。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 投影片 7: 數學原理 Logits 與 Softmax -->
+        <section id="slide-7" class="slide">
+            <p>Transformer 計算出每個詞彙的<strong>原始分數 (Logits)</strong>。Logits 代表了每個詞彙的可能性，但尚未標準化。</p>
+                <p>Softmax 函數將原始分數轉換為機率分佈，確保所有選項的機率總和為1。</p>
+            <div class="math-container">
+                <p>公式: Logit $z_i$ 轉換為機率 $P_i$：</p>
+                <div style="text-align: center; margin: 2rem 0;">
+                    $$P_i = \frac{e^{z_i}}{\sum_{j=1}^{N} e^{z_j}}$$
+                </div>
+                <p>• 轉換後，所有詞彙的機率總和為 1，就是下一個字詞</p>
+            </div>
+        </section>
+
+        <!-- 投影片 8: QKV 核心機制 -->
+        <section id="slide-8" class="slide">
+            <h1>核心機制 — Query, Key, Value (QKV)</h1>
+            <h2>QKV 類比：圖書館/網路搜尋</h2>
+            <p>Q、K、V 的概念是為了在模型內部模擬一種「搜尋與比對」的程序。</p>
+        </section>
+
+        <!-- 投影片 9: QKV 詳細說明 -->
+        <section id="slide-9" class="slide bunch-word-container">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+                <!-- Query (Q) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-primary); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Query (Q)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">查詢</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">提問的意圖</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">代表詞彙「想要知道什麼」</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-primary);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>類比：</strong>Google搜尋引擎關鍵字</p>
+                    </div>
+                </div>
+
+                <!-- 箭頭 1 -->
+                <div style="font-size: 3rem; color: var(--accent-color); display: flex; align-items: center;">
+                    <span style="transform: rotate(0deg);">→</span>
+                </div>
+
+                <!-- Key (K) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-secondary); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Key (K)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">鍵值</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">資訊標籤</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">代表其他詞彙「能提供什麼資訊」</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-secondary);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>類比：</strong>搜尋結果的網頁標題</p>
+                    </div>
+                </div>
+
+                <!-- 箭頭 2 -->
+                <div style="font-size: 3rem; color: var(--accent-color); display: flex; align-items: center;">
+                    <span style="transform: rotate(0deg);">→</span>
+                </div>
+
+                <!-- Value (V) -->
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <div style="background: var(--color-accent); padding: 1.5rem; border-radius: 8px; color: white; margin-bottom: 1.2rem;">
+                        <h4 style="color: white; margin-bottom: 0.75rem; font-size: 1.65rem;">Value (V)</h4>
+                        <h5 style="color: white; font-size: 1.35rem; margin-bottom: 0.45rem;">數值</h5>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.45rem;">實際內容</p>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">Q 找到匹配 K 後要提取的「內容」</p>
+                    </div>
+                    <div style="background: transparent; padding: 1.2rem; border-radius: 6px; border: 2px dashed var(--color-accent);">
+                        <p style="font-size: 1.2rem; color: var(--text-color); margin: 0;"><strong>類比：</strong>網頁的實際文章內容</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 投影片 10: QKV 數學原理 -->
+        <section id="slide-10" class="slide bunch-word-container">
+            <div>
+                <h2>QKV 數學原理：用「暴君的廚師」來理解</h2>
+                <div class="homework-content">
+                    <h4>生活化類比：暴君的廚師</h4>
+                    <p>想像你是暴君的私人廚師，每天都要準備不同的料理。每個食材（詞彙）都有無限的可能性，但你需要從三個不同角度來處理它：</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 2rem 0;">
+                        <div style="background: linear-gradient(135deg, rgba(120, 120, 91, 0.8), rgba(120, 120, 91, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🔍 Query (Q)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>「暴君今天想吃什麼？」</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">搜尋的目標</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, rgba(163, 163, 128, 0.8), rgba(163, 163, 128, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🏷️ Key (K)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>「這個食材適合做什麼？」</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">被搜尋的標籤</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, rgba(120, 140, 160, 0.8), rgba(120, 140, 160, 0.6)); padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                            <h4 style="color: white; margin: 0 0 1rem 0;">🍽️ Value (V)</h4>
+                            <p style="color: white; margin: 0; font-size: 0.9rem;"><strong>「實際的料理內容」</strong></p>
+                            <p style="color: white; margin: 0.5rem 0 0 0; font-size: 0.8rem;">內容的價值</p>
+                        </div>
+                    </div>
+
+                    <h4>數學原理：三種不同的「料理轉換」</h4>
+                    <p>• 每個食材（詞彙嵌入 $X$）就像一塊生肉，有無限的料理可能性</p>
+                    <p>• 透過三種不同的「料理手法」（權重矩陣），我們可以從同一塊肉中提取出不同的資訊：</p>
+
+                    <div style="background: rgba(255, 255, 255, 0.3); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border: 1px solid var(--line-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🔍 搜尋轉換：</strong>$Q = X W_Q$ <span style="color: var(--highlight-color);">（找出暴君想吃的）</span></p>
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🏷️ 標籤轉換：</strong>$K = X W_K$ <span style="color: var(--highlight-color);">（判斷食材適合做什麼）</span></p>
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>🍽️ 內容轉換：</strong>$V = X W_V$ <span style="color: var(--highlight-color);">（實際的料理內容）</span></p>
+                        </div>
+                    </div>
+
+                    <h4>💡 為什麼需要三種轉換？</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div style="background: rgba(120, 150, 120, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid rgba(120, 150, 120, 0.7);">
+                            <p style="margin: 0; font-weight: bold; color: var(--accent-color);">精確匹配</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-color);">就像廚師需要知道「暴君想吃什麼」和「食材能做什麼」才能完美匹配</p>
+                        </div>
+                        <div style="background: rgba(120, 140, 160, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid rgba(120, 140, 160, 0.7);">
+                            <p style="margin: 0; font-weight: bold; color: var(--accent-color);">靈活運用</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-color);">同一種食材可以根據不同需求（Q、K、V）展現不同的特性和價值</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 11: 自我注意力機制 -->
+        <section id="slide-11" class="slide">
+            <h1>自我注意力機制 (Self-Attention)</h1>
+            <h2>上下文的計算與重要性分配</h2>
+            <h3>讓每個詞都擁有「全局視野」</h3>
+            <p>自我注意力機制是 Transformer 區塊的核心。它讓序列中的每個詞都能考量到序列中所有其他詞的資訊，來重新定義自己的意思。</p>
+            <p>目標：讓詞彙的表徵從單純的詞義，提升為上下文相關的語義表徵。</p>
+        </section>
+
+        <!-- 投影片 12: 縮放點積注意力數學原理 -->
+        <section id="slide-12" class="slide bunch-word-container">
+            <div>
+                <h2>數學原理：縮放點積注意力</h2>
+                <div class="homework-content">
+                    <p>• Transformer 採用的是「縮放點積注意力」（Scaled Dot-Product Attention）。</p>
+                    <p>• 注意力分數計算 ( $Q K^T$ )：將 Query 矩陣與 Key 矩陣的轉置相乘 (點積)，計算出所有詞彙之間的相似度或相關性。</p>
+                    <p>• 公式：</p>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+                    </div>
+
+                    <table style="width: 100%; margin: 2rem 0; border-collapse: collapse;">
+                        <tr style="background: var(--accent-color); color: white;">
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">數學符號</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">意義</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">白話解釋</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">$Q K^T$</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">點積相似度</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">查詢 (Q) 與所有標題 (K) 的比對結果。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">$\sqrt{d_k}$</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">縮放因子</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">用於防止向量維度 $d_k$ 過大時，點積結果也變得太大，導致 Softmax 運算後梯度變得不穩定。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">Softmax</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">正規化</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">將相似度分數轉換成總和為 1 的加權機率分佈。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">$\times V$</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">加權求和</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">根據機率權重，從 Value (內容) 中提取上下文資訊。</td>
+                        </tr>
+                    </table>
+
+                    <!-- 互動式視覺化演示 -->
+                    <div style="margin: 3rem 0; padding: 2rem; background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(244, 242, 239, 0.8) 100%); border-radius: 15px; border: 2px solid var(--accent-color); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                        <h3 style="text-align: center; color: var(--accent-color); margin-bottom: 2rem; font-size: clamp(1.4rem, 2.8vw, 1.8rem);">互動式縮放因子演示</h3>
+                        <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-color);">調整縮放因子 $\sqrt{d_k}$ 來觀察注意力分數的變化</p>
+
+                        <!-- 控制面板 -->
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                            <div style="text-align: center;">
+                                <label for="scaling-factor" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--text-color);">縮放因子 $\sqrt{d_k}$:</label>
+                                <input type="range" id="scaling-factor" min="0.5" max="5" step="0.1" value="2"
+                                       style="width: 200px; height: 8px; background: rgba(120, 140, 160, 0.3); border-radius: 5px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none;">
+                                <div id="scaling-value" style="margin-top: 0.5rem; font-weight: bold; color: var(--accent-color); font-size: 1.1rem;">2.0</div>
+                            </div>
+                            <button id="reset-demo" style="padding: 0.8rem 1.5rem; background: var(--accent-color); color: var(--bg-color); border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                重置參數
+                            </button>
+                        </div>
+
+                        <!-- 範例句子 -->
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <h4 style="color: var(--text-color); margin-bottom: 1rem; font-size: clamp(1.2rem, 2.2vw, 1.5rem);">範例句子：「鏟子超人，我...」</h4>
+                            <div id="sentence-display" style="font-size: 1.5rem; font-weight: bold; color: var(--accent-color); padding: 1rem; background: rgba(255, 255, 255, 0.5); border-radius: 8px; border: 1px solid var(--line-color);">
+                                鏟子超人，我 <span id="next-word-display">的超人</span>
+                            </div>
+                        </div>
+
+                        <!-- 注意力分數視覺化 -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-color); font-size: clamp(1.1rem, 2vw, 1.3rem);">注意力分數矩陣 (Query: "我")</h4>
+                            <div id="attention-matrix" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; max-width: 600px; margin: 0 auto;">
+                                <!-- 動態生成的注意力分數格子 -->
+                            </div>
+                        </div>
+
+                        <!-- 結果展示 -->
+                        <div style="background: rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--line-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-color); font-size: clamp(1.1rem, 2vw, 1.3rem);">Softmax 後的注意力權重</h4>
+                            <div id="attention-weights" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem;">
+                                <!-- 動態生成的權重條 -->
+                            </div>
+                            <div style="text-align: center; margin-top: 1rem; padding: 1rem; background: rgba(120, 120, 91, 0.1); border-radius: 8px; border: 1px solid var(--accent-color);">
+                                <strong style="color: var(--text-color);"></strong>
+                                <span id="predicted-word" style="color: var(--accent-color); font-size: 1.2rem; font-weight: bold;"></span>
+                            </div>
+                        </div>
+
+                        <!-- 說明文字 -->
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(120, 120, 91, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-color);">
+                                <strong style="color: var(--accent-color);">💡 觀察重點：</strong>
+                                當縮放因子較小時，注意力分數差異會被放大，模型會更專注於最相關的詞彙。
+                                當縮放因子較大時，注意力分數會變得較為平均，模型會考慮更多詞彙的資訊。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 投影片 13: 自我注意力與上下文價值 -->
+        <section id="slide-13" class="slide bunch-word-container">
+            <div>
+                <h2>自我注意力與上下文價值</h2>
+                <div class="homework-content">
+                    <h4>精確捕捉語義：讓「蘋果」不再只有一種意思</h4>
+                    <h5>核心價值：創造豐富的上下文表徵</h5>
+                    <p>• 自我注意力機制最重要的功能，是將輸入詞彙的嵌入轉化為具有豐富上下文資訊的表徵。</p>
+                    <p>• 在 Transformer 中，模型可以根據句子環境，為同一個詞賦予不同的意義，解決了傳統模型無法處理的一詞多義問題。</p>
+
+                    <h5>案例：語義的整合</h5>
+                    <p>• 句子 1： 「我喜歡吃<strong>蘋果</strong>。」</p>
+                    <p>• 句子 2： 「他買了一台<strong>蘋果</strong>手機。」</p>
+                    <p>• 運作過程：</p>
+                    <p style="margin-left: 2rem;">1. 當 Query (Q) 為「蘋果」時，它會與序列中的 Key (K)（例如：「吃」或「手機」）進行比對。</p>
+                    <p style="margin-left: 2rem;">2. 如果 Q-K 比對結果顯示它與「手機」高度相關，模型會從 Value (V) 提取「品牌/科技產品」的上下文資訊。</p>
+                    <p>• 結果：輸出的新向量不再是單純的詞義，而是這個詞在當前句子中的精確語義。這種加權平均的機制使模型能精準捕捉長距離的依賴性。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 14: 多頭注意力 -->
+        <section id="slide-14" class="slide bunch-word-container">
+            <div>
+                <h2>進階概念：多頭注意力 (Multi-Head Attention)</h2>
+                <div class="homework-content">
+                    <h4>多角度分析 — 讓模型像多位專家一樣思考</h4>
+
+                    <h5>原始數學公式</h5>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        $$\text{MultiHead}(Q,K,V) = \text{Concat}(\text{head}_1, ..., \text{head}_h)W^O$$
+                    </div>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        $$\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$
+                    </div>
+                    <p style="text-align: center; color: var(--text-color); font-size: 1.2rem;">
+                        其中 $h$ 是注意力頭的數量，$W^O$ 是輸出投影矩陣
+                    </p>
+
+                    <h5>白話文：同時從不同角度看問題</h5>
+                    <p>• Transformer 不只使用一個自注意力機制，而是同時使用多個「注意力頭」（Head）平行運作。</p>
+                    <p>• 想像你在看書，你需要多位專家同時幫助你理解：</p>
+                    <p style="margin-left: 2rem;">◦ 頭 A：專注於文法結構（句法關係）。</p>
+                    <p style="margin-left: 2rem;">◦ 頭 B：專注於語意關聯（詞彙意義）。</p>
+                    <p style="margin-left: 2rem;">◦ 頭 C：專注於邏輯順序（上下文連貫性）。</p>
+
+                    <h5>「專家看書」的數學表示</h5>
+                    <p>以句子「我 喜歡 吃 蘋果」為例：</p>
+
+                    <div style="background: rgba(120, 120, 91, 0.1); padding: 15px; border-radius: 8px; margin: 1rem 0; border-left: 4px solid var(--color-primary);">
+                        <h6 style="color: var(--color-primary); margin-bottom: 10px;">👨‍🏫 專家 A（文法結構）：</h6>
+                        <p style="font-family: monospace; margin: 5px 0;">Q<sub>A</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>A</sub><sup>Q</sup></p>
+                        <p style="font-family: monospace; margin: 5px 0;">K<sub>A</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>A</sub><sup>K</sup></p>
+                        <p style="margin: 5px 0;"><strong>專注：</strong>「喜歡」→「我」（主語關係）、「吃」→「蘋果」（動賓關係）</p>
+                    </div>
+
+                    <div style="background: rgba(163, 163, 128, 0.1); padding: 15px; border-radius: 8px; margin: 1rem 0; border-left: 4px solid var(--color-secondary);">
+                        <h6 style="color: var(--color-secondary); margin-bottom: 10px;">🧠 專家 B（語意關聯）：</h6>
+                        <p style="font-family: monospace; margin: 5px 0;">Q<sub>B</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>B</sub><sup>Q</sup></p>
+                        <p style="font-family: monospace; margin: 5px 0;">K<sub>B</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>B</sub><sup>K</sup></p>
+                        <p style="margin: 5px 0;"><strong>專注：</strong>「喜歡」↔「吃」（情感動作）、「吃」↔「蘋果」（動作對象）</p>
+                    </div>
+
+                    <div style="background: rgba(180, 120, 120, 0.1); padding: 15px; border-radius: 8px; margin: 1rem 0; border-left: 4px solid var(--color-accent);">
+                        <h6 style="color: var(--color-accent); margin-bottom: 10px;">🔗 專家 C（邏輯順序）：</h6>
+                        <p style="font-family: monospace; margin: 5px 0;">Q<sub>C</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>C</sub><sup>Q</sup></p>
+                        <p style="font-family: monospace; margin: 5px 0;">K<sub>C</sub> = [我, 喜歡, 吃, 蘋果] × W<sub>C</sub><sup>K</sup></p>
+                        <p style="margin: 5px 0;"><strong>專注：</strong>「我」→「喜歡」→「吃」→「蘋果」（時間順序）</p>
+                    </div>
+
+                    <div style="background: rgba(120, 150, 120, 0.1); padding: 15px; border-radius: 8px; margin: 1rem 0; border-left: 4px solid var(--color-success);">
+                        <h6 style="color: var(--color-success); margin-bottom: 10px;">🤝 整合結果：</h6>
+                        <p style="font-family: monospace; margin: 5px 0;">MultiHead = Concat(專家A輸出, 專家B輸出, 專家C輸出) × W<sup>O</sup></p>
+                        <p style="margin: 5px 0;"><strong>結果：</strong>「蘋果」= 文法上的賓語 + 語意上的食物 + 邏輯上的動作對象</p>
+                    </div>
+
+                    <h5>核心原理</h5>
+                    <p>• 每個注意力頭都會使用獨立學習的 Q、K、V 權重矩陣。</p>
+                    <p>• 因此，每個頭能夠從輸入中捕捉不同類型、不同層次的關係。</p>
+                    <p>• 所有注意力頭的結果會被串接（Concatenate）起來，再整合成一個統一的、更豐富的表徵，極大提升模型的表達能力。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 15: 殘差連接 -->
+        <section id="slide-15" class="slide bunch-word-container">
+            <div>
+                <h2>穩定訓練機制 — 殘差連接 (Residual Connections)</h2>
+                <div class="homework-content">
+                    <h4>深層學習的「捷徑」與記憶力</h4>
+                    <h5>白話文：防止資訊在深層網路中遺失</h5>
+                    <p>• 殘差連接（Residual Connections）是深度神經網路中的關鍵創新。</p>
+                    <p>• 它就像在每一層（Transformer Block）都設置了一個「捷徑」（Shortcut）。</p>
+                    <p>• 在處理資料時，殘差連接會將未經當前層修改的原始輸入直接跳過一或多層，並加到該層的最終輸出上。</p>
+
+                    <h5>視覺化說明</h5>
+                    <div style="text-align: center; margin: 2rem 0; padding: 1rem; background-color: rgba(255, 255, 255, 0.3); border-radius: 8px; border: 1px solid var(--line-color);">
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                            <!-- 沒有殘差連接的網路 -->
+                            <div style="text-align: center;">
+                                <h6 style="color: var(--color-accent); margin-bottom: 1rem; font-size: 1.2rem; font-weight: 600;">❌ 沒有殘差連接</h6>
+                                <div style="position: relative; width: 200px; height: 300px; border: 2px solid var(--color-accent); border-radius: 8px; background: linear-gradient(to bottom, rgba(180, 120, 120, 0.1), rgba(180, 120, 120, 0.05));">
+                                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">輸入</div>
+                                    <div style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層1</div>
+                                    <div style="position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層2</div>
+                                    <div style="position: absolute; top: 200px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層3</div>
+                                    <div style="position: absolute; top: 260px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">輸出</div>
+
+                                    <!-- 箭頭 -->
+                                    <div style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 180px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 240px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+
+                                    <!-- 箭頭頭部 -->
+                                    <div style="position: absolute; top: 78px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 138px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 198px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 258px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                </div>
+                                <p style="font-size: 1rem; color: var(--text-color); margin-top: 0.5rem; font-weight: 500;">資訊可能遺失</p>
+                            </div>
+
+                            <!-- 有殘差連接的網路 -->
+                            <div style="text-align: center;">
+                                <h6 style="color: var(--color-success); margin-bottom: 1rem; font-size: 1.2rem; font-weight: 600;">✅ 有殘差連接</h6>
+                                <div style="position: relative; width: 200px; height: 300px; border: 2px solid var(--color-success); border-radius: 8px; background: linear-gradient(to bottom, rgba(120, 150, 120, 0.1), rgba(120, 150, 120, 0.05));">
+                                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">輸入</div>
+                                    <div style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層1</div>
+                                    <div style="position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層2</div>
+                                    <div style="position: absolute; top: 200px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-info); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">層3</div>
+                                    <div style="position: absolute; top: 260px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">輸出</div>
+
+                                    <!-- 主要箭頭 -->
+                                    <div style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 180px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+                                    <div style="position: absolute; top: 240px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: var(--text-color);"></div>
+
+                                    <!-- 殘差連接（捷徑） -->
+                                    <div style="position: absolute; top: 20px; left: 80px; width: 100px; height: 2px; background: var(--color-earth); transform: rotate(45deg); transform-origin: left center;"></div>
+                                    <div style="position: absolute; top: 80px; left: 80px; width: 100px; height: 2px; background: var(--color-earth); transform: rotate(45deg); transform-origin: left center;"></div>
+                                    <div style="position: absolute; top: 140px; left: 80px; width: 100px; height: 2px; background: var(--color-earth); transform: rotate(45deg); transform-origin: left center;"></div>
+
+                                    <!-- 箭頭頭部 -->
+                                    <div style="position: absolute; top: 78px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 138px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 198px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+                                    <div style="position: absolute; top: 258px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--text-color);"></div>
+
+                                    <!-- 殘差連接箭頭頭部 -->
+                                    <div style="position: absolute; top: 78px; left: 178px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--color-earth);"></div>
+                                    <div style="position: absolute; top: 138px; left: 178px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--color-earth);"></div>
+                                    <div style="position: absolute; top: 198px; left: 178px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--color-earth);"></div>
+                                </div>
+                                <p style="font-size: 1rem; color: var(--text-color); margin-top: 0.5rem; font-weight: 500;">原始資訊保留</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; font-size: 1rem; color: var(--text-color);">
+                            <p style="margin-bottom: 0.5rem;"><strong style="color: var(--color-earth);">大地色線條</strong>：殘差連接（捷徑），直接將原始輸入加到每層的輸出</p>
+                            <p style="margin-bottom: 0;"><strong>數學表示</strong>：<code style="background: rgba(120, 120, 91, 0.1); padding: 0.2rem 0.4rem; border-radius: 4px; color: var(--accent-color);">輸出 = F(x) + x</code>，其中 F(x) 是層的轉換，x 是原始輸入</p>
+                        </div>
+                    </div>
+
+                    <h5>數學與用途</h5>
+                    <p>• 核心功能：確保「原始資訊」可以無損地流經多層網路。</p>
+                    <p>• 穩定性：有效減輕深度網路訓練中常見的「梯度消失問題」，確保模型底層的權重在訓練時能獲得足夠的更新。這對擁有 12 個或更多區塊的深層 Transformer 模型至關重要。</p>
+                </div>
+            </div>
+        </section>
+        <!-- 投影片 16: Temperature 參數 -->
+        <section id="slide-16" class="slide bunch-word-container">
+            <div>
+                <h2>控制創造力的「溫度」— 超參數 Temperature</h2>
+                <div class="homework-content">
+                    <h4>Temperature 決定模型輸出的確定性或隨機性</h4>
+                    <h5>白話文：隨機性或創造力的「調節旋鈕」</h5>
+                    <p>• Temperature (T) 是一個超參數，用於控制模型在預測下一個詞時的隨機性或創造力。</p>
+                    <p>• 它的數值決定了機率分佈的形狀。</p>
+
+                    <h5>出現的位置</h5>
+                    <p>• Temperature 出現在模型計算出 Logits 之後、Softmax 函數轉換成機率之前。</p>
+
+                    <p>• 模型會將 Logits ($z_i$) 先除以 Temperature ($T$)，然後才進行 Softmax 運算：</p>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        $$\text{Probability} = \text{Softmax}\left(\frac{\text{Logits}}{T}\right)$$
+                        $$P_i = \frac{e^{z_i / T}}{\sum_{j=1}^{N} e^{z_j / T}}$$
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 17: Temperature 特性比較 -->
+        <section id="slide-17" class="slide bunch-word-container">
+            <div>
+                <h2>超參數「溫度」 低溫求穩，高溫求變</h2>
+                <div class="homework-content">
+                    <table style="width: 100%; margin: 2rem 0; border-collapse: collapse;">
+                        <tr style="background: var(--accent-color); color: white;">
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">Temperature $T$</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">特性/模式</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">對機率分佈的影響</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">輸出結果</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">應用情境</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 1em;">低溫 (T < 1)</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">決定性 (Deterministic)</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">分佈更「尖銳」。差異被放大。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">傾向選擇最高機率詞彙。結果可預測且一致。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">摘要、翻譯、事實型問答 (需要精度)。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 1em;">高溫 (T > 1)</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">隨機性/創造性 (Probabilistic/Creative)</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">分佈更「平滑」。差異被壓縮。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">增加選擇低機率詞的機會。輸出更具多樣性與驚喜。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">故事寫作、腦力激盪 (需要創意)。</td>
+                        </tr>
+                    </table>
+                    <p>• 極端情況：當 $T=0$ 時，模型進入貪婪模式 (Greedy Selection)，總是選擇最高機率的詞彙。</p>
+                    <p>• 風險：雖然高 $T$ 帶來創意，但也可能導致輸出不連貫、不準確或不符合語義。</p>
+
+                    <!-- 互動式個性測試 -->
+                    <div style="margin-top: 3rem; padding: 2rem; background: rgba(255, 255, 255, 0.5); border-radius: 12px; border: 2px solid var(--line-color);">
+                        <h4 style="text-align: center; margin-bottom: 2rem; color: var(--accent-color);">🎭 溫度參數個性化測試</h4>
+
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <label for="personalitySlider" style="display: block; margin-bottom: 1rem; font-size: 1.2rem; color: var(--text-color);">
+                                調整您的「冒險指數」：<span id="sliderValue">50</span>%
+                            </label>
+                            <input type="range" id="personalitySlider" min="0" max="100" value="50"
+                                   style="width: 80%;">
+                            <div style="display: flex; justify-content: space-between; width: 80%; margin: 0.5rem auto 0;">
+                                <span style="font-size: 0.9rem; color: #666;">保守</span>
+                                <span style="font-size: 0.9rem; color: #666;">冒險</span>
+                            </div>
+                        </div>
+
+                        <div id="personalityResult" style="text-align: center; margin-bottom: 2rem;">
+                            <div style="padding: 1.5rem; background: rgba(120, 120, 91, 0.1); border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                                <h5 style="margin: 0 0 1rem 0; color: var(--accent-color); font-size: 1.4rem;">您的 AI 個性：<span id="personalityType">平衡型</span></h5>
+                                <p style="margin: 0 0 0.5rem 0; font-size: 1.1rem;"><strong>溫度參數：</strong><span id="temperatureValue">1.0</span></p>
+                                <p style="margin: 0; font-size: 1rem; color: #666;"><span id="personalityDescription">在保守與冒險之間取得平衡，既不會過於死板，也不會過於隨性。</span></p>
+                            </div>
+                        </div>
+
+                        <div id="personalityChart" style="width: 100%; height: 200px; margin: 1rem 0;"></div>
+
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <button id="generateExampleBtn" style="padding: 0.8rem 1.5rem; font-size: 1rem; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                🎲 生成個性化例子
+                            </button>
+                            <div id="exampleResult" style="margin-top: 1rem; font-size: 1rem; color: var(--text-color);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 18: 核心問題 -->
+        <section id="slide-18" class="slide">
+            <h1>核心問題 — 自我注意力與人類注意力的差異？</h1>
+            <h2>AI 的運算與人腦的思考</h2>
+            <h3>關鍵問題：效能與價值的權重分配</h3>
+            <p>如果 Transformer 的效能取決於它如何分配注意力來決定「上下文價值」，那麼我們個人效能的提升，是否也遵循類似的「自我注意力」機制，精準地決定我們當下行動或決策中「價值 (Value)」的權重？</p>
+        </section>
+        <!-- 投影片 19: 人機注意力差異比較 -->
+        <section id="slide-19" class="slide bunch-word-container">
+            <div>
+                <h2>差異比較 — 人機注意力的根本不同 (四個面向)</h2>
+                <div class="homework-content">
+                    <h4>AI 的平行運算 vs. 人腦的生物學限制</h4>
+                    <table style="width: 100%; margin: 2rem 0; border-collapse: collapse;">
+                        <tr style="background: var(--accent-color); color: white;">
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">比較面向</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">人類注意力 (生物系統)</th>
+                            <th style="padding: 1rem; border: 1px solid var(--line-color);">Transformer 自我注意力 (人工系統)</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">1. 容量限制與處理方式</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">受限/序列式。必須在不同輸入間切換。是解決有限資源的方案。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">平行處理。在充足資源下，可以一次性考慮序列中所有元素。是一種提取上下文關係的機制。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">2. 注意力路徑</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">雙向 (Top-down & Bottom-up)。受意圖、知識 (Top-down) 和顯著刺激 (Bottom-up) 驅動。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">單向 (數據驅動)。注意力分配完全基於訓練數據的模式。缺乏由目標或認知狀態驅動的「由上而下」控制機制。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">3. 意圖性與能動性</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">主動/有意識。注意力是一種主動的決策機制，與個體的能動性 (Agency) 相關。</td>
+                            <td style="padding: 1rem; border: 1px solid var(--line-color); font-size: 0.75em;">被動/數學構造。模型不具備內在的認知狀態或意圖。其「注意力」本質上是計算元素間關係的數學構造。</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 20: 大腦的有限資源管理器 -->
+        <section id="slide-20" class="slide bunch-word-container">
+            <div>
+                <h2>大腦的「有限資源管理器」</h2>
+                <div class="homework-content">
+                    <h4>人類注意力的定義與功能</h4>
+                    <p>• 定義：注意力是心靈選擇性地掌握「幾個同時可能的對象或思緒」之一的能力。</p>
+                    <p>• 核心功能：這是對有限的認知資源（limited computational resources）進行彈性控制（flexible control）的關鍵。</p>
+                    <p>• 五大面向：人類注意力包括了選擇性注意力 (維持原有行為並過濾刺激)、分開性注意力 (同時專注多件事情)、轉移性注意力 (快速切換焦點)、持續性注意力 (長時間專注)、以及集中的注意力 (井然有序地應對外部刺激)。</p>
+
+                    <h4>人類注意力的能力上限與限制</h4>
+                    <p>• 容量限制 (Capacity Constraints)：人類受限於有限的視覺範圍和工作記憶容量。工作記憶的限制類似於著名的「神奇的數字 4」 (Magic Number 4)。</p>
+                    <p>• 處理方式：由於這些生物限制，人類的注意力必須是序列式地運作，需要不斷切換焦點。</p>
+                    <p>• 數據佐證：類似於人類，Transformer 模型在 N-back 任務中，隨著 N 增加，準確度會顯著下降。研究假設這與自我注意力機制的容量限制相似。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 21: Magic 4 遊戲 -->
+        <section id="slide-21" class="slide">
+            <h1>Magic Number</h1>
+            <div class="magic-game">
+                <h3>測試你的工作記憶容量</h3>
+                <p>請記住以下數字序列，然後按順序點擊：</p>
+                <div id="game-display" style="font-size: 2rem; margin: 2rem 0; padding: 1rem; background: rgba(255,255,255,0.8); border-radius: 8px; min-height: 60px;">
+                    點擊「開始遊戲」開始
+                </div>
+                <div id="game-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 2rem 0;">
+                    <button class="game-button" onclick="startGame()">開始遊戲</button>
+                    <button class="game-button" onclick="resetGame()" style="display: none;">重新開始</button>
+                </div>
+                <div id="number-buttons" style="display: none; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+                    <button class="game-button" onclick="selectNumber(1)">1</button>
+                    <button class="game-button" onclick="selectNumber(2)">2</button>
+                    <button class="game-button" onclick="selectNumber(3)">3</button>
+                    <button class="game-button" onclick="selectNumber(4)">4</button>
+                    <button class="game-button" onclick="selectNumber(5)">5</button>
+                    <button class="game-button" onclick="selectNumber(6)">6</button>
+                    <button class="game-button" onclick="selectNumber(7)">7</button>
+                    <button class="game-button" onclick="selectNumber(8)">8</button>
+                    <button class="game-button" onclick="selectNumber(9)">9</button>
+                </div>
+                <div id="game-result" style="margin-top: 2rem; font-size: 1.2rem;"></div>
+            </div>
+        </section>
+
+        <!-- 投影片 22: 參考文獻 -->
+        <section id="slide-22" class="slide bunch-word-container">
+            <h1>參考文獻</h1>
+            <div class="references-list">
+                <ul class="reference-list">
+                    <li>
+                        <strong>Attention Is All You Need (2017)</strong><br>
+                        <a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank">
+                            經典 Transformer 論文
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Transformer 解釋互動式網站</strong><br>
+                        <a href="https://poloclub.github.io/transformer-explainer/" target="_blank">
+                            視覺化學習資源
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>手把手帶你寫程式理解 Transformer</strong><br>
+                        <a href="https://deeplearning.neuromatch.io/tutorials/W2D5_AttentionAndTransformers/student/W2D5_Tutorial1.html" target="_blank">
+                            實作教學課程
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Transformer GPT2.0 互動式深入原理剖析</strong><br>
+                        <a href="https://bbycroft.net/llm" target="_blank">
+                            深入原理分析
+                        </a>
+                    </li>
+
+                    <li>
+                        <strong>Transformer 教科書</strong><br>
+                        <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">
+                            圖解式教學
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 投影片 23: 考試？遊戲？ -->
+        <section id="slide-23" class="slide bunch-word-container" style="display: none;">
+            <div>
+                <h2>考試？遊戲？</h2>
+                <div class="homework-content">
+                    <h4>請點擊連結：
+                    <a href="https://chatgpt.com/g/g-68d8ee2c7dc88191af386a6d722ac8b4-master-w4-transformer-qa" target="_blank">進入 ChatGPT 問答遊戲</a>
+                    </h4>
+                    <h4>回答完問題後將你的答案傳到 <a href="https://forms.gle/5YbYdcnVDqkr7nmN8" target="_blank">google 表單</a>
+                    </h4>
+                </div>
+                <h1>限時 10 分鐘</h1>
+
+                <!-- 測試題目集 -->
+                <div class="quiz-container" style="margin-top: 20px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">[測試題目集]</h3>
+
+                    <div class="quiz-question">
+                        <h4>第1題</h4>
+                        <p>Transformer 架構的最大創新是什麼？</p>
+                        <p>a. 引入循環神經網路處理長序列</p>
+                        <p>b. 使用卷積層取代嵌入向量</p>
+                        <p>c. 自我注意力機制，可同時處理整個序列</p>
+                        <p>d. 減少參數，避免過擬合</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第2題</h4>
+                        <p>以下哪一項是 Transformer 的錯誤特性？</p>
+                        <p>a. 可以同時處理整個序列中的所有詞</p>
+                        <p>b. 使用自我注意力機制捕捉長距離依賴</p>
+                        <p>c. 需要透過訓練學習 Q、K、V 的權重矩陣</p>
+                        <p>d. 必須逐步處理序列，無法並行計算</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第3題</h4>
+                        <p>在詞彙機率預測過程中，Logits 的角色是什麼？</p>
+                        <p>a. 模型計算出的未正規化分數</p>
+                        <p>b. 機率總和為 1 的分佈</p>
+                        <p>c. 輸入的嵌入向量</p>
+                        <p>d. 注意力權重</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第4題</h4>
+                        <p>Softmax 在 Transformer 中的功能是什麼？</p>
+                        <p>a. 將分數壓縮到 -1 到 1 之間</p>
+                        <p>b. 將所有輸入向量轉換為 QKV</p>
+                        <p>c. 將 Logits 正規化為機率分佈</p>
+                        <p>d. 增加模型的計算速度</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第5題</h4>
+                        <p>Q、K、V 在 Transformer 中的對應意義為？</p>
+                        <p>a. 查詢、鍵值、數值</p>
+                        <p>b. 問題、答案、結果</p>
+                        <p>c. 向量、矩陣、張量</p>
+                        <p>d. 查詢、分類、值</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第6題</h4>
+                        <p>在注意力運算中，為什麼要對「查詢與鍵值的相似度分數」進行縮放處理？</p>
+                        <p>a. 減少參數數量</p>
+                        <p>b. 提高模型容量</p>
+                        <p>c. 確保 Softmax 的輸入數值不會過大而導致梯度不穩定</p>
+                        <p>d. 減少訓練時間</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第7題</h4>
+                        <p>多頭注意力機制的主要優勢是什麼？</p>
+                        <p>a. 從多角度捕捉不同語意關係</p>
+                        <p>b. 降低模型參數</p>
+                        <p>c. 提升計算速度</p>
+                        <p>d. 減少訓練資料需求</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第8題</h4>
+                        <p>殘差連接 (Residual Connection) 在 Transformer 中的主要功能是？</p>
+                        <p>a. 提升隨機性</p>
+                        <p>b. 減少運算量</p>
+                        <p>c. 替代多頭注意力</p>
+                        <p>d. 確保資訊暢通，避免梯度消失</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第9題</h4>
+                        <p>Temperature 參數調高 (T > 1) 時，模型輸出會如何？</p>
+                        <p>a. 更隨機、多樣化</p>
+                        <p>b. 更保守、重複性高</p>
+                        <p>c. 完全不輸出文字</p>
+                        <p>d. 變成確定性預測</p>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>第10題</h4>
+                        <p>下列哪一項正確描述 Transformer 與人類注意力的差異？</p>
+                        <p>a. Transformer 有內在意圖，人類沒有</p>
+                        <p>b. 人類注意力可同時平行處理無限資訊，Transformer 無法</p>
+                        <p>c. Transformer 注意力由數據驅動，人類注意力有意識主導</p>
+                        <p>d. 兩者運作方式完全相同</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        // AI 文字生成機率展示功能
+        function showNextWordProbabilities() {
+            console.log('函數被調用了！');
+            const display = document.getElementById('probability-display');
+            const container = document.getElementById('word-probabilities');
+
+            if (!display || !container) {
+                console.error('找不到元素！', { display, container });
+                return;
+            }
+
+            // 模擬 AI 預測的下一個詞機率（基於詩意語境）
+            const wordProbabilities = [
+                { word: '成蔭', probability: 0.25, color: '#78785b' },
+                { word: '橙汁', probability: 0.20, color: '#a3a380' },
+                { word: '釘槌', probability: 0.18, color: '#b47878' },
+                { word: '德華', probability: 0.17, color: '#789678' },
+                { word: '一郎', probability: 0.17, color: '#788ca0' }
+            ];
+
+            // 清空容器
+            container.innerHTML = '';
+
+            // 創建機率條
+            wordProbabilities.forEach((item, index) => {
+                const probabilityBar = document.createElement('div');
+                probabilityBar.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin: 0.5rem;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: all 0.6s ease;
+                `;
+
+                probabilityBar.innerHTML = `
+                    <div style="
+                        width: ${item.probability * 200}px;
+                        height: 30px;
+                        background: ${item.color};
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 0.9rem;
+                        margin-bottom: 0.5rem;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    ">
+                        ${item.word}
+                    </div>
+                    <div style="
+                        font-size: 0.8rem;
+                        color: #5a5a5a;
+                        font-weight: 500;
+                    ">
+                        ${(item.probability * 100).toFixed(1)}%
+                    </div>
+                `;
+
+                container.appendChild(probabilityBar);
+
+                // 延遲顯示動畫
+                setTimeout(() => {
+                    probabilityBar.style.opacity = '1';
+                    probabilityBar.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // 顯示結果區域
+            display.style.display = 'block';
+            display.style.opacity = '0';
+            display.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                display.style.transition = 'all 0.6s ease';
+                display.style.opacity = '1';
+                display.style.transform = 'translateY(0)';
+            }, 200);
+        }
+
+        // Magic 4 遊戲 JavaScript
+        let gameSequence = [];
+        let currentStep = 0;
+        let gamePhase = 'waiting'; // waiting, showing, playing
+        let gameLevel = 3; // 從 4 個數字開始
+        let maxLevel = 20; // 最大關卡數
+
+        function startGame() {
+            gameSequence = [];
+            currentStep = 0;
+            gameLevel = 3;
+            gamePhase = 'showing';
+
+            // 生成隨機數字序列
+            for (let i = 0; i < gameLevel; i++) {
+                gameSequence.push(Math.floor(Math.random() * 9) + 1);
+            }
+
+            document.getElementById('game-display').textContent = gameSequence.join(' ');
+            document.getElementById('game-buttons').style.display = 'none';
+            document.getElementById('number-buttons').style.display = 'flex';
+            document.getElementById('game-result').textContent = '';
+
+            // 3秒後開始遊戲
+            setTimeout(() => {
+                gamePhase = 'playing';
+                document.getElementById('game-display').textContent = '請按順序點擊數字：';
+            }, 3000);
+        }
+
+        function selectNumber(num) {
+            if (gamePhase !== 'playing') return;
+
+            if (num === gameSequence[currentStep]) {
+                currentStep++;
+                document.getElementById('game-display').textContent = `正確！已點擊 ${currentStep}/${gameSequence.length}`;
+
+                if (currentStep === gameSequence.length) {
+                    // 完成當前關卡
+                    gameLevel++;
+                    document.getElementById('game-result').textContent = `恭喜！完成 ${gameSequence.length} 個數字的關卡！`;
+
+                    if (gameLevel <= maxLevel) {
+                        setTimeout(() => {
+                            startNextLevel();
+                        }, 2000);
+                    } else {
+                        // 完成所有關卡，停留在成功畫面
+                        document.getElementById('game-result').textContent = `太棒了！你完成了所有關卡！`;
+
+                        // 顯示重新開始按鈕
+                        document.getElementById('game-buttons').style.display = 'flex';
+                        document.querySelector('button[onclick="startGame()"]').style.display = 'none';
+                        document.querySelector('button[onclick="resetGame()"]').style.display = 'inline-block';
+
+                        // 隱藏數字按鈕
+                        document.getElementById('number-buttons').style.display = 'none';
+
+                        // 停止遊戲
+                        gamePhase = 'completed';
+                    }
+                }
+            } else {
+                // 遊戲失敗，顯示正確答案並停留在失敗畫面
+                document.getElementById('game-display').textContent = `錯誤！正確順序是：${gameSequence.join(' ')}`;
+                document.getElementById('game-result').textContent = `遊戲結束！你記住了 ${gameSequence.length-1} 個數字。`;
+
+                // 顯示重新開始按鈕
+                document.getElementById('game-buttons').style.display = 'flex';
+                document.querySelector('button[onclick="startGame()"]').style.display = 'none';
+                document.querySelector('button[onclick="resetGame()"]').style.display = 'inline-block';
+
+                // 隱藏數字按鈕
+                document.getElementById('number-buttons').style.display = 'none';
+
+                // 停止遊戲
+                gamePhase = 'failed';
+            }
+        }
+
+        function startNextLevel() {
+            gameSequence = [];
+            currentStep = 0;
+            gamePhase = 'showing';
+
+            for (let i = 0; i < gameLevel; i++) {
+                gameSequence.push(Math.floor(Math.random() * 9) + 1);
+            }
+
+            document.getElementById('game-display').textContent = gameSequence.join(' ');
+            document.getElementById('game-result').textContent = `第 ${gameLevel} 關：記住 ${gameLevel} 個數字`;
+
+            setTimeout(() => {
+                gamePhase = 'playing';
+                document.getElementById('game-display').textContent = '請按順序點擊數字：';
+            }, 3000);
+        }
+
+        function resetGame() {
+            gameSequence = [];
+            currentStep = 0;
+            gameLevel = 4;
+            gamePhase = 'waiting';
+
+            document.getElementById('game-display').textContent = '點擊「開始遊戲」開始';
+            document.getElementById('game-buttons').style.display = 'flex';
+            document.querySelector('button[onclick="startGame()"]').style.display = 'inline-block';
+            document.querySelector('button[onclick="resetGame()"]').style.display = 'none';
+            document.getElementById('number-buttons').style.display = 'none';
+            document.getElementById('game-result').textContent = '';
+        }
+
+        // 側邊欄功能
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function goToSlide(slideId) {
+            // 關閉側邊欄
+            closeSidebar();
+
+            // 跳轉到指定投影片
+            showSlideById(slideId);
+        }
+
+        // 全域變數
+        let currentIndex = 0;
+        let slidesContainer;
+        let allSlides;
+        let visibleSlides;
+
+        // Summary Box 互動效果
+        function initSummaryBoxes() {
+            const summaryBoxes = document.querySelectorAll('.summary-box');
+            summaryBoxes.forEach(box => {
+                box.addEventListener('mouseenter', () => {
+                    box.style.transform = 'scale(1.02)';
+                    box.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+                    box.style.borderColor = 'var(--accent-color)';
+                });
+                box.addEventListener('mouseleave', () => {
+                    box.style.transform = 'scale(1)';
+                    box.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                    box.style.borderColor = 'var(--line-color)';
+                });
+            });
+        }
+
+        // 溫度參數個性化測試功能
+        function initPersonalityTest() {
+            const slider = document.getElementById('personalitySlider');
+            const sliderValue = document.getElementById('sliderValue');
+            const personalityType = document.getElementById('personalityType');
+            const temperatureValue = document.getElementById('temperatureValue');
+            const personalityDescription = document.getElementById('personalityDescription');
+            const personalityChart = document.getElementById('personalityChart');
+            const generateBtn = document.getElementById('generateExampleBtn');
+            const exampleResult = document.getElementById('exampleResult');
+
+            if (!slider || !sliderValue || !personalityType || !temperatureValue || !personalityDescription || !personalityChart || !generateBtn || !exampleResult) {
+                console.log('部分元素未找到，跳過個性化測試初始化');
+                return;
+            }
+
+            // 個性類型定義
+            const personalityTypes = {
+                conservative: {
+                    name: '保守型',
+                    tempRange: [0, 25],
+                    tempValue: 0.3,
+                    description: '像一位謹慎的長者，總是選擇最安全、最可靠的選項。做事穩重，但可能缺乏創新。',
+                    color: '#78785b',
+                    examples: ['總是選擇熟悉的餐廳', '偏好經典的音樂', '選擇穩定的投資', '使用傳統的學習方法']
+                },
+                balanced: {
+                    name: '平衡型',
+                    tempRange: [25, 50],
+                    tempValue: 0.7,
+                    description: '在保守與冒險之間取得平衡，既不會過於死板，也不會過於隨性。',
+                    color: '#a3a380',
+                    examples: ['偶爾嘗試新餐廳', '混合聽經典和流行音樂', '平衡投資組合', '結合傳統和創新學習']
+                },
+                creative: {
+                    name: '創意型',
+                    tempRange: [50, 75],
+                    tempValue: 1.5,
+                    description: '喜歡探索新事物，富有想像力，但偶爾可能過於天馬行空。',
+                    color: '#b47878',
+                    examples: ['經常嘗試新餐廳', '喜歡實驗性音樂', '投資新興產業', '使用創新的學習方法']
+                },
+                adventurous: {
+                    name: '冒險型',
+                    tempRange: [75, 100],
+                    tempValue: 2.0,
+                    description: '極度熱愛冒險和探索，充滿創意，但可能缺乏一致性。',
+                    color: '#788ca0',
+                    examples: ['總是選擇沒去過的餐廳', '聽最前衛的音樂', '投資高風險項目', '嘗試最新的學習技術']
+                }
+            };
+
+            // 更新個性顯示
+            function updatePersonality(value) {
+                let currentType = personalityTypes.balanced;
+
+                for (const [key, type] of Object.entries(personalityTypes)) {
+                    if (value >= type.tempRange[0] && value < type.tempRange[1]) {
+                        currentType = type;
+                        break;
+                    }
+                }
+
+                // 處理邊界情況
+                if (value === 100) {
+                    currentType = personalityTypes.adventurous;
+                }
+
+                personalityType.textContent = currentType.name;
+                temperatureValue.textContent = currentType.tempValue;
+                personalityDescription.textContent = currentType.description;
+
+                // 更新圖表
+                updatePersonalityChart(currentType);
+            }
+
+            // 更新個性圖表
+            function updatePersonalityChart(type) {
+                const scenarios = [
+                    { name: '選擇餐廳', conservative: 0.8, creative: 0.3 },
+                    { name: '選擇音樂', conservative: 0.7, creative: 0.4 },
+                    { name: '選擇投資', conservative: 0.9, creative: 0.2 },
+                    { name: '選擇學習', conservative: 0.6, creative: 0.5 }
+                ];
+
+                personalityChart.innerHTML = '';
+
+                scenarios.forEach(scenario => {
+                    const bar = document.createElement('div');
+                    bar.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        margin: 0.5rem 0;
+                        font-size: 0.9rem;
+                    `;
+
+                    const label = document.createElement('div');
+                    label.textContent = scenario.name;
+                    label.style.cssText = `
+                        width: 80px;
+                        text-align: right;
+                        margin-right: 1rem;
+                        color: var(--text-color);
+                        font-weight: 500;
+                    `;
+
+                    const barContainer = document.createElement('div');
+                    barContainer.style.cssText = `
+                        flex: 1;
+                        height: 25px;
+                        background: var(--line-color);
+                        border-radius: 12px;
+                        overflow: hidden;
+                        position: relative;
+                    `;
+
+                    // 根據個性類型計算機率
+                    let prob;
+                    if (type.name === '保守型') {
+                        prob = scenario.conservative;
+                    } else if (type.name === '冒險型') {
+                        prob = scenario.creative;
+                    } else if (type.name === '創意型') {
+                        prob = (scenario.conservative + scenario.creative) / 2;
+                    } else { // 平衡型
+                        prob = (scenario.conservative + scenario.creative) / 2;
+                    }
+
+                    const fill = document.createElement('div');
+                    fill.style.cssText = `
+                        height: 100%;
+                        width: ${prob * 100}%;
+                        background: ${type.color};
+                        transition: width 0.8s ease;
+                        border-radius: 12px;
+                    `;
+
+                    const percentage = document.createElement('div');
+                    percentage.textContent = `${Math.round(prob * 100)}%`;
+                    percentage.style.cssText = `
+                        position: absolute;
+                        right: 8px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: white;
+                        font-weight: bold;
+                        font-size: 0.8rem;
+                    `;
+
+                    barContainer.appendChild(fill);
+                    barContainer.appendChild(percentage);
+                    bar.appendChild(label);
+                    bar.appendChild(barContainer);
+                    personalityChart.appendChild(bar);
+                });
+            }
+
+            // 生成個性化例子
+            function generateExample() {
+                const value = parseInt(slider.value);
+                let currentType = personalityTypes.balanced;
+
+                for (const [key, type] of Object.entries(personalityTypes)) {
+                    if (value >= type.tempRange[0] && value < type.tempRange[1]) {
+                        currentType = type;
+                        break;
+                    }
+                }
+
+                if (value === 100) {
+                    currentType = personalityTypes.adventurous;
+                }
+
+                const randomExample = currentType.examples[Math.floor(Math.random() * currentType.examples.length)];
+
+                exampleResult.innerHTML = `
+                    <div style="padding: 1rem; background: rgba(120, 120, 91, 0.1); border-radius: 8px; border-left: 4px solid ${currentType.color};">
+                        <strong>${currentType.name} 的典型行為：</strong><br>
+                        "${randomExample}"
+                    </div>
+                `;
+
+                // 動畫效果
+                exampleResult.style.opacity = '0';
+                exampleResult.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    exampleResult.style.transition = 'all 0.3s ease';
+                    exampleResult.style.opacity = '1';
+                    exampleResult.style.transform = 'translateY(0)';
+                }, 100);
+            }
+
+            // 事件監聽器
+            slider.addEventListener('input', () => {
+                sliderValue.textContent = slider.value;
+                updatePersonality(parseInt(slider.value));
+            });
+
+            generateBtn.addEventListener('click', generateExample);
+
+            // 初始化
+            updatePersonality(50);
+        }
+
+        // 導航到下一個可見投影片
+        function goToNextVisibleSlide() {
+            for (let i = currentIndex + 1; i < allSlides.length; i++) {
+                if (allSlides[i].style.display !== 'none') {
+                    const slideId = allSlides[i].id;
+                    showSlideById(slideId);
+                    return;
+                }
+            }
+            // 如果沒有找到下一個可見投影片，回到第一個可見投影片
+            for (let i = 0; i < allSlides.length; i++) {
+                if (allSlides[i].style.display !== 'none') {
+                    const slideId = allSlides[i].id;
+                    showSlideById(slideId);
+                    return;
+                }
+            }
+        }
+
+        // 導航到上一個可見投影片
+        function goToPrevVisibleSlide() {
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (allSlides[i].style.display !== 'none') {
+                    const slideId = allSlides[i].id;
+                    showSlideById(slideId);
+                    return;
+                }
+            }
+            // 如果沒有找到上一個可見投影片，跳到最後一個可見投影片
+            for (let i = allSlides.length - 1; i >= 0; i--) {
+                if (allSlides[i].style.display !== 'none') {
+                    const slideId = allSlides[i].id;
+                    showSlideById(slideId);
+                    return;
+                }
+            }
+        }
+
+        // 全域函數
+        function showSlideById(slideId) {
+            const targetSlide = document.getElementById(slideId);
+            if (!targetSlide) {
+                console.error('Slide not found:', slideId);
+                return;
+            }
+
+            // 檢查投影片是否可見
+            if (targetSlide.style.display === 'none') {
+                console.warn('Slide is hidden:', slideId);
+                return;
+            }
+
+            // 找到投影片在 allSlides 中的索引
+            const absoluteIndex = allSlides.indexOf(targetSlide);
+            if (absoluteIndex === -1) {
+                console.error('Slide not found in allSlides:', slideId);
+                return;
+            }
+
+            // 計算偏移量並移動到目標投影片
+            const offset = -absoluteIndex * 100;
+            slidesContainer.style.transform = `translateX(${offset}%)`;
+
+            // 更新當前索引
+            currentIndex = absoluteIndex;
+        }
+
+        // 投影片導航系統
+        document.addEventListener('DOMContentLoaded', () => {
+            slidesContainer = document.querySelector('.slides-container');
+            allSlides = Array.from(document.querySelectorAll('.slide'));
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+
+            // 初始化 Summary Box 互動效果
+            initSummaryBoxes();
+
+            // 初始化溫度參數個性化測試
+            initPersonalityTest();
+
+            nextBtn.addEventListener('click', () => {
+                goToNextVisibleSlide();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                goToPrevVisibleSlide();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    goToNextVisibleSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    goToPrevVisibleSlide();
+                }
+            });
+
+            // 初始化：顯示第一個可見投影片
+            for (let i = 0; i < allSlides.length; i++) {
+                if (allSlides[i].style.display !== 'none') {
+                    const slideId = allSlides[i].id;
+                    showSlideById(slideId);
+                    break;
+                }
+            }
+        });
+
+        // 互動式縮放因子演示功能
+        function initScalingFactorDemo() {
+            const scalingFactor = document.getElementById('scaling-factor');
+            const scalingValue = document.getElementById('scaling-value');
+            const attentionMatrix = document.getElementById('attention-matrix');
+            const attentionWeights = document.getElementById('attention-weights');
+            const predictedWord = document.getElementById('predicted-word');
+            const resetDemo = document.getElementById('reset-demo');
+
+            if (!scalingFactor || !scalingValue || !attentionMatrix || !attentionWeights || !predictedWord || !resetDemo) {
+                console.log('縮放因子演示元素未找到，跳過初始化');
+                return;
+            }
+
+            // 範例句子和對應的詞彙
+            const words = ['鏟子', '超人', '我', '在', '等', '公車'];
+            const queryIndex = 2; // "我" 的索引
+
+            // 模擬的注意力分數（QK^T 的結果）
+            const rawAttentionScores = [
+                -0.5,  // 鏟子
+                0.8,   // 超人
+                1.0,   // 我 (自己)
+                -0.2,  // 在
+                0.3,   // 等
+                0.1    // 公車
+            ];
+
+            // 預測詞彙選項
+            const predictions = {
+                low: '的超人',      // 縮放因子小時，專注於"超人"
+                medium: '在等公車', // 縮放因子中等時，考慮更多詞彙
+                high: '阿嬤ㄟ咖稱'  // 縮放因子大時，考慮更多可能性
+            };
+
+            function updateDemo() {
+                const scalingFactorValue = parseFloat(scalingFactor.value);
+                scalingValue.textContent = scalingFactorValue.toFixed(1);
+
+                // 計算縮放後的注意力分數
+                const scaledScores = rawAttentionScores.map(score => score / scalingFactorValue);
+
+                // 計算 Softmax
+                const expScores = scaledScores.map(score => Math.exp(score));
+                const sumExpScores = expScores.reduce((sum, exp) => sum + exp, 0);
+                const attentionWeightsArray = expScores.map(exp => exp / sumExpScores);
+
+                // 更新注意力分數矩陣
+                updateAttentionMatrix(scaledScores, attentionWeightsArray);
+
+                // 更新注意力權重條
+                updateAttentionWeights(attentionWeightsArray);
+
+                // 更新預測詞彙
+                updatePredictedWord(scalingFactorValue);
+            }
+
+            function updateAttentionMatrix(scores, weights) {
+                attentionMatrix.innerHTML = '';
+
+                // 添加標題行
+                const headerRow = document.createElement('div');
+                headerRow.style.gridColumn = '1 / -1';
+                headerRow.style.textAlign = 'center';
+                headerRow.style.fontWeight = 'bold';
+                headerRow.style.marginBottom = '0.5rem';
+                headerRow.textContent = 'Query: "我"';
+                attentionMatrix.appendChild(headerRow);
+
+                words.forEach((word, index) => {
+                    const cell = document.createElement('div');
+                    cell.style.padding = '0.8rem';
+                    cell.style.borderRadius = '8px';
+                    cell.style.textAlign = 'center';
+                    cell.style.fontSize = '0.9rem';
+                    cell.style.fontWeight = 'bold';
+                    cell.style.color = 'white';
+                    cell.style.transition = 'all 0.3s ease';
+
+                    // 根據權重設置背景色 - 使用侘寂風調色盤
+                    const intensity = Math.min(weights[index] * 3, 1);
+                    // 使用 style.md 中定義的侘寂風色彩
+                    if (intensity > 0.7) {
+                        cell.style.backgroundColor = 'rgba(120, 120, 91, 0.8)'; // accent-color 高強度
+                    } else if (intensity > 0.4) {
+                        cell.style.backgroundColor = 'rgba(163, 163, 128, 0.7)'; // secondary-color 中強度
+                    } else if (intensity > 0.2) {
+                        cell.style.backgroundColor = 'rgba(139, 125, 107, 0.6)'; // earth-color 低強度
+                    } else {
+                        cell.style.backgroundColor = 'rgba(152, 144, 136, 0.5)'; // stone-color 最低強度
+                    }
+
+                    cell.innerHTML = `
+                        <div style="margin-bottom: 0.3rem;">${word}</div>
+                        <div style="font-size: 0.7rem; opacity: 0.9;">${scores[index].toFixed(2)}</div>
+                        <div style="font-size: 0.6rem; opacity: 0.8;">${(weights[index] * 100).toFixed(1)}%</div>
+                    `;
+
+                    attentionMatrix.appendChild(cell);
+                });
+            }
+
+            function updateAttentionWeights(weights) {
+                attentionWeights.innerHTML = '';
+
+                words.forEach((word, index) => {
+                    const weightBar = document.createElement('div');
+                    weightBar.style.textAlign = 'center';
+                    weightBar.style.flex = '1';
+                    weightBar.style.minWidth = '80px';
+
+                    const barContainer = document.createElement('div');
+                    barContainer.style.width = '100%';
+                    barContainer.style.height = '120px';
+                    barContainer.style.backgroundColor = '#f0f0f0';
+                    barContainer.style.borderRadius = '4px';
+                    barContainer.style.position = 'relative';
+                    barContainer.style.overflow = 'hidden';
+
+                    const bar = document.createElement('div');
+                    bar.style.position = 'absolute';
+                    bar.style.bottom = '0';
+                    bar.style.width = '100%';
+                    bar.style.height = `${weights[index] * 100}%`;
+                    // 使用侘寂風調色盤的漸變色彩
+                    const intensity = weights[index];
+                    if (intensity > 0.7) {
+                        bar.style.backgroundColor = 'rgba(120, 120, 91, 0.8)'; // accent-color
+                    } else if (intensity > 0.4) {
+                        bar.style.backgroundColor = 'rgba(163, 163, 128, 0.7)'; // secondary-color
+                    } else if (intensity > 0.2) {
+                        bar.style.backgroundColor = 'rgba(139, 125, 107, 0.6)'; // earth-color
+                    } else {
+                        bar.style.backgroundColor = 'rgba(152, 144, 136, 0.5)'; // stone-color
+                    }
+                    bar.style.transition = 'all 0.3s ease';
+                    bar.style.borderRadius = '4px 4px 0 0';
+
+                    const label = document.createElement('div');
+                    label.style.marginTop = '0.5rem';
+                    label.style.fontSize = '0.8rem';
+                    label.style.fontWeight = 'bold';
+                    label.innerHTML = `
+                        <div>${word}</div>
+                        <div style="color: var(--accent-color);">${(weights[index] * 100).toFixed(1)}%</div>
+                    `;
+
+                    barContainer.appendChild(bar);
+                    weightBar.appendChild(barContainer);
+                    weightBar.appendChild(label);
+                    attentionWeights.appendChild(weightBar);
+                });
+            }
+
+            function updatePredictedWord(scalingFactorValue) {
+                let prediction;
+                if (scalingFactorValue <= 1.0) {
+                    prediction = predictions.low;
+                } else if (scalingFactorValue <= 2.5) {
+                    prediction = predictions.medium;
+                } else {
+                    prediction = predictions.high;
+                }
+
+                // 更新預測詞彙顯示
+                predictedWord.textContent = prediction;
+
+                // 更新句子中的下一個詞顯示
+                const nextWordDisplay = document.getElementById('next-word-display');
+                if (nextWordDisplay) {
+                    nextWordDisplay.textContent = prediction;
+
+                    // 添加動畫效果
+                    nextWordDisplay.style.transform = 'scale(1.1)';
+                    nextWordDisplay.style.color = 'rgba(120, 140, 160, 0.9)'; // 使用藍色系突出顯示
+                    setTimeout(() => {
+                        nextWordDisplay.style.transform = 'scale(1)';
+                        nextWordDisplay.style.color = 'var(--accent-color)';
+                    }, 200);
+                }
+
+                // 添加動畫效果
+                predictedWord.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    predictedWord.style.transform = 'scale(1)';
+                }, 200);
+            }
+
+            // 事件監聽器
+            scalingFactor.addEventListener('input', updateDemo);
+            resetDemo.addEventListener('click', () => {
+                scalingFactor.value = 2;
+                updateDemo();
+            });
+
+            // 初始化
+            updateDemo();
+        }
+
+        // 在頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initScalingFactorDemo();
+
+            // 添加滑桿樣式
+            const slider = document.getElementById('scaling-factor');
+            if (slider) {
+                // 滑桿軌道樣式
+                slider.style.background = `
+                    linear-gradient(to right,
+                        rgba(120, 140, 160, 0.7) 0%,
+                        rgba(120, 140, 160, 0.7) ${(slider.value - slider.min) / (slider.max - slider.min) * 100}%,
+                        rgba(120, 140, 160, 0.2) ${(slider.value - slider.min) / (slider.max - slider.min) * 100}%,
+                        rgba(120, 140, 160, 0.2) 100%
+                    )
+                `;
+
+                // 滑桿滑塊（原點）樣式
+                slider.style.setProperty('--thumb-color', 'rgba(120, 140, 160, 0.9)');
+
+                // 監聽滑桿值變化，更新軌道顏色
+                slider.addEventListener('input', function() {
+                    const percentage = (this.value - this.min) / (this.max - this.min) * 100;
+                    this.style.background = `
+                        linear-gradient(to right,
+                            rgba(120, 140, 160, 0.7) 0%,
+                            rgba(120, 140, 160, 0.7) ${percentage}%,
+                            rgba(120, 140, 160, 0.2) ${percentage}%,
+                            rgba(120, 140, 160, 0.2) 100%
+                        )
+                    `;
+                });
+            }
+
+            // 添加按鈕 hover 效果
+            const resetBtn = document.getElementById('reset-demo');
+            if (resetBtn) {
+                resetBtn.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(163, 163, 128, 0.8)'; // secondary-color
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                });
+
+                resetBtn.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'var(--accent-color)';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
