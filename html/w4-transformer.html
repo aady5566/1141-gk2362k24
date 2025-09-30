@@ -1810,10 +1810,27 @@
             document.getElementById('number-buttons').style.display = 'flex';
             document.getElementById('game-result').textContent = '';
 
+            // 禁用數字按鈕並設置灰色樣式
+            const numberButtons = document.querySelectorAll('#number-buttons button');
+            numberButtons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+                button.style.cursor = 'not-allowed';
+                button.style.backgroundColor = '#ccc';
+            });
+
             // 3秒後開始遊戲
             setTimeout(() => {
                 gamePhase = 'playing';
                 document.getElementById('game-display').textContent = '請按順序點擊數字：';
+
+                // 啟用數字按鈕並恢復正常樣式
+                numberButtons.forEach(button => {
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                    button.style.cursor = 'pointer';
+                    button.style.backgroundColor = '';
+                });
             }, 3000);
         }
 
@@ -1879,9 +1896,26 @@
             document.getElementById('game-display').textContent = gameSequence.join(' ');
             document.getElementById('game-result').textContent = `第 ${gameLevel} 關：記住 ${gameLevel} 個數字`;
 
+            // 禁用數字按鈕並設置灰色樣式
+            const numberButtons = document.querySelectorAll('#number-buttons button');
+            numberButtons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+                button.style.cursor = 'not-allowed';
+                button.style.backgroundColor = '#ccc';
+            });
+
             setTimeout(() => {
                 gamePhase = 'playing';
                 document.getElementById('game-display').textContent = '請按順序點擊數字：';
+
+                // 啟用數字按鈕並恢復正常樣式
+                numberButtons.forEach(button => {
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                    button.style.cursor = 'pointer';
+                    button.style.backgroundColor = '';
+                });
             }, 3000);
         }
 
