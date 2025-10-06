@@ -60,6 +60,8 @@
             transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
             transform: scale(0.98);
             text-align: center;
+            overflow-y: auto; /* allow vertical scroll for long content */
+            -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
         }
         .slide.active {
             opacity: 1;
