@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Write Good Prompts</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .aspect-ratio-box {
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            max-height: 900px;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid var(--line-color);
+        }
+        .slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vmin;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+        .slide.hidden { display: none !important; }
+
+        h1 { font-size: calc(1.8rem + 2vmin); margin: 0 0 0.5em 0; color: var(--text-color); line-height: 1.2; }
+        h2 { font-size: calc(1rem + 1.5vmin); margin: 0 0 1em 0; color: var(--accent-color); font-weight: 400; }
+        p, li { font-size: calc(0.8rem + 0.8vmin); line-height: 1.6; text-align: left; }
+        ul, ol { text-align: left; width: 80%; margin-top: 1em; }
+        .content { width: 90%; }
+
+        .title-slide h1 { font-size: calc(2.5rem + 2.5vmin); }
+        .single-line-text h1 { font-size: calc(2rem + 2vmin); padding: 0 10%; }
+
+        .two-columns { display: flex; justify-content: space-evenly; align-items: flex-start; width: 90%; gap: 5%; margin-top: 1em;}
+        .column { flex: 1; text-align: left; }
+        .column ul { width: 100%; padding-left: 20px; margin: 0; }
+        .column p { margin-top: 0; }
+
+        img.slide-image { max-width: 90%; max-height: 70%; object-fit: contain; margin-top: 1em; }
+        .image-layout-container { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
+
+        .responsive-flex { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2em; width: 90%;}
+        .responsive-flex img { max-width: 100%; flex: 1 1 40%; max-height: 60vh; object-fit: contain; }
+        .responsive-flex .text-content { flex: 1 1 50%; text-align: left; }
+
+        table { border-collapse: collapse; width: 85%; margin-top: 2em; font-size: calc(0.7rem + 0.7vmin); }
+        th, td { border: 1px solid var(--line-color); padding: 0.8em; text-align: left; }
+        th { background-color: rgba(120, 120, 91, 0.1); font-weight: bold; }
+
+        pre {
+            background-color: #e8e6e3;
+            color: #333;
+            border: 1px solid var(--line-color);
+            padding: 1.5em;
+            border-radius: 8px;
+            text-align: left;
+            white-space: pre-wrap;
+            width: 85%;
+            font-size: calc(0.6rem + 0.5vmin);
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-top: 1em;
+        }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+
+        .quote { font-size: calc(1.5rem + 1.5vmin); font-weight: bold; font-style: italic; padding: 0 5%;}
+        .text-center { text-align: center; }
+        .text-center li, .text-center p { text-align: center; }
+        .emphasis { color: #4A90E2; font-weight: bold; }
+
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .nav { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+        .nav button {
+            background: rgba(0,0,0,0.4); color: white; border: none;
+            padding: 8px 16px; margin: 0 5px; border-radius: 5px; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .nav button:hover { background: rgba(0,0,0,0.7); }
+        .slide-counter { position: absolute; bottom: 15px; right: 20px; z-index: 10; font-size: 1em; color: var(--text-color); }
+        .copy-btn {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+        .copy-btn:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="aspect-ratio-box">
+    <div class="slides">
+        <!-- Slide 1 -->
+        <div class="slide active title-slide">
+            <h1>How to Write Good Prompts</h1>
+            <h2>Prompt Engineering: You Are Programming!</h2>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide single-line-text">
+            <h1>Do you really know how to talk to AI?</h1>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide image-layout-container">
+            <h1>"Please" or "Thank you"</h1>
+            <img src="../pic/w5-thanks.jpg" alt="Thanks image" class="slide-image">
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide">
+            <h1>The Cost of Politeness</h1>
+            <div class="two-columns">
+                <div class="column">
+                    <p><strong>How many resources are spent on these polite words annually?</strong></p>
+                    <ul>
+                        <li>ChatGPT daily active users (assumption): 10 million</li>
+                        <li>Average conversation turns per person per day: 20</li>
+                        <li>Average of 1 "please" or "thank you" type of word per turn</li>
+                        <li>Each "please/thank you" triggers the model to generate 10 extra tokens (the model will reply with "you're welcome" or "of course")</li>
+                        <li>Average energy consumption per token generated is about 0.00003 kWh</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <p><strong>Annual additional energy consumption:</strong><br>
+                    7.3 trillion × 0.00003 kWh ≈ 219,000,000 kWh / year</p>
+                    <p><strong>Converted to electricity cost (estimated at 3 TWD per kWh):</strong><br>
+                    219M kWh × 3 TWD ≈ </p>
+                    <br>
+                     <p><span style="font-size: 3em; color: rgba(180, 120, 120, 1); font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">657 million / year</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide single-line-text">
+            <h1>You can be polite, but you still have to write good prompts</h1>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide">
+            <h1>Prompt Engineering</h1>
+            <p class="content" style="text-align: center; font-size: calc(1.2rem + 1vmin);">The Four Core Principles of Prompt Engineering</p>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide">
+            <h1>Four Principles of Prompt Engineering</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Principle</th>
+                        <th>In plain words</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Role</td>
+                        <td>Who do you want the AI to be?</td>
+                    </tr>
+                    <tr>
+                        <td>2. Goal</td>
+                        <td>What task do you want the AI to complete?</td>
+                    </tr>
+                    <tr>
+                        <td>3. Output Format</td>
+                        <td>What should the response look like?</td>
+                    </tr>
+                    <tr>
+                        <td>4. Constraints</td>
+                        <td>What are the rules and boundaries?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide">
+            <h1>Principle 1: Role</h1>
+            <p class="content text-center">Assign a specific identity to the AI (e.g., editor, analyst) to generate more targeted and context-aware responses.</p>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide">
+            <h1>Principle 2: Goal</h1>
+            <p class="content text-center">Describe the desired outcome and style in a specific and detailed way. Don't just say "write a poem," but "write a short inspirational poem in a specific style."</p>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide">
+            <h1>Principle 3: Output Format</h1>
+            <p class="content text-center">Clearly define the desired structure of the response (e.g., a list, comma-separated, or in markdown format).</p>
+        </div>
+
+        <!-- Slide 11 -->
+        <div class="slide">
+            <h1>Principle 4: Constraints</h1>
+            <p class="content text-center">Set clear rules, explaining "what to do" rather than "what not to do," and specify the length (e.g., at most 50 words).</p>
+        </div>
+
+        <!-- Slide 12 -->
+        <div class="slide">
+            <h1>From Vague Request to Clear Prompt</h1>
+            <div class="two-columns">
+                <div class="column">
+                    <h3>Before (Vague Prompt)</h3>
+                    <p>Tell me how to make coffee.</p>
+                </div>
+                <div class="column">
+                    <h3>After (Structured Prompt)</h3>
+                    <p><strong>Role</strong>: Coffee Master<br><strong>Goal</strong>: Explain pour-over coffee for beginners<br><strong>Format</strong>: Numbered list<br><strong>Constraint</strong>: Under 200 words</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13 -->
+        <div class="slide">
+            <h1>Discussion Case: 4 Bad Prompts</h1>
+            <div class="content" style="text-align:center;">
+                <p>Please answer, based on the four principles just mentioned, what are the problems with the following prompts? How can they be improved?</p>
+                <ol style="display: inline-block; text-align: left;">
+                    <li>Help me make a presentation about generative AI.</li>
+                    <li>Help me make my resume more impressive.</li>
+                    <li>Help me create a one-week study plan.</li>
+                    <li>Help me write a copy to promote our club activity.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Slide 14 -->
+        <div class="slide">
+            <h1>Discussion Case: 4 Bad Prompts</h1>
+            <div class="content" style="text-align: left; font-size: calc(0.7rem + 0.5vmin);">
+                <p><strong>Case 1 "Help me make a presentation about generative AI."</strong><br>
+                Further thinking: What is the goal? "How many pages, for whom, what decision to make"? What output format/directory structure is needed? Are there any restrictions on fabrication or data sources? Are examples or scoring rubrics needed to calibrate quality?</p>
+                <p><strong>Case 2 "Help me make my resume more impressive."</strong><br>
+                Further thinking: What job/industry are you applying for? What does the other party value? What is your specialty? What is the desired tone/word count/layout? Do you need to quantify your achievements?</p>
+                <p><strong>Case 3 "Help me create a one-week study plan."</strong><br>
+                Further thinking: What is your exam date, subject weights, and weaknesses? To what granularity should the plan be (daily/hourly), and what is the success criterion? Should it include a checklist and backup plans (for temporary work/illness)?</p>
+                <p><strong>Case 4 "Help me write a copy to promote our club activity."</strong><br>
+                Further thinking: Is the audience freshmen/current students/off-campus? Is the platform IG/club board/poster? Is the goal the number of registrations/attendees/likes and shares? Is there a CTA and deadline? Are multiple versions for A/B testing and scheduling suggestions needed?</p>
+            </div>
+        </div>
+
+        <!-- Slide 15 -->
+        <div class="slide hidden">
+            <h1>"Help me make a presentation about generative AI."</h1>
+            <pre><code>【Role】You are a senior presentation coach.
+【Goal】Produce an 8-10 page presentation outline and key points for each page on the topic "The Impact of Generative AI on University Students' Learning," for a 10-minute oral report; success criteria: includes an opening, problem definition, three arguments, a counter-argument, a conclusion, and references, and can be directly assigned to group members for production.
+【Context】The audience is non-computer science students; do not fabricate research; you can use public reports/journals from 2023-2025 as evidence (list 3-5 sources).
+【Output Format】List in Markdown (1) Cover (2) Table of Contents (3) Title of each page + 3-5 key points (4) List of citations/links.
+【Scope and Constraints】The tone should be neutral, with each page's key points under 60 words; list 2 points that could be questioned and how to respond.
+【Example】Page format example:
+- p3<Argument 1: Learning Efficiency>: Key point (1)..... (2)..... (3).....
+【Scoring Rubric】Completeness, verifiable sources, ability to be divided for work, time control (10 minutes).</code></pre>
+        </div>
+
+        <!-- Slide 16 -->
+        <div class="slide hidden">
+            <h1>"Help me make my resume more impressive."</h1>
+            <pre><code>【Role】You are a human resources recruitment specialist for a chain of coffee shops, familiar with student part-time job resumes.
+【Goal】Optimize the following original experience into the "Work Experience" section of a 1-page Chinese resume; success criteria: each point includes a verb + task + quantified result + tool/skill.
+【Context】Job opening: Store partner (heavy on service, cashier, restocking, hygiene, and front/back of house collaboration). Target audience: Store manager, reading time <30 seconds.
+【Output Format】List 4-6 key points, each under 30 words.
+【Scope and Constraints】The tone should be pragmatic and concise.
+【Example】"Maintained an average waiting time of <5 minutes during peak hours for 4 hours, rotating between restocking and cashier duties with 3 partners."</code></pre>
+        </div>
+
+        <!-- Slide 17 -->
+        <div class="slide hidden">
+            <h1>"Help me create a one-week study plan."</h1>
+            <pre><code>【Role】You are a learning coach.
+【Goal】Generate a 7-day review plan; success criteria: each day is divided into AM/PM/night sessions; each subject has three steps: "input -> output practice -> self-test," with an executable checklist.
+【Context】Exam: Next Friday; subjects and weights: Statistics (40%), Introduction to Psychology (30%), Sociology (30%); weakness: statistical inference problems; available time per day: 2.5h on weekdays, 5h on weekends; need to work for 3h on Wednesday evening.
+【Output Format】Table: Date | Session | Subject | Task | Estimated Time | Completion Mark; below, list 3 "minimum viable product (MVP)" results for each day and 1 "backup plan if you get stuck."
+【Scope and Constraints】Total hours should not exceed available time; 2 tasks per session; Statistics subject has a 30-minute calculation output practice every day.
+【Example】"Complete 10 parameter estimation exercises and note 3 key concepts in a mistake notebook."</code></pre>
+        </div>
+
+        <!-- Slide 18 -->
+        <div class="slide hidden">
+            <h1>"Help me write a copy to promote our club activity."</h1>
+            <pre><code>【Role】You are a campus marketing planner, familiar with IG/club board promotion.
+【Goal】Produce 3 versions of a post for the "Photography Club New Member Experience Day" (IG post, long club board post, poster copy); success criteria: each version includes event highlights, time and location, registration link, CTA, and deadline; and provide 2 opening hook sentences.
+【Context】Audience: Freshmen; event time: 10/25 (Sat) 14:00–16:30; location: Activity Center 203; 40 spots; early bird registration until 10/20; want to increase the "actual attendance."
+【Output Format】Output in order: (1) IG copy (under 120 words + 3-5 hashtags) (2) Long club board post (3 short paragraphs) (3) One-sentence poster headline (≤14 words) + three selling points; finally, provide a suggested posting schedule and A/B testing points (e.g., headline emotion/number hooks).
+【Scope and Constraints】The tone should be friendly; the information should be complete, simple, and easy to understand.
+【Example】"For those of you still hesitating about buying your first camera: come and play for an afternoon first."</code></pre>
+        </div>
+
+        <!-- Slide 19 -->
+        <div class="slide">
+            <h1>Advanced Prompting Techniques</h1>
+            <p class="content" style="text-align: center; font-size: calc(1.2rem + 1vmin);">Strengthen the core principles and take it to the next level</p>
+        </div>
+
+        <!-- Slide 20 -->
+        <div class="slide">
+            <h1>Emotion Prompting</h1>
+            <p class="content text-center">Add <strong>emotional language</strong> to your prompts to leverage the AI's emotionally rich training data, thereby improving accuracy and response quality.</p>
+        </div>
+
+        <!-- Slide 21 -->
+        <div class="slide">
+            <p class="quote">"This is <span class="emphasis">very important</span> for my career, please be sure to answer accurately."</p>
+        </div>
+
+        <!-- Slide 22 -->
+        <div class="slide">
+            <p class="quote" style="font-style: normal;">Emotional prompting can strengthen your goal and fine-tune the role the AI plays.</p>
+        </div>
+
+        <!-- Slide 23 -->
+        <div class="slide">
+            <h1>Few-shot Prompting</h1>
+            <p class="content text-center">Provide one or more "input/output" examples in the prompt to have the model imitate the pattern to complete the task.</p>
+        </div>
+
+        <!-- Slide 24 -->
+        <div class="slide">
+            <h1>Re-reading</h1>
+            <p class="content text-center">Finally, ask the model to re-read the prompt before answering to ensure that no key details are missed.</p>
+        </div>
+
+        <!-- Slide 25 -->
+        <div class="slide">
+            <p class="quote" style="font-style: normal;">"Re-reading" ensures that the AI perfectly adheres to the <span class="emphasis">goal</span> and scope <span class="emphasis">constraints</span> you set.</p>
+        </div>
+
+        <!-- Slide 26 -->
+        <div class="slide">
+            <h1>Key Takeaways</h1>
+            <ul class="content text-center" style="list-style-type: none;">
+                <li><strong>Four Core Principles</strong>: Always define the role, goal, format, and constraints.</li>
+                <li><strong>Advanced 1 (Emotional Prompting)</strong>: Add emotion to increase focus.</li>
+                <li><strong>Advanced 2 (Few-shot)</strong>: Show, don't just tell, the format you want.</li>
+                <li><strong>Advanced 3 (Re-reading)</strong>: Ask the AI to double-check your instructions.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 27 -->
+        <div class="slide image-layout-container">
+            <img src="../pic/w5-line-chat.png" alt="LINE chat screenshot" class="slide-image" style="max-height: 80vh; margin-top: 1em;">
+            <div class="text-content text-center" style="margin-top: 1em;">
+                <p>How should a soldier handle this situation?<br>(A polite response)</p>
+            </div>
+        </div>
+
+        <!-- Slide 28 is a duplicate, so I'm skipping it as per the content -->
+
+        <!-- Slide 29 -->
+        <div class="slide">
+            <h1>In-class Practice Case (Continued)</h1>
+            <p class="content text-center">Practice writing a prompt to transcribe an emotional or vulgar conversation into a polite, factually clear, and formal response that can be understood by superiors and colleagues.</p>
+        </div>
+
+        <!-- Slide 30 -->
+        <div class="slide hidden">
+            <h1>In-class Practice Case (Continued)</h1>
+            <div style="position: relative; width: 85%;">
+                <pre id="prompt-1"><code>【Role】You are a "military communication coach + official document format writing assistant," specializing in transcribing emotional or vulgar conversations into polite, factually clear, and formal responses that can be understood by superiors and colleagues.
+【Goal】Based on the 【Original Text】, produce a "formal, polite, fact-focused, and improvement-oriented" response suitable for private messages or for submission to cadres for reference. Success criteria:
+1) Do not talk back or blame individuals; use "I" to describe the facts and their impact.
+2) Clearly state: the time, the event, the actions already taken, the subsequent commitments, and a specific request (e.g., for guidance or clarification of standards).
+3) The tone should be respectful and concise (150-220 words), and can be directly pasted into LINE.
+4) Remove abusive words; retain key facts and the core demand for roll call.
+5) If there are violations/shortcomings, proactively admit them and propose remedial and preventive measures.
+【Output Format】
+Salutation (e.g., Senior/Sergeant, Hello)
+Brief description of the facts (when, what, impact)
+Admission and explanation (if there are omissions)
+Actions taken and improvement plan (with quantitative commitments)
+Specific request (please guide/please clarify the regulations/please confirm the execution method)
+Closing (polite, thank you)
+【Scope and Constraints】
+Use honorifics throughout the text; avoid emotional words and speculation about motives.
+Do not embellish or add fuel to the fire; do not mention third-party gossip.
+Use "common polite language in the military" (e.g., "report to senior/sister," "thank you senior/sister").
+【Original Text】
+<Paste the conversation or text to be transcribed here, or provide it in the next conversation></code></pre>
+                <button onclick="copyToClipboard('prompt-1', this)" class="copy-btn">📋</button>
+            </div>
+        </div>
+
+        <!-- Slide 31 -->
+        <div class="slide">
+            <h1>References</h1>
+            <ul class="content">
+                <li><a href="https://platform.openai.com/chat/edit?models=gpt-5&optimize=true" target="_blank">Lazy Pack to make your prompt more professional</a></li>
+                <li><a href="https://learnprompting.org/" target="_blank">Learn Prompting</a></li>
+                <li><a href="https://help.openai.com/zh-hant/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api" target="_blank">Best practices for prompt engineering with the OpenAI API</a></li>
+                <li><a href="https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/prompt-engineering" target="_blank">Prompt engineering techniques - Azure OpenAI | Microsoft Learn</a></li>
+                <li><a href="https://aws.amazon.com/what-is/prompt-engineering/" target="_blank">What is Prompt Engineering?</a></li>
+                <li><a href="https://uit.stanford.edu/service/techtraining/class/generative-ai-prompting-basics-beginners" target="_blank">Generative AI Prompting Basics for Beginners - Stanford University</a></li>
+                <li><a href="https://mitsloanedtech.mit.edu/ai/basics/effective-prompts/" target="_blank">Effective Promts pfor AI: The Essentials - MIT Sloan Teaching & Learning Technologies</a></li>
+            </ul>
+        </div>
+
+        <!-- Slide 32 -->
+        <div class="slide hidden">
+            <h1>Homework</h1>
+            <div class="content text-center" style="text-align: left;">
+                <p>Try to write a prompt to express your gratitude to the relatives and friends who raised you.<br>(Goal: To transform the words you dare not say in your heart into a conversation you are willing to share with him/her through a prompt)</p>
+                <p><strong>Please submit your homework by 10/12 23:59: <a href="https://forms.gle/qrXkPAe4k6eRZvNe8" target="_blank">Form submission portal</a></strong></p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav">
+        <button id="prev">◄</button>
+        <button id="next">►</button>
+    </div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides"></span></div>
+</div>
+
+<script>
+    const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+        });
+        document.getElementById('current-slide').textContent = index + 1;
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(currentSlide);
+    }
+
+    document.getElementById('next').addEventListener('click', nextSlide);
+    document.getElementById('prev').addEventListener('click', prevSlide);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    document.getElementById('total-slides').textContent = totalSlides;
+    showSlide(currentSlide);
+
+    function copyToClipboard(elementId, button) {
+        const preElement = document.getElementById(elementId);
+        if (preElement) {
+            const textToCopy = preElement.querySelector('code').innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalIcon = button.innerText;
+                button.innerText = '✅';
+                setTimeout(() => {
+                    button.innerText = originalIcon;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                button.innerText = '❌';
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

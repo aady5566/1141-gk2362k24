@@ -194,6 +194,8 @@
         .week-card:nth-child(1) { animation-delay: 0.2s; }
         .week-card:nth-child(2) { animation-delay: 0.4s; }
         .week-card:nth-child(3) { animation-delay: 0.6s; }
+        .week-card:nth-child(4) { animation-delay: 0.8s; }
+        .week-card:nth-child(5) { animation-delay: 1.0s; }
 
         @keyframes fadeIn {
             to {
@@ -274,6 +276,25 @@
                 </ul>
             </div>
 
+            <!-- Week 5 -->
+            <div class="week-card fade-in">
+                <h2 class="week-title">第五週 10/7</h2>
+                <ul class="slides-list">
+                    <li class="slide-item">
+                        <a href="html/w5-prompt-guides.html" class="slide-link">
+                            <div class="slide-title">如何寫好提示詞</div>
+                            <div class="slide-description">提示工程，你就是在寫程式！</div>
+                        </a>
+                    </li>
+                    <li class="slide-item">
+                        <a href="https://wall.sli.do/event/gy54HqBb6UmxQ4RZdxuo9w/?section=6020ac61-f37c-442b-810d-d03a4acec525" class="slide-link" target="_blank" rel="noopener noreferrer">
+                            <div class="slide-title">Slido 線上問答</div>
+                            <div class="slide-description">課堂即時提問與互動</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
         </div>
 
         <div class="footer">
@@ -282,13 +303,18 @@
     </div>
 
     <script>
-        // 為所有週次卡片添加淡入動畫
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.week-card');
-            cards.forEach(card => {
-                card.classList.add('fade-in');
-            });
-        });
+        // 動畫效果已經在 CSS 中設定，不需要重複添加 class
+        // 如果需要重新觸發動畫，可以使用以下代碼：
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const cards = document.querySelectorAll('.week-card');
+        //     cards.forEach((card, index) => {
+        //         setTimeout(() => {
+        //             card.style.opacity = '0';
+        //             card.style.transform = 'translateY(20px)';
+        //             card.style.animation = 'fadeIn 0.8s forwards';
+        //         }, index * 200);
+        //     });
+        // });
     </script>
 </body>
 </html>
