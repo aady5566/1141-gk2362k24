@@ -60,6 +60,8 @@
             transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
             transform: scale(0.98);
             text-align: center;
+            overflow-y: auto; /* 允許單張投影片直向捲動 */
+            -webkit-overflow-scrolling: touch; /* iOS 慣性捲動 */
         }
         .slide.active {
             opacity: 1;
@@ -514,6 +516,7 @@
 </div>
 
 <script>
+    // 還原為舊機制：單張 active 顯示，並保留直向捲動
     const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
     const totalSlides = slides.length;
     let currentSlide = 0;
@@ -523,6 +526,7 @@
             slide.classList.toggle('active', i === index);
         });
         document.getElementById('current-slide').textContent = index + 1;
+        document.getElementById('total-slides').textContent = totalSlides;
     }
 
     function nextSlide() {
@@ -546,7 +550,6 @@
         }
     });
 
-    document.getElementById('total-slides').textContent = totalSlides;
     showSlide(currentSlide);
 
     function copyToClipboard(elementId, button) {
