@@ -109,6 +109,7 @@
             line-height: 1.5;
             overflow-x: auto;
             margin-top: 1em;
+            position: relative; /* For positioning the copy button */
         }
         code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
 
@@ -344,49 +345,49 @@
         </div>
 
         <!-- Slide 15 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>「幫我做一份有關生成式 AI 的投影片。」</h1>
-            <pre><code>【角色】你是一位資深的簡報教練。
+            <pre id="prompt-gen-ai-slides"><code>【角色】你是一位資深的簡報教練。
 【目標】產出 8–10 頁的簡報大綱與每頁要點，主題「生成式 AI 對大學生學習的影響」，用於 10 分鐘口頭報告；成功標準：有開場、問題定義、三個論點、反方觀點、結論與參考文獻，並能被同組同學直接分工製作。
 【脈絡】對象是非資工背景同學；不允許杜撰研究；可使用 2023–2025 的公開報導/期刊作佐證（列出 3–5 則來源）。
 【輸出格式】Markdown 列出 (1) 封面 (2) 目錄 (3) 每頁標題＋3–5 個要點 (4) 引用/連結清單。
 【範圍與限制】語氣中立，每頁要點小於 60 字；列出 2 個可被質疑的點與如何回應。
 【樣例】頁面格式示例：
 - p3〈論點一：學習效率〉：要點(1)..... (2)..... (3).....
-【評分規則】完整性、可驗證來源、可分工性、時間可控（10 分鐘）。</code></pre>
+【評分規則】完整性、可驗證來源、可分工性、時間可控（10 分鐘）。</code><button onclick="copyToClipboard('prompt-gen-ai-slides', this)" class="copy-btn">📋</button></pre>
         </div>
 
         <!-- Slide 16 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>「幫我把履歷寫得更厲害。」</h1>
-            <pre><code>【角色】你是連鎖咖啡店的人資招募專員，熟悉學生打工履歷。
+            <pre id="prompt-resume"><code>【角色】你是連鎖咖啡店的人資招募專員，熟悉學生打工履歷。
 【目標】將下列原始經歷優化為 1 頁中文履歷的「工作經歷」段落；成功標準：每點含動詞＋任務＋量化成果＋工具/技能。
 【脈絡】職缺：門市夥伴（重服務、收銀、補貨、衛生、內外場協作）。投遞對象：店長，閱覽時間<30 秒。
 【輸出格式】列出 4–6 條要點，每條小於 30 字。
 【範圍與限制】語氣務實精煉。
-【樣例】「高峰期 4 小時維持平均候位 <5 分鐘，與 3 位夥伴輪替補貨與收銀」。</code></pre>
+【樣例】「高峰期 4 小時維持平均候位 <5 分鐘，與 3 位夥伴輪替補貨與收銀」。</code><button onclick="copyToClipboard('prompt-resume', this)" class="copy-btn">📋</button></pre>
         </div>
 
         <!-- Slide 17 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>「幫我排一個一週的讀書計畫。」</h1>
-            <pre><code>【角色】你是學習教練。
+            <pre id="prompt-study-plan"><code>【角色】你是學習教練。
 【目標】生成 7 天複習計畫；成功標準：每天分 AM/PM/夜三時段；每科具「輸入 → 輸出練習 → 自測」三步，並附可執行檢核清單。
 【脈絡】考試：下週五；科目與權重：統計(40%)、心理導論(30%)、社會學(30%)；弱點：統計推論題；每日可用時間：平日 2.5h、假日 5h；週三晚上需打工 3h。
 【輸出格式】表格：日期｜時段｜科目｜任務｜預估時長｜完成標記；下方列出每日 3 條「最小可交付（MVP）成果」與 1 條「如果臨時卡關的備援方案」。
 【範圍與限制】總時數不超過可用時間；每時段任務 2 件；統計科目每日皆有 30 分鐘計算題輸出練習。
-【樣例】「完成 10 題母數估計練習並用錯題本記 3 個關鍵概念」。</code></pre>
+【樣例】「完成 10 題母數估計練習並用錯題本記 3 個關鍵概念」。</code><button onclick="copyToClipboard('prompt-study-plan', this)" class="copy-btn">📋</button></pre>
         </div>
 
         <!-- Slide 18 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>「幫我寫一篇文案宣傳我們社團活動。」</h1>
-            <pre><code>【角色】你是校園行銷企劃，熟悉 IG/社團版宣傳。
+            <pre id="prompt-event-promo"><code>【角色】你是校園行銷企劃，熟悉 IG/社團版宣傳。
 【目標】為「攝影社新生體驗日」產出 3 種貼文版本（IG 貼文、社團版長文、海報文案），成功標準：各版本皆含活動亮點、時間地點、報名連結、CTA 與截止日；並提供 2 組開頭鉤子句。
 【脈絡】受眾：大一新生；活動時間：10/25(六) 14:00–16:30；地點：活動中心 203；名額 40；早鳥截至 10/20；想提高「實到人數」。
 【輸出格式】依序輸出：(1) IG 文案（小於 120 字＋3–5 個標籤）(2) 社團版長文（3 小段）(3) 海報一句話主標（≤14 字）＋三列賣點；最後附建議發文排程與 A/B 測試點（如主標情緒/數字鉤子）。
 【範圍與限制】語氣友善；資訊完整簡單易懂。
-【樣例】「給還在猶豫要不要買第一台相機的你：先來玩一下午。」</code></pre>
+【樣例】「給還在猶豫要不要買第一台相機的你：先來玩一下午。」</code><button onclick="copyToClipboard('prompt-event-promo', this)" class="copy-btn">📋</button></pre>
         </div>
 
         <!-- Slide 19 -->
@@ -456,10 +457,9 @@
         </div>
 
         <!-- Slide 30 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>課堂實作案例（續）</h1>
-            <div style="position: relative; width: 85%;">
-                <pre id="prompt-1"><code>【角色】你是「軍中溝通教練＋公文格式撰寫助理」，專長是把情緒化或粗俗對話，轉寫為禮貌、事實清楚、可被長官與同袍理解的正式回應。
+            <pre id="prompt-1"><code>【角色】你是「軍中溝通教練＋公文格式撰寫助理」，專長是把情緒化或粗俗對話，轉寫為禮貌、事實清楚、可被長官與同袍理解的正式回應。
 【目標】根據【原文】產出一份「正式、有禮、聚焦事實與改進」的回應，適合私訊或提出給幹部參考。成功標準：
 1) 不回嗆、不指責個人，以「我」敘述描述事實與影響。
 2) 明確交代：時間、事件、已採取行動、後續承諾與具體請求（如請求指導或釐清標準）。
@@ -478,9 +478,7 @@
 不渲染，不加油添醋；不提及第三人八卦。
 用詞以「部隊常用禮貌用語」為準（如：報告學長/姐、謝謝學長/姐）。
 【原文】
-<在這裡貼上需要被轉寫的對話或文字，或是下一個對話提供給你></code></pre>
-                <button onclick="copyToClipboard('prompt-1', this)" class="copy-btn">📋</button>
-            </div>
+<在這裡貼上需要被轉寫的對話或文字，或是下一個對話提供給你></code><button onclick="copyToClipboard('prompt-1', this)" class="copy-btn">📋</button></pre>
         </div>
 
         <!-- Slide 31 -->
@@ -498,7 +496,7 @@
         </div>
 
         <!-- Slide 32 -->
-        <div class="slide">
+        <div class="slide hidden">
             <h1>作業</h1>
             <div class="content text-center" style="text-align: left;">
                 <p>試著寫一個提示詞，表達對養育你的親友的感謝。<br>（   目標：將內心不敢說的話，透過提示詞轉化成，你願意分享給他/她的一段對話）</p>
