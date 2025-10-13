@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事實查核與 AI 生成內容辨識</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+
+            /* 擴展色盤 */
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        /* 可滾動的 slide 樣式 */
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section a {
+            color: var(--color-earth);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .content-section a:hover {
+            color: var(--accent-color);
+        }
+
+        /* 置左對齊的類別 */
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* 圖表區域樣式 */
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            align-items: center;
+        }
+
+        .chart-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .vertical-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 1rem 0;
+            max-height: 200px;
+        }
+
+        .vertical-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2rem;
+            width: 100%;
+            max-width: 250px;
+            height: 180px;
+            border-left: 2px solid var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding: 0 0 1rem 1rem;
+            position: relative;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 40px;
+            color: var(--bg-color);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 20px;
+        }
+
+        .bar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bar-value {
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .bar-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            margin-top: 0.5rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .chart-note {
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            color: var(--text-color);
+            text-align: center;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .content-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .content-section li {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .content-section li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .fact-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .fact-table th,
+        .fact-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--line-color);
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+        }
+
+        .fact-table th {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+        }
+
+        .fact-table td {
+            color: var(--text-color);
+        }
+
+        .fact-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .video-container {
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            margin-top: 20px;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 1rem auto;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center; /* 預設置中對齊 */
+        }
+
+        /* 置左對齊的類別 */
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        /* 置中對齊的類別（明確指定） */
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0;
+        }
+
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+        }
+
+        .homework-content {
+            font-size: 1.65rem;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .homework-content h4 {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .homework-content h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .homework-content p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .homework-content p a {
+            color: var(--accent-color);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .homework-content ol {
+            padding-left: 2rem;
+        }
+
+        .homework-content li {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            /* 手機版可滾動的 slide 樣式 */
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .two-columns > div {
+                width: 100%;
+            }
+
+            .chart-section {
+                padding: 1rem;
+            }
+
+            .chart-section h4 {
+                font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            }
+
+            .vertical-chart-container {
+                max-height: 150px;
+            }
+
+            .vertical-chart {
+                max-width: 200px;
+                height: 130px;
+                gap: 1.5rem;
+            }
+
+            .bar {
+                width: 30px;
+                font-size: 0.7rem;
+            }
+
+            .bar-value {
+                font-size: 0.65rem;
+            }
+
+            .bar-label {
+                font-size: 0.7rem;
+            }
+
+            .chart-note {
+                font-size: clamp(0.8rem, 1.6vw, 1rem);
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px 0;
+                width: 90%;
+                max-width: 450px;
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .homework-content {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                padding: 0 0.3rem;
+            }
+
+            .homework-content h4 {
+                font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+                font-weight: 700;
+                line-height: 1.3;
+                margin-bottom: 0.8rem;
+            }
+
+            .homework-content h5 {
+                font-size: clamp(1rem, 2.2vw, 1.2rem);
+                font-weight: 700;
+                line-height: 1.2;
+                margin-bottom: 0.6rem;
+            }
+
+            .homework-content p {
+                font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+                line-height: 1.4;
+                margin-bottom: 0.8rem;
+            }
+
+            .homework-content li {
+                font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+                line-height: 1.4;
+                margin-bottom: 0.6rem;
+            }
+
+            .step-container {
+                gap: 1.5rem;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            .table-container {
+                margin: 1rem auto;
+            }
+
+            .fact-table th,
+            .fact-table td {
+                padding: 0.8rem 0.5rem;
+                font-size: clamp(0.9rem, 2vw, 1.2rem);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+
+            .two-columns {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+
+            .video-container {
+                width: 75%;
+                max-width: 700px;
+            }
+        }
+
+        /* 圖表樣式 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .chart-caption {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            text-align: center;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* 響應式圖表 */
+        @media (max-width: 767px) {
+            .chart-container {
+                height: 250px;
+            }
+
+            .chart-caption {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- 投影片 1: 標題頁 -->
+        <section class="slide active">
+            <h1>事實查核與 AI 生成內容辨識</h1>
+            <h2 class="slide-subtitle">培養數位時代的媒體素養</h2>
+        </section>
+
+        <!-- 投影片 2: 真真假假 -->
+        <section class="slide">
+            <h1>真真假假</h1>
+            <img src="../pic/w6/wego-mad.jpg" alt="薇閣案例" class="slide-image">
+        </section>
+
+        <!-- 投影片 3: 假資訊分類 -->
+        <section class="slide">
+            <h1>假資訊的惡意程度分類</h1>
+            <div class="table-container">
+                <table class="fact-table">
+                    <thead>
+                        <tr>
+                            <th>術語</th>
+                            <th>定義</th>
+                            <th>意圖</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>錯誤資訊</td>
+                            <td>散播不實資訊</td>
+                            <td>無惡意</td>
+                        </tr>
+                        <tr>
+                            <td>虛假資訊</td>
+                            <td>刻意製造假消息</td>
+                            <td>意圖傷害或欺騙</td>
+                        </tr>
+                        <tr>
+                            <td>惡意資訊</td>
+                            <td>混雜真假資訊</td>
+                            <td>意圖傷害</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 投影片 4: 影片 -->
+        <section class="slide video-slide">
+            <h1>眼見為憑，看到就轉發？</h1>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/wkUKY8odqa0"
+                        title="風街訪 - 眼見為憑"
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
+        <!-- 投影片 5: 心理學認知捷徑 -->
+        <section class="slide">
+            <h1>心理學：大腦的認知捷徑</h1>
+            <div class="two-columns">
+                <div class="content-section">
+                    <h4>驗證性偏誤</h4>
+                    <p>傾向於尋找、解讀、強化與我們既有信念相符的資訊。</p>
+                    <p><strong>（追求我對了！）</strong></p>
+                </div>
+                <div class="content-section">
+                    <h4>動機性推理</h4>
+                    <p>我們會用極度嚴苛的標準去檢視自己否定的觀點，努力找出它的缺陷或錯誤，以便駁斥它。</p>
+                    <p><strong>（堅持你錯了！）</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 6: 分組討論 -->
+        <section class="slide">
+            <h1>分組討論</h1>
+            <div class="step-container">
+                <div class="step-card text-left">
+                    <h4>A. 每個人分享自己生活中遇到驗證性偏誤或動機性推理的狀況？</h4>
+                    <h4>B. 以薇閣的案例為例</h4>
+
+                        <p>1. 這則資訊觸發了我的什麼強烈情緒（憤怒、恐懼、喜悅、同情）？我的分享衝動，有多少是基於情緒，又有多少是基於理性判斷？</p>
+                        <br>
+                        <p>2. 來源檢視 (Source Scrutiny): 這個資訊是誰發布的？是專業新聞機構、政府單位、特定立場的團體，還是一個匿名的帳號？我能輕易找到這個來源的其他資訊和信譽記錄嗎？</p>
+                        <br>
+                        <p>3. 動機思辨 (Motive Speculation): 發布這則資訊的人或組織，想達到什麼目的？是為了通知公眾、娛樂大眾、說服我相信某個觀點，還是為了賺取點擊率或販賣商品？</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 7: 認知偏誤的影響 -->
+        <section class="slide">
+            <h3>認知偏誤使假資訊能夠廣泛傳播並難以被糾正</h3>
+            <div class="step-container">
+                <div class="step-card text-left">
+                    <p>我們找到支持自己觀點的內容時，會獲得一種多巴胺帶來的心理快感，驅使我們持續投入其中</p>
+                </div>
+                <div class="step-card text-left">
+                    <p>當一則挑戰或質疑我們核心信念的資訊（例如一篇事實查核報告）出現時，我們不會客觀地看待它，而是會啟動心理防衛機制我們對自己否定的觀點，會感到極度不舒服，因此會用極度嚴苛的標準去檢視它，努力找出它的缺陷或錯誤，以便駁斥它。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 8: 假新聞傳播數據 -->
+        <section class="slide scrollable">
+            <h1>假新聞傳播得更快、更廣</h1>
+            <div class="two-columns">
+                <div class="content-section text-left">
+                    <p>MIT 在 2018 年於《Science》期刊發表的研究，分析了 Twitter 上約 12.6 萬則新聞的傳播路徑。研究發現，假新聞比真實新聞被轉發的可能性高出 70%。真實新聞需要比假新聞多 6 倍的時間才能觸及 1500 人。這背後的原因是，假新聞通常更「新奇」、更能激發恐懼、厭惡等強烈情緒。</p>
+                    <p><strong>數據來源：</strong><a href="news.mit.edu/2018/study-twitter-false-news-travels-faster-true-stories-0308" target="_blank">news.mit.edu</a></p>
+                </div>
+                <div class="chart-section">
+                    <h4>轉發比率比較</h4>
+                    <div class="vertical-chart-container">
+                        <div class="vertical-chart">
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 100px; background-color: var(--color-earth);">
+                                    <span class="bar-value">100%</span>
+                                </div>
+                                <div class="bar-label">真實新聞</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 170px; background-color: var(--color-accent);">
+                                    <span class="bar-value">170%</span>
+                                </div>
+                                <div class="bar-label">假新聞</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="chart-note">假新聞比真實新聞被轉發的可能性高出 70%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 9: 情緒驅動力 -->
+        <section class="slide scrollable">
+            <h1>情緒是關鍵驅動力</h1>
+            <div class="two-columns">
+                <div class="content-section text-left">
+                    <p>紐約大學的研究團隊發現，在社群媒體上，帶有「道德情緒」詞彙（如：恥辱、邪惡、殘忍）的貼文，每一萬個追蹤者可以增加約 20% 的分享率。這證明了演算法和人類心理共同偏愛那些能劃清敵我、激發群體情感的內容。</p>
+                    <p><strong>數據來源：</strong><a href="https://www.pnas.org/doi/10.1073/pnas.1618923114" target="_blank">Emotion shapes the diffusion of moralized content in social networks</a></p>
+                </div>
+                <div class="content-section">
+                    <h4>道德情緒詞彙的傳播效應</h4>
+                    <div class="chart-container">
+                        <canvas id="moralEmotionChart"></canvas>
+                    </div>
+                    <p class="chart-caption">研究顯示，含有道德情緒詞彙的貼文，每一萬個追蹤者可以增加約 20% 的分享率</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 10: 台灣現況 -->
+        <section class="slide scrollable">
+            <h1>台灣的現況</h1>
+            <div class="two-columns">
+                <div class="content-section text-left">
+                    <p>根據路透新聞學研究所 2023 年的數位新聞報告，台灣民眾對新聞的整體信任度僅有 29%。更值得注意的是，有高達 43% 的台灣民眾表示，他們在網路上很難區分什麼是真實的新聞、什麼是虛假的消息。這顯示我們的資訊環境充滿挑戰，個人媒體素養的提升刻不容緩。</p>
+                    <p><strong>數據來源：</strong><a href="https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2023/taiwan" target="_blank">台灣媒體在中美緊張升溫下加速應對資安與錯假訊息</a></p>
+                </div>
+                <div class="content-section">
+                    <h4>台灣民眾新聞信任度</h4>
+                    <div class="chart-container">
+                        <canvas id="taiwanTrustChart"></canvas>
+                    </div>
+                    <p class="chart-caption"><strong>43% </strong>的台灣民眾表示難以區分真實與虛假消息</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 11: 被動接受到主動查核 -->
+        <section class="slide">
+            <h1>被動接受到主動查核</h1>
+        </section>
+
+        <!-- 投影片 12: Bellingcat -->
+        <section class="slide">
+            <h1>非營利機構 - Bellingcat</h1>
+            <div class="two-columns">
+                <div class="content-section text-left">
+                    <p>任務：調查2014年馬航 MH17 班機遭擊落事件。</p>
+                    <p>工具：公民上傳的社群照片、Google 地圖、衛星影像。</p>
+                    <p>結果：成功將飛彈發射車追溯至一個特定的位置</p>
+                    <p><a href="https://www.bellingcat.com/" target="_blank">https://www.bellingcat.com/</a></p>
+                </div>
+                <div class="content-section">
+                    <img src="../pic/w6/bellingcat.jpg" alt="Bellingcat" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 13: 事實查核中心 -->
+        <section class="slide scrollable">
+            <h1>非營利機構 - 事實查核中心</h1>
+            <div class="two-columns">
+                <div class="content-section text-left">
+                    <p>目標：證據蒐集與事實實比對。</p>
+                    <p>工具組合：政策與機關統計資料、媒體素養與影像查核技術、資安與詐騙樣態資料庫。</p>
+                    <p>成果呈現：以清楚結論分級（錯誤、部分錯誤）、關鍵證據與行動建議（例如避免詐騙的具體步驟）提升可用性與公共信任。</p>
+                    <p><a href="https://tfc-taiwan.org.tw/" target="_blank">https://tfc-taiwan.org.tw/</a></p>
+                </div>
+                <div class="content-section">
+                    <img src="../pic/w6/tfc.jpg" alt="事實查核中心" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 14: 查證工具 -->
+        <section class="slide">
+            <h1>查證工具</h1>
+            <div class="content-section">
+                <p><a href="https://www.mjib.gov.tw/EditPage/?PageID=adf9b60f-98af-4b65-b996-4f74145a4cd0" target="_blank">法務部調查局</a></p>
+                <img src="../pic/w6/mjib.jpg" alt="法務部調查局" class="slide-image">
+            </div>
+        </section>
+
+        <!-- 投影片 15: 我們能做什麼 -->
+        <section class="slide">
+            <h1>那我們能做什麼？</h1>
+        </section>
+
+        <!-- 投影片 16: 慢思考流程 -->
+        <section class="slide">
+            <h3>建立一套「慢思考」的資訊處理流程，以對抗平台的「快傳播」機制</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟一：保持懷疑</h4>
+                    <p>對引發強烈情緒的資訊保持警覺</p>
+                </div>
+                <div class="step-card">
+                    <h4>步驟二：主動查證</h4>
+                    <p>使用工具驗證資訊的真實性</p>
+                </div>
+                <div class="step-card">
+                    <h4>步驟三：負責任分享</h4>
+                    <p>確認後再分享，避免成為假資訊的幫兇</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 17: 橫向閱讀 -->
+        <section class="slide">
+            <h1>橫向閱讀 (Lateral Reading)</h1>
+        </section>
+
+        <!-- 投影片 18: 如何橫向閱讀 -->
+        <section class="slide scrollable">
+            <h1>如何橫向閱讀</h1>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟一</h4>
+                    <p>看到一則讓你情緒激動或驚訝的新聞。</p>
+                </div>
+                <div class="step-card">
+                    <h4>步驟二</h4>
+                    <p>停下來。在你閱讀或分享前，打開一個新的瀏覽器分頁。</p>
+                </div>
+                <div class="step-card">
+                    <h4>步驟三</h4>
+                    <p>調查來源。確認資訊的可靠度與真實性。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 19: 實作事實查核過濾器 -->
+        <section class="slide">
+            <h1>實作：事實查核過濾器</h1>
+            <div class="content-section">
+                <h4>目標</h4>
+                <p>將常用的提示詞變成一個可重複使用的對話式工具</p>
+                <h4>做法</h4>
+                <p>透過 Gemini Gems, ChatGPT, GPTs 製作事實查核過濾器</p>
+            </div>
+        </section>
+
+        <!-- 投影片 20: Gemini Gems 實作與提示詞撰寫 -->
+        <section class="slide scrollable">
+            <h3>實作：以 Gemini Gems 為例</h3>
+
+            <!-- Gemini Gems 步驟 -->
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟 1. 探索 Gems</h4>
+                    <img src="../pic/w6/explore-gems.jpg" alt="探索 Gems" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 2. 從網頁版 Gemini 建立</h4>
+                    <img src="../pic/w6/your-gems.jpg" alt="建立 Gems" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 3. 建立我的 Gems</h4>
+                    <img src="../pic/w6/my-gems.jpg" alt="建立 Gems" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 4. 透過提示詞建立事實查核過濾器</h4>
+                    <img src="../pic/w6/my-prompts.jpg" alt="我的提示詞" class="slide-image">
+                </div>
+            </div>
+            <br>
+            <h2>事實查核提示詞撰寫</h>
+            <div class="step-container">
+                <div class="step-card text-left">
+                    <h4>1. 角色</h4>
+                    <p>你是一位資深的xxx（探員、內容查核員、資安專家、專業記者、專業編輯，自行補充）</p>
+                    <h4>2. 目標</h4>
+                    <p>（區分真假資訊/AI 生成資訊，自行補充）</p>
+                    <h4>3. 輸出格式</h4>
+                    <p>（請自行補充）</p>
+                    <h4>4. 工具使用</h4>
+                    <p>（利用課堂所知道的網站，如：法務部調查局、事實查核中心，自行補充）</p>
+                    <h4>5. 風格限制</h4>
+                    <p>（語氣嚴謹、專業、客觀、中立，自行補充）</p>
+                </div>
+            </div>
+            <div class="step-card text-left">
+                <h3>完整提示詞的格式範例</h3>
+                <p>你是一位資深的....，專長為...。你的核心任務包括：...，。你所進行的分析具高度關鍵性，對我來說非常重要。<br>
+                    每當收到一個主題、關鍵字、文章、圖片或影片時，請執行以下：<br>
+                    1. 進行事實查核，並使用可信的公信力來源，如：...<br>
+                    2. 判斷該內容是否由 AI 生成，並分析...<br>
+                    請以簡潔、準確、情報報告式的格式回覆，避免主觀臆測，所有結論須有依據。回覆格式如...<br>
+                    語氣務必...<br>
+                    最後請你再次仔細閱讀指導語，並根據指導語，進行任務。
+                </p>
+            </div>
+        </section>
+
+        <!-- 投影片 23: 作業 -->
+        <section class="slide hidden">
+            <h1>作業 - 事實查核過濾器應用</h1>
+            <div class="content-section text-left">
+                    <h3>作業：假新聞與 AI 生成文章辨識練習</h3>
+                    <p>說明：每題兩則新聞（A、B），其中只有一則為真實新聞。請根據你設計的事實查核過濾器，並回答 5 題選擇題哪些是事實。</p>
+                    <h3>請於 10/17 23:59 前繳交作業內容。</h3>
+                    <p>作業繳交傳送門：<a href="https://forms.gle/asDAun1vYySGyKmQ8" target="_blank">Google Form 連結</a></p>
+
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+
+                // 當顯示情緒驅動力投影片時創建圖表
+                if (index === 8) { // 情緒驅動力是第9張投影片（索引8）
+                    console.log('顯示情緒驅動力投影片，準備創建圖表');
+                    setTimeout(createMoralEmotionChart, 200);
+                }
+
+                // 當顯示台灣現況投影片時創建圖表
+                if (index === 9) { // 台灣現況是第10張投影片（索引9）
+                    console.log('顯示台灣現況投影片，準備創建信任度圖表');
+                    setTimeout(createTaiwanTrustChart, 200);
+                }
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // 向左滑動，下一張
+                        nextSlide();
+                    } else {
+                        // 向右滑動，上一張
+                        prevSlide();
+                    }
+                }
+            }
+
+            // 創建道德情緒詞彙傳播效應圖表
+            function createMoralEmotionChart() {
+                const ctx = document.getElementById('moralEmotionChart');
+                console.log('嘗試創建圖表，canvas元素:', ctx);
+                if (!ctx) {
+                    console.log('找不到 canvas 元素');
+                    return;
+                }
+
+                // 檢查是否已經有圖表實例，如果有就先銷毀
+                if (window.moralEmotionChartInstance) {
+                    window.moralEmotionChartInstance.destroy();
+                }
+
+                // 自定義插件：在泡泡上顯示文字
+                const textPlugin = {
+                    id: 'textPlugin',
+                    afterDatasetsDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        chart.data.datasets.forEach((dataset, datasetIndex) => {
+                            dataset.data.forEach((dataPoint, index) => {
+                                const meta = chart.getDatasetMeta(datasetIndex);
+                                const element = meta.data[index];
+                                if (element) {
+                                    const x = element.x;
+                                    const y = element.y;
+
+                                    ctx.save();
+                                    ctx.fillStyle = '#5a5a5a';
+                                    ctx.font = 'bold 12px "Calibri", "Noto Sans TC", sans-serif';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText(dataPoint.label, x, y);
+                                    ctx.restore();
+                                }
+                            });
+                        });
+                    }
+                };
+
+                window.moralEmotionChartInstance = new Chart(ctx, {
+                    type: 'bubble',
+                    plugins: [textPlugin],
+                    data: {
+                        datasets: [{
+                            label: '道德情緒詞彙',
+                            data: [
+                                {x: 1, y: 1, r: 15, label: '恥辱'},
+                                {x: 2, y: 1, r: 18, label: '邪惡'},
+                                {x: 3, y: 1, r: 12, label: '殘忍'},
+                                {x: 4, y: 1, r: 16, label: '可惡'},
+                                {x: 5, y: 1, r: 14, label: '卑鄙'},
+                                {x: 1, y: 2, r: 17, label: '無恥'},
+                                {x: 2, y: 2, r: 13, label: '惡毒'},
+                                {x: 3, y: 2, r: 19, label: '冷血'},
+                                {x: 4, y: 2, r: 15, label: '虛偽'},
+                                {x: 5, y: 2, r: 16, label: '背叛'}
+                            ],
+                            backgroundColor: 'rgba(180, 120, 120, 0.6)',  // --color-accent
+                            borderColor: 'rgba(180, 120, 120, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const dataPoint = context.raw;
+                                        return dataPoint.label + ' (影響力: ' + dataPoint.r + ')';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                min: 0.5,
+                                max: 2.5,
+                                display: false
+                            },
+                            x: {
+                                min: 0.5,
+                                max: 5.5,
+                                display: false
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeInOutQuart'
+                        },
+                        onClick: function(event, elements) {
+                            if (elements.length > 0) {
+                                const dataIndex = elements[0].index;
+                                const datasetIndex = elements[0].datasetIndex;
+                                const dataPoint = this.data.datasets[datasetIndex].data[dataIndex];
+                                alert('詞彙: ' + dataPoint.label + '\n影響力: ' + dataPoint.r);
+                            }
+                        }
+                    }
+                });
+                console.log('道德情緒詞彙圖表創建成功');
+            }
+
+            // 創建台灣民眾新聞信任度圓餅圖
+            function createTaiwanTrustChart() {
+                const ctx = document.getElementById('taiwanTrustChart');
+                console.log('嘗試創建台灣信任度圖表，canvas元素:', ctx);
+                if (!ctx) {
+                    console.log('找不到台灣信任度 canvas 元素');
+                    return;
+                }
+
+                // 檢查是否已經有圖表實例，如果有就先銷毀
+                if (window.taiwanTrustChartInstance) {
+                    window.taiwanTrustChartInstance.destroy();
+                }
+
+                window.taiwanTrustChartInstance = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['信任新聞 (29%)', '不信任新聞 (71%)'],
+                        datasets: [{
+                            data: [29, 71],
+                            backgroundColor: [
+                                'rgba(120, 120, 91, 0.7)',  // --color-primary (信任)
+                                'rgba(180, 120, 120, 0.7)'   // --color-accent (不信任)
+                            ],
+                            borderColor: [
+                                'rgba(120, 120, 91, 1)',
+                                'rgba(180, 120, 120, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#5a5a5a',
+                                    font: {
+                                        family: "'Calibri', 'Noto Sans TC', sans-serif",
+                                        size: 14
+                                    },
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed;
+                                        return label + ': ' + value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeInOutQuart'
+                        },
+                        onClick: function(event, elements) {
+                            if (elements.length > 0) {
+                                const dataIndex = elements[0].index;
+                                const label = this.data.labels[dataIndex];
+                                const value = this.data.datasets[0].data[dataIndex];
+                                alert(label + '\n數值: ' + value + '%');
+                            }
+                        }
+                    }
+                });
+                console.log('台灣信任度圖表創建成功');
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
