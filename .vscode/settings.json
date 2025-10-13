@@ -1,0 +1,27 @@
+{
+  "cursor.autocomplete.enabled": true,
+  "cursor.autocomplete.delay": 100,
+  "cursor.autocomplete.maxLines": 6,
+  "cursor.autocomplete.autoTrigger": true,
+  "cursor.autocomplete.temperature": 0.2,
+  "cursor.autocomplete.languages": {
+    "markdown": {
+      "enabled": true,
+      "maxLines": 8,
+      "temperature": 0.1
+    }
+  },
+  "editor.suggest.showWords": false,
+  "editor.suggest.showSnippets": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.tabCompletion": "on",
+  "editor.wordBasedSuggestions": "off",
+  "editor.suggest.insertMode": "replace",
+  "editor.suggest.filterGraceful": true,
+  "editor.suggest.localityBonus": true,
+  "markdown.preview.breaks": true,
+  "markdown.preview.linkify": true,
+  "cursor.cpp.disabledLanguages": [],
+  "cursor.general.enableCodeActions": true,
+  "cursor.general.enableInlineCompletion": true
+}

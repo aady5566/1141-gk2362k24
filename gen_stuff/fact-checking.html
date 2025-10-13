@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>先查核再分享：把手機變成你的事實過濾器</title>
+    <style>
+        :root {
+            --bg-color: #f4f1ea;
+            --text-color: #4a4a4a;
+            --header-color: #3d3d3d;
+            --accent-color: #a39e8c;
+            --nav-color: #cccccc;
+            --nav-hover-color: #4a4a4a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: Calibri, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+        }
+
+        .slide-content {
+            width: 100%;
+            max-width: 960px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .slide-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide-content::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        .slide-content::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+        .slide-content::-webkit-scrollbar-thumb:hover {
+            background: var(--text-color);
+        }
+
+
+        h1, h2, h3 {
+            color: var(--header-color);
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 small {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-left: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        p, li {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--accent-color);
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--header-color);
+        }
+
+        blockquote {
+            border-left: 3px solid var(--accent-color);
+            padding-left: 2rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: #666;
+        }
+
+        .nav-button {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            border: none;
+            font-size: 3rem;
+            color: var(--nav-color);
+            cursor: pointer;
+            padding: 0 1rem;
+            z-index: 10;
+            transition: color 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: var(--nav-hover-color);
+        }
+
+        #prev-btn {
+            left: 1vw;
+        }
+
+        #next-btn {
+            right: 1vw;
+        }
+
+        .quiz-options {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .quiz-options li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        .quiz-options li::before {
+            content: "○";
+            margin-right: 0.5rem;
+            color: var(--accent-color);
+            display: inline-block;
+            width: 1em;
+            margin-left: -1.5em;
+        }
+
+        .highlight {
+            background-color: rgba(163, 158, 140, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slider-container">
+        <div class="slide-wrapper">
+
+            <div class="slide">
+                <div class="slide-content" style="text-align: center;">
+                    <h1>先查核再分享：<br>把手機變成你的事實過濾器</h1>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>1. 課堂簡介 <small>Introduction</small></h2>
+                    <p>歡迎來到大學的第一堂課。今天，我們不談你的主修，而是要談論一個你每天都在使用，卻可能從未深入思考的工具——你的手機。</p>
+                    <p>在當今這個資訊以光速傳播的時代，手機既是我們連接世界的窗口，也可能成為假訊息、惡意宣傳和認知偏誤的溫床。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>1. 課堂簡介 <small>Introduction</small></h2>
+                    <p>這個時代最大的挑戰之一，是我們大腦處理資訊的古老機制，與現代社群媒體演算法的設計，形成了一場完美的風暴。</p>
+                    <p><span class="highlight">「情緒」</span>和<span class="highlight">「速度」</span>成為了資訊傳播的主要驅動力，而「真相」和「思辨」卻往往被拋在腦後。</p>
+                    <p>當一則聳動的標題或一張極具衝擊力的圖片滑過你的螢幕時，你內心分享的衝動，其實是演算法工程師和心理學家精心設計的結果。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>1. 課堂簡介 <small>Introduction</small></h2>
+                    <p>這堂課的目標，不是要你變成一位專業的事實查核員，而是要賦予你一種新的「心態」與「技能」，讓你能夠在分享按鈕按下去之前，啟動內心的<span class="highlight">「事實過濾器」</span>。</p>
+                    <p>我們將探索假訊息背後的心理學，理解演算法如何影響我們的認知，並學習幾個簡單卻強大的技巧，把你的手機從一個被動的資訊接收器，轉變為一個主動、強大的事實過濾工具。這不僅是為了保護你自己，更是為了保護你所關心的社群，以及我們共同生活的公共領域。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>2. 延伸文獻與反面論點 <small>Further Reading</small></h2>
+                    <h3>深入閱讀 (英文為主)</h3>
+                    <ul>
+                        <li><strong>"The Psychology of Fake News"</strong> (Scientific American): 深入淺出地解釋了認知偏誤（如確認偏誤）如何讓我們更容易接受並傳播假新聞。</li>
+                        <li><strong>"Network Propaganda"</strong> (Oxford University Press): 詳細分析了美國政治中的資訊生態系統，揭示了假訊息如何透過不對稱的媒體網絡進行傳播。</li>
+                        <li><strong>"The Hype Machine"</strong> (MIT): 用數據和科學實驗拆解了社群媒體的運作機制，以及它如何被用來大規模影響人類行為。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>2. 延伸文獻與反面論點 <small>Counterarguments</small></h2>
+                    <h3>特殊反面論點</h3>
+                    <blockquote>「誰來查核『查核者』？」 (Who fact-checks the fact-checkers?)</blockquote>
+                    <p>這個論點質疑事實查核機構本身的中立性。查核者也是人，他們可能擁有自己的政治立場或文化偏見。當大型科技公司與特定的事實查核組織合作時，這是否賦予了這些組織過大的權力，讓他們成為「真相的仲裁者」？這是否會壓制非主流但合理的觀點？</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>2. 延伸文獻與反面論點 <small>Counterarguments</small></h2>
+                    <h3>特殊反面論點</h3>
+                    <blockquote>「事實查核扼殺了言論自由」 (Fact-checking stifles free speech)</blockquote>
+                    <p>部分觀點認為，過度的事實查核和內容審查，會導致寒蟬效應。人們可能因為害怕被貼上「散播假訊息」的標籤，而不敢公開討論有爭議的話題。這種觀點主張，思想的自由市場，最終會讓好的觀念勝出，而壓制言論只會讓猜疑和不信任加劇。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>2. 延伸文獻與反面論點 <small>Counterarguments</small></h2>
+                    <h3>特殊反面論點</h3>
+                    <blockquote>「問題不在『事實』，而在『詮釋』」 (The problem isn't facts, but interpretation)</blockquote>
+                    <p>這個論點認為，現代社會的許多爭議，根源並非事實層面的錯誤，而是不同群體對相同事實的「價值判斷」和「詮釋」不同。例如，一份經濟數據報告，有人會解讀為「政府政策成功」，有人則會解讀為「貧富差距擴大」。在這種情況下，單純的事實查核無法解決根本的社會分歧。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>3. 核心概念 <small>Core Concept</small></h2>
+                    <h3>認知摩擦力 (Cognitive Friction)</h3>
+                    <p>在物理世界中，摩擦力是阻止物體運動的力量。在資訊世界裡，「認知摩擦力」是阻止我們輕易相信、分享資訊的心理力量。</p>
+                    <p>社群媒體的設計，本質上是為了消除認知摩擦力。我們的目標，就是學習如何刻意地、策略性地<span class="highlight">增加認知摩擦力</span>。在看到一則聳動的資訊時，不是順滑地接受並分享，而是主動讓自己「卡一下」，問自己幾個關鍵問題。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>3. 關鍵問題 <small>Key Question</small></h2>
+                    <blockquote>在一個為「速度」與「情緒」而設計的數位環境中，我們個人如何能重新校準自己的資訊消費習慣，以對抗那股偏愛「病毒式傳播」勝過「事實準確性」的強大力量？</blockquote>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>4. 關鍵問題拆解 <small>Deconstructing the Key Question</small></h2>
+                    <p>為了回答上述核心問題，我們可以從以下五個面向來探索：</p>
+                    <ul>
+                        <li><strong>情緒識別</strong> (Emotional Awareness)</li>
+                        <li><strong>來源檢視</strong> (Source Scrutiny)</li>
+                        <li><strong>動機思辨</strong> (Motive Speculation)</li>
+                        <li><strong>證據質疑</strong> (Evidence Interrogation)</li>
+                        <li><strong>演算法覺察</strong> (Algorithmic Consciousness)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>4. 關鍵問題拆解 <small>Deconstructing the Key Question</small></h2>
+                    <p><strong>情緒識別:</strong> 這則資訊觸發了我的什麼強烈情緒（憤怒、恐懼、喜悅）？我的分享衝動，有多少是基於情緒，又有多少是基於理性判斷？</p>
+                    <p><strong>來源檢視:</strong> 這個資訊是誰發布的？是專業新聞機構、政府單位，還是一個匿名的帳號？我能輕易找到這個來源的信譽記錄嗎？</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>4. 關鍵問題拆解 <small>Deconstructing the Key Question</small></h2>
+                    <p><strong>動機思辨:</strong> 發布這則資訊的人或組織，想達到什麼目的？是為了通知公眾、說服我相信某個觀點，還是為了賺取點擊率？</p>
+                    <p><strong>證據質疑:</strong> 資訊中的核心主張，是基於什麼證據？是數據、專家引述，還是只是傳聞？我能從其他獨立的來源找到支持或反駁這個證據的資訊嗎？</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>4. 關鍵問題拆解 <small>Deconstructing the Key Question</small></h2>
+                    <p><strong>演算法覺察:</strong> 我為什麼會看到這則資訊？是因為我追蹤了這個帳號，還是演算法根據我的過去行為「認為」我會喜歡？我看到的，是事情的全貌，還是一個被演算法過濾後的「個人化真相」？</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>5. 核心問題的答案與數據支持 <small>Data-Backed Answer</small></h2>
+                    <p>答案在於：個人需要建立一套<span class="highlight">「慢思考」的資訊處理流程</span>，以對抗平台的「快傳播」機制。 這不是天賦，而是一種可以透過練習養成的習慣。</p>
+                    <p>數據顯示，這種對抗是必要且緊迫的。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>5. 數據支持 <small>Data-Backed Answer</small></h2>
+                    <h3>假新聞傳播得更快、更廣</h3>
+                    <p>MIT 在 2018 年於《Science》期刊發表的研究發現，假新聞比真實新聞被轉發的可能性高出 <strong>70%</strong>。真實新聞需要比假新聞多 <strong>6 倍</strong>的時間才能觸及 1500 人。</p>
+                    <p>原因是，假新聞通常更「新奇」、更能激發恐懼、厭惡等強烈情緒。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>5. 數據支持 <small>Data-Backed Answer</small></h2>
+                    <h3>情緒是關鍵驅動力</h3>
+                    <p>紐約大學的研究團隊發現，在社群媒體上，帶有「道德情緒」詞彙（如：恥辱、邪惡、殘忍）的貼文，每一萬個追蹤者可以增加約 <strong>20%</strong> 的分享率。</p>
+                    <p>這證明了演算法和人類心理共同偏愛那些能劃清敵我、激發群體情感的內容。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>5. 數據支持 <small>Data-Backed Answer</small></h2>
+                    <h3>台灣的現況</h3>
+                    <p>根據路透新聞學研究所 2023 年的報告，台灣民眾對新聞的整體信任度僅有 <strong>29%</strong>。</p>
+                    <p>高達 <strong>43%</strong> 的台灣民眾表示，他們在網路上很難區分什麼是真實的新聞、什麼是虛假的消息。這顯示我們的資訊環境充滿挑戰，個人媒體素養的提升刻不容緩。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>6. 實際案例分析 <small>Case Study</small></h2>
+                    <h3>反面教材：Pizzagate 陰謀論</h3>
+                    <p>2016 年，一則完全捏造的陰謀論在網路迅速傳播。該理論聲稱民主黨高層在華盛頓一家披薩店經營兒童性販賣集團。</p>
+                    <p><strong>結果：</strong> 一名男子輕信了陰謀論，帶著步槍闖入該披薩店「拯救兒童」。這是線上假訊息直接轉化為現實世界暴力的極端案例。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>6. 實際案例分析 <small>Case Study</small></h2>
+                    <h3>正面案例：台灣事實查核中心的「颱風假圖卡」查核</h3>
+                    <p>在台灣，每逢颱風季節，各種真假難辨的「停班停課」圖卡就會在 LINE 和 Facebook 上瘋傳。</p>
+                    <p><strong>行動：</strong> 台灣事實查核中心等組織，會迅速啟動查核機制，比對官方公告，並教導民眾如何辨識假圖卡的特徵。</p>
+                    <p><strong>影響：</strong> 他們有效地增加了「認知摩擦力」，阻斷了謠言的傳播鏈。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 課堂練習 <small>In-Class Exercises</small></h2>
+                    <h3>互動遊戲</h3>
+                    <p><strong>遊戲一：真假頭條對對決 (Fake News Fighter)</strong><br>
+                    說明： 遊戲會一次顯示兩則新聞頭條，一則是真實的，一則是虛假的。你需要在 10 秒內判斷哪一則是假的。目標是訓練對標題的敏感度。</p>
+                    <p><strong>遊戲二：訊息來源大挑戰 (Source Inspector)</strong><br>
+                    說明： 畫面上會出現一則訊息與數個可能的來源。請將你認為「最可信」的來源拖曳到訊息上。目標是培養優先考慮「來源可信度」的習慣。</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 小測驗 <small>Multiple-Choice Questions</small></h2>
+                    <p><strong>1. 當你在社群媒體上看到一則讓你非常憤怒的新聞時，根據這堂課的「核心概念」，你最應該做的第一件事是什麼？</strong></p>
+                    <ul class="quiz-options">
+                        <li>A. 立刻分享，讓更多人知道這件不公不義的事。</li>
+                        <li>B. 在底下留言，痛罵新聞中的主角。</li>
+                        <li>C. 刻意停下來，意識到自己的情緒反應，並對資訊的真實性打上一個問號。</li>
+                        <li>D. 找朋友私訊，跟他一起討論這件事有多可惡。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 小測驗 <small>Multiple-Choice Questions</small></h2>
+                    <p><strong>2. 下列哪一項是「高認知摩擦力」的行為？</strong></p>
+                    <ul class="quiz-options">
+                        <li>A. 看到朋友分享的健康資訊，覺得很有道理就跟著做。</li>
+                        <li>B. 在 LINE 家族群組看到長輩轉傳的「緊急通知」，立刻轉發給其他朋友。</li>
+                        <li>C. 滑到一則有趣的政治迷因 (Meme)，覺得很好笑就按了分享。</li>
+                        <li>D. 看到一則關於某公眾人物的醜聞，先去搜尋至少兩個不同的新聞來源報導，再決定是否相信。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 小測驗 <small>Multiple-Choice Questions</small></h2>
+                    <p><strong>3. MIT 的研究顯示，假新聞比真實新聞傳播得更快，主要原因是什麼？</strong></p>
+                    <ul class="quiz-options">
+                        <li>A. 因為假新聞的作者通常是電腦駭客。</li>
+                        <li>B. 因為真實新聞的網站通常需要付費訂閱。</li>
+                        <li>C. 因為假新聞在內容上更新奇，且更能激發人們的強烈情緒。</li>
+                        <li>D. 因為分享真實新聞不會得到社群媒體的演算法推薦。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 小測驗 <small>Multiple-Choice Questions</small></h2>
+                    <p><strong>4. 所謂「誰來查核『查核者』？」這個反面論點，主要在質疑什麼？</strong></p>
+                    <ul class="quiz-options">
+                        <li>A. 事實查核員的薪水不夠高，可能會被收買。</li>
+                        <li>B. 事實查核機構本身可能存在偏見，可能成為變相的言論審查工具。</li>
+                        <li>C. 事實查核報告寫得太長，沒有人想看。</li>
+                        <li>D. 事實查核的速度太慢，跟不上謠言散播的速度。</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="slide">
+                <div class="slide-content">
+                    <h2>7. 小測驗 <small>Multiple-Choice Questions</small></h2>
+                    <p><strong>5. 你收到一張宣稱是某市府發出的「最新防疫補貼」申請辦法的圖片，但你從未在主流新聞上看到。以下哪一個查證步驟最不可靠？</strong></p>
+                    <ul class="quiz-options">
+                        <li>A. 前往該市市政府的官方網站，查看「最新消息」公告。</li>
+                        <li>B. 打電話到市府的總機或相關局處詢問。</li>
+                        <li>C. 在台灣事實查核中心等事實查核網站上，用關鍵字搜尋。</li>
+                        <li>D. 直接把圖片傳給你的朋友，問他有沒有聽說過這件事。</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>8. 課後作業 <small>Homework Assignment</small></h2>
+                    <h3>我的 24 小時資訊反思日誌</h3>
+                    <p><strong>目標：</strong> 將課堂上學到的概念，應用到你真實的數位生活中。</p>
+                    <p><strong>工具：</strong> 你的手機，以及一個 Google Form 表單。</p>
+                    <p><strong>說明：</strong> 請回想在過去 24 小時內，你在手機上看到的一則讓你印象深刻的資訊（新聞、貼文、影片等）。然後，點擊連結，完成這份反思日誌。</p>
+                    <p style="text-align: center; margin-top: 2rem;"><a href="#" onclick="alert('此處應替換為老師建立的真實表單連結'); return false;">請點擊這裡填寫 Google Form</a></p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>8. 課後作業 <small>Google Form 表單內容建議</small></h2>
+                    <ul>
+                        <li><strong>欄位一：</strong> 請貼上該資訊的網址或截圖上傳。</li>
+                        <li><strong>欄位二：</strong> 這則資訊的核心主張是什麼？請用一句話簡短摘要。</li>
+                        <li><strong>欄位三：</strong> 這則資訊讓你產生了什麼樣的情緒？ (可複選)</li>
+                        <li><strong>欄位四：</strong> 請花 5 分鐘，找到一則與原資訊相關的不同來源報導或評論，並貼上網址。</li>
+                        <li><strong>欄位五：</strong> 經過查證後，你對原資訊的看法有任何改變嗎？你現在會選擇分享它嗎？為什麼？</li>
+                    </ul>
+                </div>
+            </div>
+
+             <div class="slide">
+                <div class="slide-content" style="text-align: center;">
+                    <h1>Q & A</h1>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button id="prev-btn" class="nav-button">&#10094;</button>
+    <button id="next-btn" class="nav-button">&#10095;</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slideWrapper = document.querySelector('.slide-wrapper');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            function updateSlidePosition() {
+                slideWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            function showNextSlide() {
+                if (currentIndex < totalSlides - 1) {
+                    currentIndex++;
+                    updateSlidePosition();
+                }
+            }
+
+            function showPrevSlide() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSlidePosition();
+                }
+            }
+
+            nextBtn.addEventListener('click', showNextSlide);
+            prevBtn.addEventListener('click', showPrevSlide);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowRight') {
+                    showNextSlide();
+                } else if (event.key === 'ArrowLeft') {
+                    showPrevSlide();
+                }
+            });
+
+            // Initial position
+            updateSlidePosition();
+        });
+    </script>
+
+</body>
+</html>
