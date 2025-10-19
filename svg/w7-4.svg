@@ -1,0 +1,118 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+    <!--
+      Infographic: Why a Revolution - From Linear to Agile (16:9)
+      Style: Wabi-sabi x Hand-drawn
+      Date: 2025-10-18
+    -->
+
+    <defs>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;display=swap');
+            .font-main { font-family: 'Noto Sans TC', sans-serif; }
+            .h1 { font-size: 96px; font-weight: 700; fill: #5E6C6A; }
+            .h2 { font-size: 56px; font-weight: 500; fill: #5E6C6A; }
+            .h3 { font-size: 36px; font-weight: 500; fill: #3C3C3C; }
+            .body { font-size: 32px; font-weight: 400; fill: #3C3C3C; }
+            .caption { font-size: 28px; font-weight: 400; fill: #A9B2AE; }
+            .bg-main { fill: #5E6C6A; }
+            .bg-accent { fill: #A9B2AE; }
+            .bg-highlight { fill: #C2B8A3; }
+            .stroke-main { stroke: #5E6C6A; }
+            .stroke-accent { stroke: #A9B2AE; }
+            .text-light { fill: #F4F2EF; }
+        </style>
+        <filter id="wobble">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1.5" />
+        </filter>
+        <filter id="wobble-light">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="0.8" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="1920" height="1080" fill="#F4F2EF" />
+
+    <!-- Header -->
+    <g class="font-main" text-anchor="middle">
+        <text x="960" y="110" class="h1" fill="#A9B2AE">AI 時代的工作流程再造</text>
+        <path d="M 760 185 C 860 180, 1060 180, 1160 185" stroke="#C2B8A3" stroke-width="2.5" fill="none" filter="url(#wobble-light)" />
+    </g>
+
+    <!-- Left Section: Traditional -->
+    <g class="font-main" text-anchor="middle">
+        <title>傳統流程</title>
+        <text x="480" y="280" class="h2">傳統的困境</text>
+
+        <g transform="translate(480, 480)">
+            <path d="M -100 -120 C -105 -130, 105 -130, 100 -120 S 105 -50, -100 -50 Z" class="stroke-main" stroke-width="2" fill="none" filter="url(#wobble-light)"/>
+            <text y="-85" class="h3">蒐集</text>
+            <path d="M 0 -45 L 0 -15" class="stroke-main" stroke-width="2" marker-end="url(#arrow-main)" filter="url(#wobble-light)"/>
+
+            <path d="M -100 -10 C -105 -20, 105 -20, 100 -10 S 105 60, -100 60 Z" class="stroke-main" stroke-width="2" fill="none" filter="url(#wobble-light)"/>
+            <text y="25" class="h3">寫作</text>
+            <path d="M 0 65 L 0 95" class="stroke-main" stroke-width="2" marker-end="url(#arrow-main)" filter="url(#wobble-light)"/>
+
+            <path d="M -100 100 C -105 90, 105 90, 100 100 S 105 170, -100 170 Z" class="stroke-main" stroke-width="2" fill="none" filter="url(#wobble-light)"/>
+            <text y="135" class="h3">排版</text>
+        </g>
+
+        <text x="480" y="700" class="body">⟶ 單向流程，耗時且僵化 ⟵</text>
+    </g>
+
+    <!-- Right Section: Agile -->
+    <g class="font-main" text-anchor="middle">
+        <title>敏捷流程</title>
+        <text x="1440" y="280" class="h2" fill="#3C3C3C">敏捷的革新</text>
+
+        <g transform="translate(1440, 480) scale(1.1)">
+            <circle cx="0" cy="0" r="50" fill="#C2B8A3" filter="url(#wobble-light)"/>
+            <text y="8" font-size="48" class="font-main text-light" font-weight="700">AI</text>
+            <path d="M 0 -120 A 120 120 0 1 1 -0.1 -120" class="stroke-accent" stroke-width="2" fill="none" filter="url(#wobble-light)"/>
+
+            <path d="M 100 -70 L 115 -55" class="stroke-accent" stroke-width="2"/>
+            <path d="M 107 -62 L 115 -55 L 108 -48" fill="none" class="stroke-accent" stroke-width="2"/>
+            <path d="M -100 70 L -115 55" class="stroke-accent" stroke-width="2"/>
+            <path d="M -107 62 L -115 55 L -108 48" fill="none" class="stroke-accent" stroke-width="2"/>
+
+            <text x="0" y="-140" class="h3">生成草稿</text>
+            <text x="0" y="155" class="h3">人類判斷</text>
+            <text x="160" y="0" class="h3" writing-mode="tb" text-anchor="middle">快速迭代</text>
+        </g>
+
+        <text x="1440" y="700" class="body">⟷ 循環迭代，高效又彈性 ⟷</text>
+    </g>
+
+    <!-- Key Insight Section -->
+    <g class="font-main" text-anchor="middle">
+        <path d="M 320 780 C 520 775, 1400 775, 1600 780" stroke="#C2B8A3" stroke-width="2.5" fill="none" filter="url(#wobble-light)" />
+        <text x="960" y="840" class="h2" fill="#3C3C3C">本質的變化：價值重塑</text>
+
+        <!-- Card 1: Human -->
+        <g transform="translate(660, 950)">
+             <path d="M -180 0 C -185 -50, 185 -50, 180 0 S 185 100, -180 100 Z" fill="#F4F2EF" stroke="#A9B2AE" stroke-width="2" filter="url(#wobble-light)"/>
+            <circle cx="-110" cy="50" r="30" fill="#C2B8A3" filter="url(#wobble-light)"/>
+            <text x="-110" y="58" font-size="48">💡</text>
+            <text x="30" y="40" class="h3">人類 Human</text>
+            <text x="30" y="75" class="body">專注策略與判斷</text>
+        </g>
+
+        <!-- Card 2: AI -->
+        <g transform="translate(1260, 950)">
+            <path d="M -180 0 C -185 -50, 185 -50, 180 0 S 185 100, -180 100 Z" fill="#F4F2EF" stroke="#A9B2AE" stroke-width="2" filter="url(#wobble-light)"/>
+            <circle cx="-110" cy="50" r="30" fill="#C2B8A3" filter="url(#wobble-light)"/>
+            <text x="-110" y="58" font-size="48">⚙️</text>
+            <text x="30" y="40" class="h3">人工智慧 AI</text>
+            <text x="30" y="75" class="body">處理重複與草稿</text>
+        </g>
+    </g>
+
+
+    <!-- Arrowhead definitions -->
+    <defs>
+        <marker id="arrow-main" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#5E6C6A" />
+        </marker>
+    </defs>
+</svg>

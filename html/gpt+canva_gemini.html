@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT + Canva: AI 驅動的設計革命</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+        h1 { font-size: 4rem; font-weight: 700; color: var(--text-color); margin-bottom: 1rem; }
+        h2 { font-size: 3rem; font-weight: 700; color: var(--accent-color); margin-bottom: 0.8rem; }
+        h3 { font-size: 2rem; font-weight: 700; color: var(--text-color); margin-bottom: 4vh; border-bottom: 1px solid var(--line-color); padding-bottom: 1rem; width: 80%; max-width: 800px; }
+        h4 { font-size: clamp(1.8rem, 3.3vw, 2.4rem); font-weight: 400; color: var(--accent-color); margin-bottom: 0.8rem; border-bottom: 1px solid var(--line-color); padding-bottom: 0.3rem; }
+        h5 { font-size: clamp(1rem, 1.8vw, 1.3rem); font-weight: 400; color: var(--accent-color); margin-bottom: 0.6rem; }
+        p { color: #666; margin-bottom: 1rem; line-height: 1.6; font-size: 1.5rem; max-width: 80ch; }
+        .slide-subtitle { color: #888; font-size: 1.8rem; font-weight: 300; margin-top: -1rem; }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+        .slide.hidden {
+            display: none !important;
+        }
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .content-section.text-left {
+            text-align: left;
+        }
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+        .step-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        .step-card.text-left {
+            text-align: left;
+        }
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        @media (max-width: 767px) {
+            .slide {
+                padding: 5vw;
+                overflow-y: auto;
+                justify-content: flex-start;
+            }
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-section {
+                width: 100%;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <section class="slide active">
+            <h1>GPT + Canva</h1>
+            <h2>AI 驅動的設計革命</h2>
+            <p class="slide-subtitle">快速生成內容，輕鬆完成設計</p>
+        </section>
+        <section class="slide">
+            <h3>什麼是 GPT？</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>生成式預訓練轉換器</h4>
+                    <p>GPT (Generative Pre-trained Transformer) 是一種由 OpenAI 開發的強大語言模型。</p>
+                    <p>它能夠理解和生成像人類一樣自然的文字，應用範圍從寫作、翻譯到程式碼生成都無所不包。</p>
+                </div>
+                <div class="content-section text-left">
+                    <h4>核心能力</h4>
+                    <p><strong>內容生成</strong>：自動撰寫文章、廣告文案、社群媒體貼文。</p>
+                    <p><strong>創意發想</strong>：提供設計靈感、標語和主題。</p>
+                    <p><strong>文字摘要</strong>：快速將長篇大論濃縮成重點。</p>
+                </div>
+            </div>
+        </section>
+        <section class="slide">
+            <h3>什麼是 Canva？</h3>
+             <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>線上設計平台</h4>
+                    <p>Canva 是一個使用者友善的圖形設計工具，讓沒有專業背景的人也能輕鬆創作出精美的視覺內容。</p>
+                    <p>它提供海量範本、圖片和字體，適用於製作簡報、海報、社群圖片等。</p>
+                </div>
+                <div class="content-section text-left">
+                    <h4>主要特色</h4>
+                    <p><strong>拖放式編輯</strong>：直覺的操作介面。</p>
+                    <p><strong>豐富範本庫</strong>：涵蓋各種設計需求。</p>
+                    <p><strong>協作功能</strong>：方便團隊共同編輯。</p>
+                </div>
+            </div>
+        </section>
+        <section class="slide scrollable">
+            <h3>GPT + Canva = 超級設計力</h3>
+            <div class="step-container">
+                <div class="step-card text-left">
+                    <h4>Step 1: 用 GPT 生成文字內容</h4>
+                    <p>無論是社群媒體的貼文、活動標語，還是簡報大綱，都可以請 GPT 快速生成。例如，輸入指令：「幫我為一個環保主題的 Instagram 貼文生成 3 個文案選項」。</p>
+                </div>
+                <div class="step-card text-left">
+                    <h4>Step 2: 在 Canva 中尋找合適範本</h4>
+                    <p>根據 GPT 提供的內容主題，在 Canva 中搜尋關鍵字（如：「環保」、「地球日」），找到最符合風格的設計範本。</p>
+                </div>
+                <div class="step-card text-left">
+                    <h4>Step 3: 結合文字與視覺</h4>
+                    <p>將 GPT 生成的文案複製到 Canva 範本中，調整字體、顏色和排版，使其與視覺設計完美融合。</p>
+                </div>
+                 <div class="step-card text-left">
+                    <h4>Step 4: 匯出與分享</h4>
+                    <p>完成設計後，從 Canva 匯出圖片或 PDF，即可用於你的行銷活動、簡報或社群媒體。</p>
+                </div>
+            </div>
+        </section>
+        <section class="slide">
+            <h3>應用場景</h3>
+            <p>社群媒體行銷 / 內容創作 / 教育學習 / 商業簡報</p>
+            <img src="https://i.imgur.com/Ab3qT4v.png" alt="GPT+Canva 應用" style="max-width: 60%; border-radius: 8px; margin-top: 2rem;">
+        </section>
+        <section class="slide">
+            <h1>Q & A</h1>
+            <h2>感謝聆聽</h2>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault(); // Prevent space from scrolling page
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // Touch support
+            let startX = 0;
+            let endX = 0;
+            const slidesContainer = document.querySelector('.slides-container');
+
+            slidesContainer.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            slidesContainer.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                if (startX - endX > threshold) {
+                    nextSlide();
+                } else if (endX - startX > threshold) {
+                    prevSlide();
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>

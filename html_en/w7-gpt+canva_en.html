@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT + Canva: Complete Content and Presentation Creation</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* Slide container */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* SVG container styles */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .responsive-svg {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Heading levels */
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        /* Body text */
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        /* Link styles - low saturation blue tones */
+        a {
+            color: #6b7c8a; /* Low saturation blue-gray */
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #5a6b7a; /* Slightly darker blue-gray */
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #6b7c8a; /* Keep same as normal state */
+            text-decoration: underline;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        /* List styles */
+        ul {
+            text-align: left;
+            max-width: 80ch;
+            margin: 0 auto;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            font-size: 1.4rem;
+            line-height: 1.6;
+        }
+
+        /* Navigation system */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* Sidebar system */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background: #4d4d3b;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar-toggle:hover {
+            background: #3a3a2c;
+            transform: translateY(-2px);
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            background: #4d4d3b;
+            color: #ffffff;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border: none;
+            padding: 0;
+            width: auto;
+        }
+
+        .sidebar-content {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(120, 120, 91, 0.1);
+            color: #4d4d3b;
+            transform: translateX(5px);
+        }
+
+        .sidebar-text {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Special slide styles */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* Timeline comparison styles */
+        .comparison-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            max-width: 1000px;
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .timeline-item.old-way {
+            background: linear-gradient(135deg, rgba(180, 120, 120, 0.1), rgba(180, 120, 120, 0.05));
+            border: 2px solid rgba(180, 120, 120, 0.3);
+        }
+
+        .timeline-item.new-way {
+            background: linear-gradient(135deg, rgba(120, 150, 120, 0.1), rgba(120, 150, 120, 0.05));
+            border: 2px solid rgba(120, 150, 120, 0.3);
+        }
+
+        .timeline-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .timeline-content h4 {
+            font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .timeline-content p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .timeline-label {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 500;
+            color: var(--accent-color);
+            border: 1px solid var(--line-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-arrow {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            /* Mobile SVG styles */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .responsive-svg {
+                min-width: 100%;
+                min-height: 100%;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-section {
+                width: 100%;
+            }
+
+            .comparison-timeline {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .timeline-arrow {
+                transform: rotate(90deg);
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                max-width: 100%;
+                padding: 1.5rem;
+            }
+
+            .sidebar-toggle {
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 28px;
+                height: 28px;
+                padding: 5px;
+            }
+
+            .sidebar-toggle span {
+                width: 16px;
+                height: 2px;
+            }
+
+            .sidebar-menu {
+                width: 260px;
+            }
+
+            .sidebar-item {
+                padding: 0.7rem 1.2rem;
+            }
+
+            .sidebar-text {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+
+        /* Step container styles */
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 1rem auto;
+        }
+
+        /* Slide image styles */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+        }
+
+        /* Mobile image optimization */
+        @media (max-width: 767px) {
+            .slide-image {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+        }
+
+        /* Code block styles */
+        pre {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem; /* Smaller font */
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+            font-weight: 400;
+            letter-spacing: 0.5px; /* Increase letter spacing, more typewriter-like */
+        }
+
+        pre:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        pre:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        /* Copy icon */
+        pre::after {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background-image: url('../pic/copy-white.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        pre:hover::after {
+            opacity: 1;
+        }
+
+        /* Mobile code block optimization */
+        @media (max-width: 767px) {
+            pre {
+                padding: 0.8rem;
+                font-size: 0.75rem; /* Even smaller for mobile */
+                margin: 0.6rem 0;
+                letter-spacing: 0.2px; /* Smaller letter spacing for mobile */
+                word-break: break-word; /* Auto wrap long text */
+                white-space: pre-wrap; /* Preserve line breaks but allow auto wrap */
+                overflow-wrap: break-word; /* Force long words to wrap */
+                max-width: 100%; /* Ensure it doesn't exceed container */
+                box-sizing: border-box;
+            }
+
+            pre::after {
+                width: 12px;
+                height: 12px;
+                top: 0.2rem;
+                right: 0.4rem;
+            }
+
+            /* Special handling for code blocks in step-card */
+            .step-card pre {
+                margin: 0.5rem -0.5rem; /* Negative margin to make code block closer to card edge */
+                border-radius: 6px; /* Smaller border radius for mobile */
+            }
+        }
+        /* Small text resource block styles */
+        .small-text-resources {
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .small-text-resources h4 {
+            font-size: 1em;
+            margin-bottom: 0.8em;
+        }
+
+        .small-text-resources p {
+            margin-bottom: 0.6em;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar toggle button -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Sidebar menu -->
+    <div id="sidebar" class="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>ChatGPT + Canva</h3>
+        </div>
+        <div class="sidebar-content">
+            <!-- Home link -->
+            <a href="index_en.html" class="sidebar-item">
+                <span class="sidebar-text">Back to Home</span>
+            </a>
+            <!-- Separator -->
+            <div style="border-bottom: 2px solid var(--accent-color); margin: 0.5rem 0;"></div>
+            <!-- Slide navigation links -->
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-1')">
+                <span class="sidebar-text">1. Cover</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-2-1')">
+                <span class="sidebar-text">2. Group Discussion</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4')">
+                <span class="sidebar-text">3. Why It's Revolutionary</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-1')">
+                <span class="sidebar-text">4. Role Division</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-3')">
+                <span class="sidebar-text">5. Human Premium</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-4')">
+                <span class="sidebar-text">6. Critical Thinking</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-5')">
+                <span class="sidebar-text">7. ChatGPT's Role</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6')">
+                <span class="sidebar-text">8. Canva's Role</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6-1')">
+                <span class="sidebar-text">9. Canva Features</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6-2')">
+                <span class="sidebar-text">10. ChatGPT vs Canva Division</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-3')">
+                <span class="sidebar-text">11. Content Overview</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7')">
+                <span class="sidebar-text">12. Integration Setup</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-1')">
+                <span class="sidebar-text">13. Method 1: ChatGPT Direct Canva Integration</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-2')">
+                <span class="sidebar-text">14. GPT Connect Canva</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-3')">
+                <span class="sidebar-text">15. Method 2: Native Canva</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-23')">
+                <span class="sidebar-text">16. Further Reading</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-23-2')">
+                <span class="sidebar-text">17. Further Reading (AI Seamless Integration Risks)</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-22')">
+                <span class="sidebar-text">18. Assignment & Submission</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Slides container -->
+    <div class="slides-container">
+        <!-- Page 1: Cover -->
+        <section id="slide-1" class="slide active">
+            <h1>ChatGPT + Canva</h1>
+            <h2 class="slide-subtitle">Agile Presentation Workflow</h2>
+        </section>
+
+
+        <!-- Page 2-1: Core Key Questions -->
+        <section id="slide-2-1" class="slide scrollable">
+            <h3>Group Discussion</h3>
+            <div class="step-card text-left">
+                <h4>Based on your past experience, answer the following questions:</h4>
+                <p>1. What does the presentation creation process look like?</p>
+                <p>2. What are the pain points?</p>
+                <p>3. In the AI era, how can human creativity and critical thinking collaborate with AI?</p>
+                <h4>Discussion Output</h4>
+                <p>Each group needs to produce: <strong>Presentation creation process</strong> + <strong>Pain points</strong> + <strong>Collaborative decision division diagram</strong></p>
+                <p>Time: 20 minutes discussion, one person from each group explains the output</p>
+            </div>
+        </section>
+
+
+        <!-- Page 4: Why It's Revolutionary -->
+        <section id="slide-4" class="slide scrollable">
+            <div class="svg-container">
+                <object data="../svg/w7-4.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-4.svg" alt="Why It's Revolutionary: From Linear to Agile" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+
+        <!-- Page 4-1: Role Division -->
+        <section id="slide-4-1" class="slide">
+            <h3>How can human creativity and critical thinking collaborate with AI</h3>
+            <ul>
+                <li>Human creative decisions: Direction of thinking, aesthetic judgment, critical thinking</li>
+                <li>AI creative decisions: Repetitive tasks, template suggestions, draft generation</li>
+                <li>Responsibility attribution: How to control errors and infringement, procedures, approval, documentation</li>
+            </ul>
+        </section>
+
+        <!-- Page 4-3: Human Premium -->
+        <section id="slide-4-3" class="slide">
+            <svg-container>
+                <object data="../svg/w7-human-premium.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-human-premium.svg" alt="human premium" class="responsive-svg" />
+                </object>
+            </svg-container>
+        </section>
+
+        <!-- Page 4-4: Critical Thinking -->
+        <section id="slide-4-4" class="slide">
+            <svg-container>
+                <object data="../svg/w7-critical-thinking.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-critical-thinking.svg" alt="critical thinking" class="responsive-svg" />
+                </object>
+            </svg-container>
+        </section>
+
+        <!-- Page 5: What ChatGPT is responsible for -->
+        <section id="slide-5" class="slide">
+            <h3>ChatGPT</h3>
+            <p>Text generation and understanding tool</p>
+        </section>
+
+        <!-- Page 6: What Canva is responsible for -->
+        <section id="slide-6" class="slide">
+            <h3>Canva</h3>
+            <p>Visual design and layout tool</p>
+        </section>
+        <!-- New SVG page -->
+        <section id="slide-6-1" class="slide">
+            <h3>Canva Features Introduction</h3>
+            <div class="svg-container">
+                <object data="../svg/w7-canva-features-v2.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-canva-features-v2.svg" alt="Canva" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+        <!-- New SVG page -->
+        <section id="slide-6-2" class="slide">
+            <h3>ChatGPT vs Canva Division of Labor</h3>
+            <div class="svg-container">
+                <object data="../svg/w7-gpt-cavas.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-gpt-cavas.svg" alt="ChatGPT vs. Canva" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+
+        <!-- Page 3: Content Overview and Learning Map -->
+        <section id="slide-3" class="slide">
+            <h3>Three-Step Process</h3>
+            <div class="step-card">
+                <p>Topic confirmation → Prompt writing → Send → (Outline generation → One-click template → Refinement and publishing)</p>
+            </div>
+        </section>
+
+        <!-- Page 7: Integration Setup -->
+        <section id="slide-7" class="slide">
+            <h3>Hands-on Teaching</h3>
+            <div class="step-card text-left">
+                <h4>Two Methods</h4>
+                <ul>
+                    <li>Method 1: Direct Canva integration in ChatGPT</li>
+                    <li>Method 2: Prompt directly in Canva (with prompt and slide count limitations)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Page 7-1: Method 1: Direct Canva integration in ChatGPT -->
+        <section id="slide-7-1" class="slide scrollable">
+            <h3>Method 1: ChatGPT Direct Canva Integration (Activate Canva Account)</h3>
+
+            <!-- Canva account activation tutorial -->
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>Step 1. Download Canva app</h4>
+                    <img src="../pic/w7/1canva-portal.jpg" alt="canva app" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 2. Login to Canva</h4>
+                    <img src="../pic/w7/2canva-login.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 3. Google login to Canva account</h4>
+                    <img src="../pic/w7/3canva-login-success.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 4. Set Canva language to English first (for GPT Bug)</h4>
+                    <img src="../pic/w7/4canva-lang-settings.jpg" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 7-2: GPT Connect Canva -->
+        <section id="slide-7-2" class="slide scrollable">
+            <h3>Method 1 (continued): GPT Connect Canva Tutorial</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>Step 1. Enter GPT settings page</h4>
+                    <img src="../pic/w7/1gpt-portal.jpg" alt="gpt portal" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 2. GPT Connect App</h4>
+                    <img src="../pic/w7/2gpt-settings.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 3. Browse Apps to find Canva and bind it</h4>
+                    <img src="../pic/w7/3gpt-connect-app.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 4. Canva binding successful</h4>
+                    <img src="../pic/w7/4gpt-connect-success.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 5. GPT select tools</h4>
+                    <img src="../pic/w7/5gpt-add-tool.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 6. Select Canva tool</h4>
+                    <img src="../pic/w7/6gpt-add-canva.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 7. GPT test output</h4>
+                    <pre><code>Please create a 5-page outline for "Social Media's Impact on Teen Mental Health": cover, problem, pros and cons, data, conclusion and recommendations</code></pre>
+                    <img src="../pic/w7/7gpt-test-canva.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 8. GPT built-in Canva presentation template generation, success!</h4>
+                    <img src="../pic/w7/8gpt-test-success.jpg" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 7-3: If GPT cannot connect to Canva, use Canva tutorial example -->
+        <section id="slide-7-3" class="slide scrollable">
+            <h3>Method 2: Native Canva Presentation Creation<br>(with prompt and slide count limitations)</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>Canva Interface Operation</h4>
+                    <pre><code>Please create a 5-page outline for "Social Media's Impact on Teen Mental Health": cover, problem, pros and cons, data, conclusion and recommendations</code></pre>
+                    <img src="../pic/w7/canva-all-in-one.jpg" alt="canva all in one" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 23: Further Reading -->
+        <section id="slide-23" class="slide scrollable">
+            <h3>Further Reading: Multi-dimensional Thinking</h3>
+            <div class="step-card text-left">
+                <div class="small-text-resources">
+                    <h4>The following resources provide different perspectives for students interested in deeper exploration</h4>
+                    <p><strong>On Human-AI Co-Creativity:</strong><p>
+                    <p>This field's literature explores guiding principles for collaborative design between humans and AI. The focus is on balancing automated efficiency with human supervision and control, ensuring AI "enhances" rather than "replaces" human creativity. Related research emphasizes that while AI can provide novel solutions, humans must retain control over final outputs to maintain the integrity and emotional depth of the creative process 15.</p>
+                    <p><strong>On AI and Critical Thinking:</strong></p>
+                    <p>Research in academic journals provides in-depth analysis of AI tools' impact on human cognition. Substantial evidence shows significant negative correlation between excessive AI use and declining critical thinking abilities. The core concept is "cognitive offloading," where users transfer thinking burdens to AI, potentially leading to atrophy of independent analysis and evaluation capabilities over time. These studies provide strong empirical support for "why human critical thinking is indispensable" 18.</p>
+                    <p><strong>On Generative AI Ethics & Bias:</strong></p>
+                    <p>These reports and articles detail algorithmic biases present in Large Language Models (LLMs) and design platforms. Since training data originates from human society filled with biases, AI systems learn and amplify these biases (such as gender and racial discrimination). Literature also explores best practices like data auditing, model transparency, and establishing human oversight mechanisms to mitigate these risks 24.</p>
+                    <p><strong>On Copyright and AI:</strong></p>
+                    <p>Official guidelines from the U.S. Copyright Office and related legal analysis are key to understanding this issue. The core principle is "human authorship requirement," meaning copyright only protects works created by humans. Current legal perspectives hold that users who merely provide instructions (prompts) haven't exerted sufficient "creative control" over AI's generation process, so they cannot be considered authors of AI-generated content. Legal controversies in this field continue to evolve 27.</p>
+
+                    15. <a href="https://www.xcubelabs.com/blog/human-ai-collaboration-enhancing-creativity-with-generative-ai/" target="_blank">Human-AI Collaboration: Enhancing Creativity with Generative AI - [x]cube LABS</a>
+                    18. <a href="https://www.mdpi.com/2075-4698/15/1/6" target="_blank">AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking</a>
+                    24. <a href="https://en.wikipedia.org/wiki/Algorithmic_bias" target="_blank">Algorithmic bias - Wikipedia</a>
+                    27. <a href="https://www.congress.gov/crs-product/LSB10922" target="_blank">Generative Artificial Intelligence and Copyright Law | Congress.gov</a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 23-2: Further Reading -->
+        <section id="slide-23-2" class="slide scrollable">
+            <h3>Further Reading: Risks of AI Seamless Integration</h3>
+            <div class="step-card text-left">
+                <div class="small-text-resources">
+                    <h4>Critical Counterarguments</h4>
+                    <p><strong>The Risk of De-skilling and Homogenization:</strong></p>
+                    <p>When students over-rely on AI to complete basic tasks like writing, research, and design, will they lose the fundamental ability to complete these tasks independently? Furthermore, AI models are essentially based on massive data for statistical prediction, and their outputs are often "most likely" or "most average" results. Could this lead to a future where creativity becomes homogenized? In that future, all presentations, articles, and designs carry similar "AI flavor," losing the unique humanity and edges 39.</p>
+                    <p><strong>The Erosion of the Learning Process:</strong></p>
+                    <p>Learning isn't just about getting correct answers or perfect products. The struggles experienced in the creative process—repeated data searching, failed attempts, constant revisions and self-doubt—are themselves key components of deep learning and knowledge internalization. By providing shortcuts, are AI tools depriving students of the opportunity to experience this necessary "intellectual struggle," making their learning shallow? 30.</p>
+                    <p><strong>The Amplification of Misinformation:</strong></p>
+                    <p>The aforementioned lawyer case involves creators intentionally taking shortcuts. But a more widespread risk is that AI might generate seemingly reasonable but completely false "hallucinations." When content generation becomes so effortless, these AI-manufactured, hard-to-distinguish false information could contaminate our information ecosystem at unprecedented speed, exacerbating society's trust crisis? 42.</p>
+                    <p><strong>The Question of Authenticity:</strong></p>
+                    <p>In a creative process where most work is done by machines, what is the meaning of "creator"? When core elements of a work—text, images, structure—all come from algorithms, can we still call it genuine human expression? This philosophical question challenges our traditional definitions of originality, artistry, and the essence of human creativity, a self-questioning that every creator in the AI era cannot avoid 38.</p>
+                    39. <a href="https://www.reddit.com/r/ClaudeAI/comments/1hb9rux/with_canvas_launched_in_chatgpt_is_claude_pro/" target="_blank">With Canvas launched in ChatGPT, is Claude Pro still worth it? : r/ClaudeAI - Reddit</a>
+                    30. <a href="https://files.eric.ed.gov/fulltext/EJ1459623.pdf" target="_blank">Critical Thinking in the Age of AI: A Systematic Review of AI's Effects</a>
+                    42. <a href="https://education.illinois.edu/about/news-events/news/article/2024/10/24/ai-in-schools--pros-and-cons" target="_blank">AI in Schools: Pros and Cons - College of Education | Illinois</a>
+                    38. <a href="https://arxiv.org/html/2411.12527v2" target="_blank">Human-AI Co-Creativity: Exploring Synergies Across Levels of Creative Collaboration</a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 22: Assignment and Submission -->
+        <section id="slide-22" class="slide scrollable">
+            <h3>Assignment & Submission Process: <strong>5-page [Topic] Presentation</strong></h3>
+            <div class="step-card text-left">
+                <h4>Assignment Objective</h4>
+                <p>Use ChatGPT → Canva to quickly create a 5-page <strong>[Topic]</strong> presentation</p>
+                <p>Topic is self-defined, but cannot use the classroom practice topic "Social Media's Impact on Teen Mental Health"</p>
+
+                <h4>Task Content</h4>
+                <p>Presentation content includes: introducing <strong>[Topic]</strong>, why <strong>[Topic]</strong> is important, how to apply <strong>[Topic]</strong></p>
+
+                <h4>Submission Specifications and Deadline</h4>
+                <p>Submission content includes: <span style="color: rgba(180, 120, 120, 0.9); font-weight: 600;">Student ID, Name, Your prompt, Public Canva link</span></p>
+                <p>Please submit assignment content by <span style="color: rgba(180, 120, 120, 0.9); font-weight: 600;">Saturday 10/25 23:59</span>.</p>
+                <p>Assignment submission portal: <a href="https://forms.gle/J46Jpup8zvsY47i59" target="_blank">Google Form Link</a></p>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        // Slide navigation system
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // Touch support
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function goToSlide(slideId) {
+            // Close sidebar
+            closeSidebar();
+
+            // Jump to specified slide
+            showSlideById(slideId);
+        }
+
+        // Slide jump functionality
+        function showSlideById(slideId) {
+            const targetSlide = document.getElementById(slideId);
+            if (!targetSlide) {
+                console.error('Slide not found:', slideId);
+                return;
+            }
+
+            // Find slide index in slides
+            const slides = Array.from(document.querySelectorAll('.slide'));
+            const absoluteIndex = slides.indexOf(targetSlide);
+            if (absoluteIndex === -1) {
+                console.error('Slide not found in slides:', slideId);
+                return;
+            }
+
+            // Update current index and show slide
+            currentSlide = absoluteIndex;
+            showSlide(currentSlide);
+        }
+
+        // Global variables
+        let currentSlide = 0;
+        const slides = Array.from(document.querySelectorAll('.slide'));
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+        }
+
+        // Code block click copy functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(block => {
+                // Store original text content
+                const originalText = block.querySelector('code').textContent;
+
+                block.addEventListener('click', async function() {
+                    // If showing "Copied!", don't execute copy
+                    if (this.querySelector('code').textContent === 'Copied!') {
+                        return;
+                    }
+
+                    const text = originalText.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+
+                        // Show copy success message
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = 'Copied!';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+
+                    } catch (err) {
+                        console.error('Copy failed:', err);
+
+                        // Fallback: use traditional method
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        // Show copy success message
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = 'Copied!';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

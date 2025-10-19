@@ -1,0 +1,105 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" style="background-color: #F4F2EF; font-family: 'Helvetica Neue', 'Arial', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft YaHei', sans-serif;">
+
+  <style>
+    .h1 {
+      font-size: 90px;
+      font-weight: 600;
+      fill: #5E6C6A;
+    }
+    .h2 {
+      font-size: 60px;
+      font-weight: 500;
+      fill: #333333;
+    }
+    .h3-num {
+      font-size: 45px;
+      font-weight: 700;
+      fill: #C2B8A3;
+    }
+    .body {
+      font-size: 40px;
+      font-weight: 400;
+      fill: #333333;
+    }
+    .caption {
+      font-size: 30px;
+      font-weight: 400;
+      fill: #A9B2AE;
+    }
+    .icon {
+      fill: none;
+      stroke: #5E6C6A;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .icon-secondary {
+      fill: none;
+      stroke: #A9B2AE;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .divider {
+      stroke: #A9B2AE;
+      stroke-width: 2;
+      stroke-dasharray: 8 8;
+    }
+  </style>
+
+  <text x="100" y="180" class="h1">Canva 的核心功能</text>
+
+  <g transform="translate(100, 300)">
+    <g transform="translate(0, -20)">
+      <rect class="icon-secondary" x="25" y="25" width="90" height="70" rx="5" transform="rotate(4 70 60)"/>
+      <rect class="icon" x="10" y="10" width="90" height="70" rx="5" transform="rotate(-5 55 45)"/>
+    </g>
+
+    <text x="0" y="180" class="h3-num">01</text>
+    <text x="80" y="180" class="h2">模板庫</text>
+
+    <text x="0" y="240" class="body">
+      <tspan x="0" dy="1.5em">提供數十萬個精美的預設設計，</tspan>
+      <tspan x="0" dy="1.5em">幫助用戶輕鬆創作各類</tspan>
+      <tspan x="0" dy="1.5em">視覺內容。</tspan>
+    </text>
+  </g>
+
+  <line class="divider" x1="615" y1="320" x2="610" y2="900" transform="rotate(0.5 612 610)" />
+
+  <g transform="translate(680, 300)">
+    <g transform="translate(0, -20)">
+      <path class="icon" d="M40 10 l30 40 l-15 10 l20 25 l-10 10 l-20 -25 l-15 -10 Z" transform="rotate(15 50 50)"/>
+    </g>
+
+    <text x="0" y="180" class="h3-num">02</text>
+    <text x="80" y="180" class="h2">拖放編輯器</text>
+
+    <text x="0" y="240" class="body">
+      <tspan x="0" dy="1.5em">簡單直觀的編輯方式，</tspan>
+      <tspan x="0" dy="1.5em">讓任何人都能快速上手，</tspan>
+      <tspan x="0" dy="1.5em">無需專業設計背景。</tspan>
+    </text>
+  </g>
+
+  <line class="divider" x1="1205" y1="320" x2="1210" y2="900" transform="rotate(-0.5 1207 610)" />
+
+  <g transform="translate(1260, 300)">
+    <g transform="translate(0, -20)">
+      <path class="icon" d="M50 10 L55 35 L80 40 L55 45 L50 70 L45 45 L20 40 L45 35 Z" />
+      <path class="icon-secondary" d="M85 20 L87 30 L97 32 L87 34 L85 44 L83 34 L73 32 L83 30 Z" transform="rotate(10)"/>
+    </g>
+
+    <text x="0" y="180" class="h3-num">03</text>
+    <text x="80" y="180" class="h2">AI 設計助手</text>
+
+    <text x="0" y="240" class="body">
+      <tspan x="0" dy="1.5em">使用 AI 設計工具，如 Magic Design</tspan>
+      <tspan x="0" dy="1.5em">和 Text to Image，</tspan>
+      <tspan x="0" dy="1.5em">幫助用戶加速創作過程。</tspan>
+    </text>
+  </g>
+
+  <text x="1820" y="1050" class="caption" text-anchor="end"></text>
+
+</svg>

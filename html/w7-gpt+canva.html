@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT + Canva：內容與簡報製作一次完成</title>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* SVG 容器樣式 */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .responsive-svg {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        /* 內文 */
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        /* 超連結樣式 - 低飽和度藍色系 */
+        a {
+            color: #6b7c8a; /* 低飽和度藍灰色 */
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #5a6b7a; /* 稍深的藍灰色 */
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #6b7c8a; /* 保持與一般狀態相同 */
+            text-decoration: underline;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        /* 列表樣式 */
+        ul {
+            text-align: left;
+            max-width: 80ch;
+            margin: 0 auto;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            font-size: 1.4rem;
+            line-height: 1.6;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 側邊欄系統 */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background: #4d4d3b;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar-toggle:hover {
+            background: #3a3a2c;
+            transform: translateY(-2px);
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            background: #4d4d3b;
+            color: #ffffff;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border: none;
+            padding: 0;
+            width: auto;
+        }
+
+        .sidebar-content {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(120, 120, 91, 0.1);
+            color: #4d4d3b;
+            transform: translateX(5px);
+        }
+
+        .sidebar-text {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 特殊投影片樣式 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* 時間軸對比樣式 */
+        .comparison-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            max-width: 1000px;
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .timeline-item.old-way {
+            background: linear-gradient(135deg, rgba(180, 120, 120, 0.1), rgba(180, 120, 120, 0.05));
+            border: 2px solid rgba(180, 120, 120, 0.3);
+        }
+
+        .timeline-item.new-way {
+            background: linear-gradient(135deg, rgba(120, 150, 120, 0.1), rgba(120, 150, 120, 0.05));
+            border: 2px solid rgba(120, 150, 120, 0.3);
+        }
+
+        .timeline-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .timeline-content h4 {
+            font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .timeline-content p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .timeline-label {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 500;
+            color: var(--accent-color);
+            border: 1px solid var(--line-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-arrow {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            /* 手機版 SVG 樣式 */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .responsive-svg {
+                min-width: 100%;
+                min-height: 100%;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-section {
+                width: 100%;
+            }
+
+            .comparison-timeline {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .timeline-arrow {
+                transform: rotate(90deg);
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                max-width: 100%;
+                padding: 1.5rem;
+            }
+
+            .sidebar-toggle {
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 28px;
+                height: 28px;
+                padding: 5px;
+            }
+
+            .sidebar-toggle span {
+                width: 16px;
+                height: 2px;
+            }
+
+            .sidebar-menu {
+                width: 260px;
+            }
+
+            .sidebar-item {
+                padding: 0.7rem 1.2rem;
+            }
+
+            .sidebar-text {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+
+        /* 步驟容器樣式 */
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 1rem auto;
+        }
+
+        /* 投影片圖片樣式 */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+        }
+
+        /* 手機版圖片優化 */
+        @media (max-width: 767px) {
+            .slide-image {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+        }
+
+        /* 程式碼區塊樣式 */
+        pre {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem; /* 更小的字體 */
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+            font-weight: 400;
+            letter-spacing: 0.5px; /* 增加字母間距，更像打字機 */
+        }
+
+        pre:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        pre:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        /* 複製圖示 */
+        pre::after {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background-image: url('../pic/copy-white.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        pre:hover::after {
+            opacity: 1;
+        }
+
+        /* 手機版程式碼區塊優化 */
+        @media (max-width: 767px) {
+            pre {
+                padding: 0.8rem;
+                font-size: 0.75rem; /* 手機版更小 */
+                margin: 0.6rem 0;
+                letter-spacing: 0.2px; /* 手機版字母間距稍小 */
+                word-break: break-word; /* 長文字自動換行 */
+                white-space: pre-wrap; /* 保留換行但允許自動換行 */
+                overflow-wrap: break-word; /* 強制長單詞換行 */
+                max-width: 100%; /* 確保不超出容器 */
+                box-sizing: border-box;
+            }
+
+            pre::after {
+                width: 12px;
+                height: 12px;
+                top: 0.2rem;
+                right: 0.4rem;
+            }
+
+            /* step-card 內的程式碼區塊特殊處理 */
+            .step-card pre {
+                margin: 0.5rem -0.5rem; /* 負邊距讓程式碼區塊更貼近卡片邊緣 */
+                border-radius: 6px; /* 手機版圓角稍小 */
+            }
+        }
+        /* 小字體資源區塊樣式 */
+        .small-text-resources {
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .small-text-resources h4 {
+            font-size: 1em;
+            margin-bottom: 0.8em;
+        }
+
+        .small-text-resources p {
+            margin-bottom: 0.6em;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄切換按鈕 -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- 側邊欄選單 -->
+    <div id="sidebar" class="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>ChatGPT + Canva</h3>
+        </div>
+        <div class="sidebar-content">
+            <!-- 回首頁連結 -->
+            <a href="../index.html" class="sidebar-item">
+                <span class="sidebar-text">回首頁</span>
+            </a>
+            <!-- 分隔線 -->
+            <div style="border-bottom: 2px solid var(--accent-color); margin: 0.5rem 0;"></div>
+            <!-- 投影片導航連結 -->
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-1')">
+                <span class="sidebar-text">1. 封面</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-2-1')">
+                <span class="sidebar-text">2. 分組討論</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4')">
+                <span class="sidebar-text">3. 為何是革命</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-1')">
+                <span class="sidebar-text">4. 權責分工</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-3')">
+                <span class="sidebar-text">5. 人類溢價</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-4-4')">
+                <span class="sidebar-text">6. 批判性思考</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-5')">
+                <span class="sidebar-text">7. ChatGPT 定位</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6')">
+                <span class="sidebar-text">8. Canva 定位</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6-1')">
+                <span class="sidebar-text">9. Canva 功能介紹</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-6-2')">
+                <span class="sidebar-text">10. ChatGPT 與 Canva 的分工</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-3')">
+                <span class="sidebar-text">11. 內容總覽</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7')">
+                <span class="sidebar-text">12. 整合前置</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-1')">
+                <span class="sidebar-text">13. 方法一：ChatGPT 直接連動 Canva</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-2')">
+                <span class="sidebar-text">14. GPT 連結 Canva</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-7-3')">
+                <span class="sidebar-text">15. 方法二：原生 Canva</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-23')">
+                <span class="sidebar-text">16. 延伸閱讀</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-23-2')">
+                <span class="sidebar-text">17. 延伸閱讀（AI 無縫整合的風險）</span>
+            </a>
+            <a href="#" class="sidebar-item" onclick="goToSlide('slide-22')">
+                <span class="sidebar-text">18. 作業與繳交</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 遮罩層 -->
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- 投影片容器 -->
+    <div class="slides-container">
+        <!-- 第1頁：封面 -->
+        <section id="slide-1" class="slide active">
+            <h1>ChatGPT + Canva</h1>
+            <h2 class="slide-subtitle">敏捷簡報工作流</h2>
+        </section>
+
+
+        <!-- 第2-1頁：核心關鍵問題 -->
+        <section id="slide-2-1" class="slide scrollable">
+            <h3>分組討論</h3>
+            <div class="step-card text-left">
+                <h4>根據你們過往經驗，回答以下問題：</h4>
+                <p>1. 做簡報的過程是什麼樣子？</p>
+                <p>2. 痛苦的點有哪些？</p>
+                <p>3. 處於 AI 時代，人類的創造力與批判性思考，可以如何與 AI 協同合作？</p>
+                <h4>討論產出</h4>
+                <p>各組需產出：<strong>簡報產出的過程</strong> + <strong>痛點為何</strong> + <strong>合作決策分工圖</strong></p>
+                <p>時間：20 分鐘討論，產出的部分各一人講解</p>
+            </div>
+        </section>
+
+
+        <!-- 第4頁：為何是革命 -->
+        <section id="slide-4" class="slide scrollable">
+            <div class="svg-container">
+                <object data="../svg/w7-4.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-4.svg" alt="為何是革命：從線性到敏捷" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+
+        <!-- 第4-1頁：權責分工 -->
+        <section id="slide-4-1" class="slide">
+            <h3>人類的創造力與批判性思考，可以如何與 AI 協同合作</h3>
+            <ul>
+                <li>人類創作決策：思考方向、審美判斷、批判性思維</li>
+                <li>AI 創作決策：重複性任務、版型建議、草稿生成</li>
+                <li>責任歸屬：錯誤與侵權如何控管、程序、簽核、留證</li>
+            </ul>
+        </section>
+
+        <!-- 第4-3頁：人類溢價 -->
+        <section id="slide-4-3" class="slide">
+            <svg-container>
+                <object data="../svg/w7-human-premium.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-human-premium.svg" alt="human premium" class="responsive-svg" />
+                </object>
+            </svg-container>
+        </section>
+
+        <!-- 第4-4頁：批判性思考 -->
+        <section id="slide-4-4" class="slide">
+            <svg-container>
+                <object data="../svg/w7-critical-thinking.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-critical-thinking.svg" alt="critical thinking" class="responsive-svg" />
+                </object>
+            </svg-container>
+        </section>
+
+        <!-- 第5頁：ChatGPT 負責什麼 -->
+        <section id="slide-5" class="slide">
+            <h3>ChatGPT</h3>
+            <p>文字生成與理解工具</p>
+        </section>
+
+        <!-- 第6頁：Canva 負責什麼 -->
+        <section id="slide-6" class="slide">
+            <h3>Canva</h3>
+            <p>視覺設計與排版工具</p>
+        </section>
+        <!-- 新增一頁 svg -->
+        <section id="slide-6-1" class="slide">
+            <h3>Canva 功能介紹</h3>
+            <div class="svg-container">
+                <object data="../svg/w7-canva-features-v2.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-canva-features-v2.svg" alt="Canva" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+        <!-- 新增一頁 svg -->
+        <section id="slide-6-2" class="slide">
+            <h3>ChatGPT 與 Canva 的分工</h3>
+            <div class="svg-container">
+                <object data="../svg/w7-gpt-cavas.svg" type="image/svg+xml" class="responsive-svg">
+                    <img src="../svg/w7-gpt-cavas.svg" alt="ChatGPT vs. Canva" class="responsive-svg" />
+                </object>
+            </div>
+        </section>
+
+        <!-- 第3頁：內容總覽與學習地圖 -->
+        <section id="slide-3" class="slide">
+            <h3>三步驟流程</h3>
+            <div class="step-card">
+                <p>主題確認 → 提示詞撰寫 → 送出 → (大綱生成 → 一鍵套版 → 精修與發布)</p>
+            </div>
+        </section>
+
+        <!-- 第7頁：整合前置 -->
+        <section id="slide-7" class="slide">
+            <h3>實戰教學</h3>
+            <div class="step-card text-left">
+                <h4>兩方法</h4>
+                <ul>
+                    <li>方法一：在 ChatGPT 直接連動 Canva</li>
+                    <li>方法二：Prompt 直接在 Canva （會有提示詞、簡報頁數的限制）</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第 7-1 頁：方法一：在 ChatGPT 直接連動 Canva -->
+        <section id="slide-7-1" class="slide scrollable">
+            <h3>方法一：ChatGPT 直接連動 Canva （啟動 Canva 帳號）</h3>
+
+            <!-- Canva 帳號啟用實作教學 -->
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟 1. 下載 Canva app</h4>
+                    <img src="../pic/w7/1canva-portal.jpg" alt="canva app" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 2. 登入 Canva</h4>
+                    <img src="../pic/w7/2canva-login.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 3. Google 登入 Canva 帳號</h4>
+                    <img src="../pic/w7/3canva-login-success.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 4. Canva 語言設定先轉成英文 (為了GPT Bug) </h4>
+                    <img src="../pic/w7/4canva-lang-settings.jpg" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 第 7-2 頁：GPT 連結 Canva -->
+        <section id="slide-7-2" class="slide scrollable">
+            <h3>方法一（續）：GPT 連結 Canva 實作教學</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟 1. 進入 GPT 設定頁面</h4>
+                    <img src="../pic/w7/1gpt-portal.jpg" alt="gpt portal" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 2. GPT 連結 App</h4>
+                    <img src="../pic/w7/2gpt-settings.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 3. 瀏覽 App 找到 Canca 將其綁定</h4>
+                    <img src="../pic/w7/3gpt-connect-app.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 4. Canva 綁定成功</h4>
+                    <img src="../pic/w7/4gpt-connect-success.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 5. GPT 選定工具</h4>
+                    <img src="../pic/w7/5gpt-add-tool.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 6. 工具選定 Canva</h4>
+                    <img src="../pic/w7/6gpt-add-canva.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 7. GPT 測試產出</h4>
+                    <pre><code>請產出「社群媒體對青少年心理健康」5頁大綱：封面、問題、正反論點、數據、結論與建議</code></pre>
+                    <img src="../pic/w7/7gpt-test-canva.jpg" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 8. GPT 內建生成 Canva 簡報模板，成功！</h4>
+                    <img src="../pic/w7/8gpt-test-success.jpg" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 第 7-3 頁： GPT 若無法連結 Canva 使用 Canva 教學範例-->
+        <section id="slide-7-3" class="slide scrollable">
+            <h3>方法二：原生 Canva 簡報製作<br>（會有提示詞、簡報頁數的限制）</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>Canva 介面操作</h4>
+                    <pre><code>請產出「社群媒體對青少年心理健康」5頁大綱：封面、問題、正反論點、數據、結論與建議</code></pre>
+                    <img src="../pic/w7/canva-all-in-one.jpg" alt="canva all in one" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 第23頁：延伸閱讀 -->
+        <section id="slide-23" class="slide scrollable">
+            <h3>延伸閱讀：多面向思維</h3>
+            <div class="step-card text-left">
+                <div class="small-text-resources">
+                    <h4>以下資源為有興趣深入探索的學生提供了不同面向的學習思維</h4>
+                    <p><strong>關於人機協同創造力 (On Human-AI Co-Creativity):</strong><p>
+                    <p>此領域的文獻探討人類與 AI 之間協同設計的指導原則。重點在於如何在自動化的高效率與人類的監督、控制之間取得平衡，確保 AI 是在「增強」而非「取代」人類的創造力。相關研究強調，雖然 AI 能提供新穎的解決方案，但人類必須保留對最終產出的控制權，以維護創作過程的完整性與情感深度 15。</p>
+                    <p><strong>關於 AI 與批判性思維 (On AI and Critical Thinking):</strong></p>
+                    <p>學術期刊上的研究深入分析了 AI 工具對人類認知的影響。大量證據顯示，過度使用 AI 與批判性思維能力下降之間存在顯著的負相關性。核心概念是「認知卸載」（cognitive offloading），即使用者將思考的負擔轉移給 AI，長期可能導致獨立分析與評估能力的萎縮。這些研究為「為何人類的批判性思維不可或缺」提供了有力的實證支持 18。</p>
+                    <p><strong>關於生成式 AI 的倫理與偏見 (On Generative AI Ethics & Bias):</strong></p>
+                    <p>此類報告與文章詳細揭示了大型語言模型（LLMs）和設計平台中存在的演算法偏見。由於訓練數據源於充滿偏見的人類社會，AI 系統會學習並放大這些偏見（如性別、種族歧視）。文獻同時也探討了如何透過數據審計、模型透明化、以及建立人類監督機制等最佳實踐，來緩解這些風險 24。</p>
+                    <p><strong>關於版權與 AI (On Copyright and AI):</strong></p>
+                    <p>美國版權局（U.S. Copyright Office）的官方指南與相關法律分析是理解此議題的關鍵。核心原則是「人類作者身份」（human authorship requirement），即版權只保護由人類創作的作品。當前法律觀點認為，僅僅提供指令（prompt）的使用者，並未對 AI 的生成過程施加足夠的「創意控制」（creative control），因此不能被視為 AI 生成內容的作者。這個領域的法律爭議仍在持續演進中 27。</p>
+
+                    15. <a href="https://www.xcubelabs.com/blog/human-ai-collaboration-enhancing-creativity-with-generative-ai/" target="_blank">Human-AI Collaboration: Enhancing Creativity with Generative AI - [x]cube LABS</a>
+                    18. <a href="https://www.mdpi.com/2075-4698/15/1/6" target="_blank">AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking</a>
+                    24. <a href="https://en.wikipedia.org/wiki/Algorithmic_bias" target="_blank">Algorithmic bias - Wikipedia</a>
+                    27. <a href="https://www.congress.gov/crs-product/LSB10922" target="_blank">Generative Artificial Intelligence and Copyright Law | Congress.gov</a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 第23-2頁：延伸閱讀 -->
+        <section id="slide-23-2" class="slide scrollable">
+            <h3>延伸閱讀：AI 無縫整合的風險</h3>
+            <div class="step-card text-left">
+                <div class="small-text-resources">
+                    <h4>批判性反方論點</h4>
+                    <p><strong>技能退化與創意的同質化風險 (The Risk of De-skilling and Homogenization):</strong></p>
+                    <p>當學生過度依賴 AI 來完成寫作、研究與設計等基礎任務時，他們是否會因此喪失獨立完成這些工作的基本能力？更進一步，AI 模型本質上是基於海量數據進行統計與預測，其產出往往是「最可能」或「最平均」的結果。這是否會導致一個創意趨於同質化的未來？在那個未來裡，所有的簡報、文章、設計都帶有相似的「AI 味」，失去了人性的獨特與稜角 39。</p>
+                    <p><strong>學習過程的侵蝕 (The Erosion of the Learning Process):</strong></p>
+                    <p>學習不僅僅是為了得到一個正確的答案或一個完美的成品。在創作過程中經歷的掙扎——反覆的資料查找、失敗的嘗試、不斷的修改與自我懷疑——本身就是深度學習與知識內化的關鍵環節。AI 工具透過提供捷徑，是否正在剝奪學生經歷這個必要「智力掙扎」的機會，從而使其學習變得淺薄？30。</p>
+                    <p><strong>錯誤資訊的放大器 (The Amplification of Misinformation):</strong></p>
+                    <p>前述的律師案例是創作者有意圖地走捷徑。但更普遍的風險是，AI 可能會產生看似合理、實則完全錯誤的「幻覺」（hallucinations）。當內容的生成變得如此輕而易舉時，這些由 AI 製造的、難以辨別的錯誤資訊，是否會以前所未有的速度污染我們的資訊生態系統，加劇社會的信任危機？42。</p>
+                    <p><strong>真實性的叩問 (The Question of Authenticity):</strong></p>
+                    <p>在一個大部分工作由機器完成的創作過程中，「創作者」的意義是什麼？當作品的核心元素——文字、圖像、結構——都來自於演算法時，我們還能稱之為真正的人類表達嗎？這個哲學層面的問題，挑戰了我們對原創性、藝術性與人類創造力本質的傳統定義，是 AI 時代每個創作者都無法迴避的自我叩問 38。</p>
+                    39. <a href="https://www.reddit.com/r/ClaudeAI/comments/1hb9rux/with_canvas_launched_in_chatgpt_is_claude_pro/" target="_blank">With Canvas launched in ChatGPT, is Claude Pro still worth it? : r/ClaudeAI - Reddit</a>
+                    30. <a href="https://files.eric.ed.gov/fulltext/EJ1459623.pdf" target="_blank">Critical Thinking in the Age of AI: A Systematic Review of AI's Effects</a>
+                    42. <a href="https://education.illinois.edu/about/news-events/news/article/2024/10/24/ai-in-schools--pros-and-cons" target="_blank">AI in Schools: Pros and Cons - College of Education | Illinois</a>
+                    38. <a href="https://arxiv.org/html/2411.12527v2" target="_blank">Human-AI Co-Creativity: Exploring Synergies Across Levels of Creative Collaboration</a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 第22頁：作業與繳交 -->
+        <section id="slide-22" class="slide scrollable">
+            <h3>作業與繳交流程：<strong>5 頁 [主題] 簡報</strong></h3>
+            <div class="step-card text-left">
+                <h4>作業目標</h4>
+                <p>用 ChatGPT → Canva 快速做出 5 頁 <strong>[主題]</strong> 的簡報</p>
+                <p>主題自訂，但不能拿課堂練習的「社群媒體對青少年心理健康」當主題</p>
+
+                <h4>任務內容</h4>
+                <p>簡報內容包含：介紹<strong> [主題] </strong>、為何<strong> [主題] </strong>重要、如何應用<strong> [主題] </strong></p>
+
+                <h4>繳交規格與期限</h4>
+                <p>繳交內容包含：<span style="color: rgba(180, 120, 120, 0.9); font-weight: 600;">學號、姓名、你的提示詞、公開的 Canva 連結</span></p>
+                <p>請於 <span style="color: rgba(180, 120, 120, 0.9); font-weight: 600;">10/25 週六 23:59</span> 前繳交作業內容。</p>
+                <p>作業繳交傳送門：<a href="https://forms.gle/J46Jpup8zvsY47i59" target="_blank">Google Form 連結</a></p>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- 導航按鈕 -->
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        // 投影片導航系統
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+
+        // 側邊欄功能
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function goToSlide(slideId) {
+            // 關閉側邊欄
+            closeSidebar();
+
+            // 跳轉到指定投影片
+            showSlideById(slideId);
+        }
+
+        // 投影片跳轉功能
+        function showSlideById(slideId) {
+            const targetSlide = document.getElementById(slideId);
+            if (!targetSlide) {
+                console.error('Slide not found:', slideId);
+                return;
+            }
+
+            // 找到投影片在 slides 中的索引
+            const slides = Array.from(document.querySelectorAll('.slide'));
+            const absoluteIndex = slides.indexOf(targetSlide);
+            if (absoluteIndex === -1) {
+                console.error('Slide not found in slides:', slideId);
+                return;
+            }
+
+            // 更新當前索引並顯示投影片
+            currentSlide = absoluteIndex;
+            showSlide(currentSlide);
+        }
+
+        // 全域變數
+        let currentSlide = 0;
+        const slides = Array.from(document.querySelectorAll('.slide'));
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+        }
+
+        // 程式碼區塊點擊複製功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(block => {
+                // 儲存原始文字內容
+                const originalText = block.querySelector('code').textContent;
+
+                block.addEventListener('click', async function() {
+                    // 如果正在顯示「已複製」，則不執行複製
+                    if (this.querySelector('code').textContent === '已複製！') {
+                        return;
+                    }
+
+                    const text = originalText.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+
+                        // 顯示複製成功提示
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+
+                        // 備用方案：使用傳統方法
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        // 顯示複製成功提示
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

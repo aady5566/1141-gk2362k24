@@ -1,0 +1,116 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .font-stack {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    .h1 {
+      font-size: 90px;
+      font-weight: 600;
+      fill: #333333;
+      dominant-baseline: hanging;
+    }
+    .h1-main {
+      font-size: 90px;
+      font-weight: 600;
+      fill: #5E6C6A; /* Main Color */
+      dominant-baseline: hanging;
+    }
+    .h2 {
+      font-size: 60px;
+      font-weight: 500;
+      fill: #5E6C6A; /* Main Color */
+      dominant-baseline: hanging;
+    }
+    .h3 {
+      font-size: 45px;
+      font-weight: 600;
+      fill: #333333;
+      dominant-baseline: hanging;
+    }
+    .body {
+      font-size: 40px;
+      font-weight: 400;
+      fill: #333333;
+      line-height: 1.5;
+      dominant-baseline: hanging;
+    }
+    .body-sm {
+      font-size: 38px; /* 略微縮小以適應區塊 */
+      font-weight: 400;
+      fill: #333333;
+      line-height: 1.5;
+      dominant-baseline: hanging;
+    }
+    .icon {
+      stroke: #5E6C6A; /* Main Color */
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .divider {
+      stroke: #A9B2AE; /* Accent Color */
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0.8;
+      fill: none;
+    }
+  </style>
+
+  <rect width="1920" height="1080" fill="#F4F2EF"/>
+
+  <text x="100" y="100" class="font-stack h1">AI 時代，人的價值：</text>
+  <text x="100" y="200" class="font-stack h1-main">從「執行」到「指導」</text>
+
+  <g transform="translate(1280, 100)">
+    <path d="M0 5 C0 2.23858 2.23858 0 5 0 H 535 C 537.761 0 540 2.23858 540 5 V 195 C 540 197.761 537.761 200 535 200 H 5 C 2.23858 200 0 197.761 0 195 V 5 Z" fill="#C2B8A3" opacity="0.6"/>
+
+    <text x="30" y="30" class="font-stack h3">AI 依賴的警訊</text>
+
+    <text x="30" y="95" class="font-stack body-sm">研究揭示：頻繁使用 AI，</text>
+    <text x="30" y="150" class="font-stack body-sm">恐削弱獨立分析與批判性思維。</text>
+  </g>
+
+  <text x="100" y="380" class="font-stack h2">人類不可取代的四大指導智慧</text>
+  <path d="M100 450 Q 500 453 900 450" class="divider" />
+
+  <g transform="translate(0, 520)">
+
+    <g transform="translate(100, 0)">
+      <path d="M50 25 C63.8071 25 75 36.1929 75 50 C75 63.8071 63.8071 75 50 75 C36.1929 75 25 63.8071 25 50 C25 36.1929 36.1929 25 50 25 Z M 50 40 L 50 60 M 40 50 L 60 50 M 43 43 L 57 57 M 43 57 L 57 43" class="icon" opacity="0.8" />
+
+      <text x="0" y="100" class="font-stack h3">1. 指導 AI</text>
+      <text x="0" y="170" class="font-stack body">提出精準、</text>
+      <text x="0" y="230" class="font-stack body">富有洞察力的指令。</text>
+    </g>
+
+    <g transform="translate(540, 0)">
+      <path d="M55 25 C69.33 25 81 36.67 81 51 C81 65.33 69.33 77 55 77 C40.67 77 29 65.33 29 51 C29 36.67 40.67 25 55 25 Z M 75 70 L 95 90" class="icon" />
+
+      <text x="0" y="100" class="font-stack h3">2. 批判性評估</text>
+      <text x="0" y="170" class="font-stack body">嚴謹審視 AI 產出，</text>
+      <text x="0" y="230" class="font-stack body">辨別其偏見與優劣。</text>
+    </g>
+
+    <g transform="translate(980, 0)">
+      <path d="M25 35 Q 40 20 55 35 T 85 35 M 25 65 Q 40 80 55 65 T 85 65 M 40 28 L 40 72 M 70 28 L 70 72" class="icon" />
+
+      <text x="0" y="100" class="font-stack h3">3. 原創性綜合</text>
+      <text x="0" y="170" class="font-stack body">整合碎片化建議，</text>
+      <text x="0" y="230" class="font-stack body">建構連貫的原創作品。</text>
+    </g>
+
+    <g transform="translate(1420, 0)">
+      <path d="M25 60 Q 45 40 65 55 Q 85 70 100 50" class="icon" />
+
+      <text x="0" y="100" class="font-stack h3">4. 承擔最終責任</text>
+      <text x="0" y="170" class="font-stack body">對作品的準確性</text>
+      <text x="0" y="230" class="font-stack body">與倫理價值負全責。</text>
+    </g>
+
+  </g>
+
+  <path d="M100 1000 Q 960 1003 1820 1000" class="divider" opacity="0.5" />
+
+</svg>

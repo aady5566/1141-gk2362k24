@@ -1,0 +1,93 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" style="font-family: 'system-ui', 'Noto Sans TC', sans-serif; background-color: #F4F2EF;">
+
+  <defs>
+    <filter id="wabi-sabi-line" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03 0.05" numOctaves="1" result="turbulence"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <filter id="wabi-sabi-text" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="1" result="turbulence"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="0.8" />
+    </filter>
+
+    <filter id="wabi-sabi-brush" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="2" result="turbulence"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#F4F2EF"/>
+
+  <g transform="translate(120, 180)">
+    <text x="0" y="0" font-size="118" font-weight="600" fill="#5E6C6A" style="filter: url(#wabi-sabi-text);">ChatGPT 內容產製</text>
+    <text x="0" y="60" font-size="46" fill="#333333" opacity="0.9">高效產出結構化簡報內容，從指定到交付。</text>
+    <path d="M 0 100 Q 300 98 600 100" stroke="#A9B2AE" stroke-width="2" fill="none" style="filter: url(#wabi-sabi-line);"/>
+  </g>
+
+  <g transform="translate(0, 480)">
+
+    <g transform="translate(300, 0)" style="text-anchor: middle;">
+      <g stroke="#5E6C6A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter: url(#wabi-sabi-line);">
+        <path d="M -40 -40 V 40"/>
+        <path d="M 0 -40 V 40"/>
+        <path d="M 40 -40 V 40"/>
+        <circle cx="-40" cy="10" r="6" fill="#F4F2EF"/>
+        <circle cx="0" cy="-15" r="6" fill="#F4F2EF"/>
+        <circle cx="40" cy="20" r="6" fill="#F4F2EF"/>
+      </g>
+
+      <path d="M -80 85 Q 0 80 80 85" stroke="#C2B8A3" stroke-width="24" fill="none" opacity="0.4" style="filter: url(#wabi-sabi-brush);" stroke-linecap="round"/>
+
+      <text x="0" y="90" font-size="59" font-weight="500" fill="#5E6C6A">彈性指定</text>
+      <text x="0" y="162" font-size="42" fill="#333333">可指定頁數與結構</text>
+      <text x="0" y="204" font-size="42" fill="#333333">可指定語氣與受眾</text>
+    </g>
+
+    <g transform="translate(600, 90)" fill="none" stroke="#A9B2AE" stroke-width="2" style="filter: url(#wabi-sabi-line);" opacity="0.7">
+      <path d="M 0 0 H 60"/>
+      <path d="M 45 -10 L 60 0 L 45 10"/>
+    </g>
+
+    <g transform="translate(960, 0)" style="text-anchor: middle;">
+      <g stroke="#5E6C6A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter: url(#wabi-sabi-line);">
+        <path d="M -30 -40 H 10 V -20 L 30 0 V 40 H -30 Z"/>
+        <path d="M 10 -40 V -20 H 30"/>
+        <path d="M -10 -15 H 20"/>
+        <path d="M -10 5 H 20"/>
+        <path d="M -10 25 H 10"/>
+        <path d="M 40 -10 L 15 -35" stroke-width="4"/>
+      </g>
+
+      <path d="M -80 85 Q 0 80 80 85" stroke="#C2B8A3" stroke-width="24" fill="none" opacity="0.4" style="filter: url(#wabi-sabi-brush);" stroke-linecap="round"/>
+
+      <text x="0" y="90" font-size="59" font-weight="500" fill="#5E6C6A">關鍵產出</text>
+      <text x="0" y="162" font-size="42" fill="#333333">大綱、要點</text>
+      <text x="0" y="204" font-size="42" fill="#333333">文案、標題</text>
+    </g>
+
+    <g transform="translate(1260, 90)" fill="none" stroke="#A9B2AE" stroke-width="2" style="filter: url(#wabi-sabi-line);" opacity="0.7">
+      <path d="M 0 0 H 60"/>
+      <path d="M 45 -10 L 60 0 L 45 10"/>
+    </g>
+
+    <g transform="translate(1620, 0)" style="text-anchor: middle;">
+      <g stroke="#5E6C6A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter: url(#wabi-sabi-line);">
+        <rect x="-40" y="-35" width="80" height="55" rx="5"/>
+        <path d="M -10 -10 H 10"/>
+        <path d="M -20 5 H 20"/>
+        <path d="M -10 35 V 50 H 10 V 35"/>
+      </g>
+
+      <path d="M -80 85 Q 0 80 80 85" stroke="#C2B8A3" stroke-width="24" fill="none" opacity="0.4" style="filter: url(#wabi-sabi-brush);" stroke-linecap="round"/>
+
+      <text x="0" y="90" font-size="59" font-weight="500" fill="#5E6C6A">即刻交付</text>
+      <text x="0" y="162" font-size="42" fill="#333333">輸出逐頁 Markdown</text>
+      <text x="0" y="204" font-size="42" fill="#333333">直接轉為投影片</text>
+    </g>
+  </g>
+
+  <text x="1800" y="1040" font-size="29" fill="#A9B2AE" text-anchor="end">infographic_chatgpt-output_16x9_2025-10-18</text>
+
+</svg>
