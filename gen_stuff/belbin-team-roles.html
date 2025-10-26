@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>團隊合作能力識別工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        /* 侘寂風 (Wabi-Sabi) 低飽和配色 + RWD 優化 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Noto Sans TC";
+            line-height: 1.7;
+            background-color: #f5f5f3; /* 淺米灰色背景 */
+            color: #333a45; /* 深灰藍文字 */
+            margin: 0;
+            padding: 10px; /* 手機端邊距 */
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            padding: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #333a45; /* 深灰藍 */
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 2.2rem;
+        }
+        h2 {
+            color: #5a6e6c; /* 灰綠色 */
+            border-bottom: 2px solid #a9b4af; /* 淺灰綠 */
+            padding-bottom: 8px;
+            margin-top: 35px;
+            font-weight: 600;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px 25px;
+            background-color: #fdfdfd;
+        }
+        .question-block p {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333a45;
+        }
+        .option {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f8; /* 淺米黃 */
+            border-color: #dcdcdc;
+        }
+        .option input {
+            margin-right: 12px;
+            /* 自訂 radio button 樣式 */
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #a9b4af;
+            border-radius: 50%;
+            position: relative;
+            top: 3px;
+            cursor: pointer;
+        }
+        .option input:checked {
+            background-color: #5a6e6c; /* 灰綠 */
+            border-color: #5a6e6c;
+        }
+        .option input:checked::after {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #5a6e6c; /* 灰綠 */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 30px;
+        }
+        .submit-btn:hover {
+            background-color: #4a5c5a; /* 深灰綠 */
+        }
+        .submit-btn:disabled {
+            background-color: #ced4da;
+            cursor: not-allowed;
+        }
+        #results {
+            display: none; /* 預設隱藏 */
+            text-align: center;
+            padding-top: 20px;
+        }
+        #results h2 {
+            color: #5a6e6c; /* 灰綠 */
+        }
+        /* [新功能] 角色頭像 */
+        #avatar-image {
+            max-width: 300px;/* 控制圖片大小 */
+            width: 80%;
+            border-radius: 12px;
+            margin:15px auto;/* 上下15px，左右自動置中*/
+            border: 1px solid #ebede0;
+            display: block;/* 確保 margin: auto 能正常運作*/
+        }
+        #role-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #b88a80; /* 赤陶色 (重點色) */
+            margin: 10px 0;
+        }
+        #role-description {
+            font-size: 1.1rem;
+            color: #333a45;
+            padding: 20px;
+            background-color: #f5f5f3; /* 淺米灰 */
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            display: inline-block;
+            text-align: left;
+            max-width: 90%;
+            margin-top: 10px;
+        }
+        #chart-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        #copy-section {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #fdfdfd;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+        }
+        #copy-section p {
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        #answer-string {
+            width: 95%;
+            padding: 10px;
+            font-size: 1rem;
+            font-family: monospace;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            background-color: #f5f5f3; /* 淺米灰 */
+            color: #495057;
+            resize: none;
+        }
+        #copy-btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #a9b4af; /* 淺灰綠 */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #copy-btn:hover {
+            background-color: #8a9a8f; /* 深一點的淺灰綠 */
+        }
+        #gform-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #7a8b99; /* 低飽和灰藍 */
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        #gform-link:hover {
+            background-color: #5f6f7b; /* 深灰藍 */
+        }
+        #error-message, #error-message-gender {
+            color: #dc3545; /* 保留紅色作為警示 */
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* [新功能] 測驗表單預設隱藏 */
+        #quiz-form {
+            display: none;
+        }
+
+        /* [RWD 優化] 響應式設計：手機螢幕 */
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            .container {
+                padding: 20px; /* 手機上 padding 減少 */
+                margin: 10px;
+                width: auto;
+                border: none;
+                box-shadow: none;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-block {
+                padding: 15px;
+            }
+            .option {
+                padding: 12px 8px; /* 增加點擊範圍 */
+                font-size: 1rem;
+            }
+            #role-title {
+                font-size: 1.8rem;
+            }
+            #role-description {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            #copy-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>團隊合作能力識別工具</h1>
+
+        <div id="gender-selection">
+            <h2>Part 0: 選擇你的性別</h2>
+            <div class="question-block" style="border: 2px solid #6c835a; background-color: #fffaf8;">
+                <p>請選擇你的性別：</p>
+                <label class="option"><input type="radio" name="gender" value="male"> 男性</label>
+                <label class="option"><input type="radio" name="gender" value="female"> 女性</label>
+            </div>
+            <p id="error-message-gender">請先選擇一個性別！</p>
+            <button type="button" class="submit-btn" id="start-quiz-btn" style="background-color: #6c835a; width: 100%;">
+                開始測驗
+            </button>
+        </div>
+
+        <form id="quiz-form">
+            <p style="text-align: center; font-size: 1.1rem; color: #6c757d;">
+                透過以下 16 個情境題，發掘你在團隊中最獨特的超能力！<br>請誠實作答，所有答案沒有對錯。
+            </p>
+
+            <h2>Part 1: 專案啟動階段</h2>
+
+            <div class="question-block">
+                <p>Q1. 剛拿到一個模糊的專案主題（例如「永續城市」），你的第一反應是？</p>
+                <label class="option"><input type="radio" name="q1" value="E"> 馬上開始找資料，看別人做過什麼，想找一個沒人做過的酷切入點。</label>
+                <label class="option"><input type="radio" name="q1" value="N"> 先把主題拆解成幾個部分，規劃好接下來幾週的進度表。</label>
+                <label class="option"><input type="radio" name="q1" value="I"> 思考最終要如何呈現這個主題，是做模型、拍影片還是寫報告？</label>
+                <label class="option"><input type="radio" name="q1" value="S"> 想像一下如果我是評審，我會想看到什麼樣的標題和開場。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q2. 團隊第一次開會，你最可能扮演的角色是？</p>
+                <label class="option"><input type="radio" name="q2" value="N"> 主動擔任會議主席，確保每個人都發言，並在最後總結共識。</label>
+                <label class="option"><input type="radio" name="q2" value="E"> 提出各種天馬行空的點子，挑戰大家思考「有沒有可能...」。</label>
+                <label class="option"><input type="radio" name="q2" value="I"> 專心聽大家的想法，並思考技術上或執行上是否可行。</label>
+                <label class="option"><input type="radio" name="q2" value="S"> 觀察大家的語氣和表情，適時緩和氣氛，讓討論更熱絡。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q3. 在確定主題方向時，你更傾向於？</p>
+                <label class="option"><input type="radio" name="q3" value="E"> 選擇一個資料豐富、研究深入，但可能比較冷門的主題。</label>
+                <label class="option"><input type="radio" name="q3" value="N"> 選擇一個目標明確、步驟清晰，大家都有把握能完成的主題。</label>
+                <label class="option"><input type="radio" name="q3" value="I"> 選擇一個可以做出「實體成品」（如 App 原型、教具）的主題。</label>
+                <label class="option"><input type="radio" name="q3" value="S"> 選擇一個好發揮、容易包裝成精彩故事，能讓觀眾眼睛一亮的主題。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q4. 團隊在討論分工時，你最希望負責哪個部分？</p>
+                <label class="option"><input type="radio" name="q4" value="S"> 「我想做 PPT！」把複雜的內容轉化成漂亮的圖表和視覺。</label>
+                <label class="option"><input type="radio" name="q4" value="N"> 「我來統整！」幫大家整理文件、追蹤進度、提醒 deadline。</label>
+                <label class="option"><input type="radio" name="q4" value="I"> 「我來實作！」負責寫程式、做模型、剪影片或畫設計圖。</label>
+                <label class="option"><input type="radio" name="q4" value="E"> 「我來找梗！」負責研究主題背景、找創新點或做文獻探討。</label>
+            </div>
+
+            <h2>Part 2: 專案執行階段</h2>
+
+            <div class="question-block">
+                <p>Q5. 專案進行到一半，發現原定計劃有困難，你會？</p>
+                <label class="option"><input type="radio" name="q5" value="N"> 重新評估資源和時間，和大家商量是否要調整目標或方法。</label>
+                <label class="option"><input type="radio" name="q5" value="E"> 把它當成一個新挑戰，深入研究困難點，看能不能找到創新的解決方案。</label>
+                <label class="option"><input type="radio" name="q5" value="I"> 不想太多，先動手做，試著用現有資源硬幹出一個可行的版本。</label>
+                <label class="option"><input type="radio" name="q5" value="S"> 開始思考備案 (Plan B)，如果失敗了，上台報告時要怎麼「說」這個故事。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q6. 你認為一個「高品質」的團隊報告，最重要的是？</p>
+                <label class="option"><input type="radio" name="q6" value="E"> 內容紮實，研究深入，有獨到的觀點。</label>
+                <label class="option"><input type="radio" name="q6" value="N"> 邏輯清晰，架構完整，前後呼應。</label>
+                <label class="option"><input type="radio" name="q6" value="I"> 成果具體，排版精美，沒有錯別字或 bug。</label>
+                <label class="option"><input type="radio" name="q6" value="S"> 故事動人，簡報吸睛，問答環節應對得體。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q7. 當團隊成員對某個環節意見不合時，你傾向怎麼做？</p>
+                <label class="option"><input type="radio" name="q7" value="N"> 仔細分析雙方的優缺點，試圖找到一個折衷或雙贏的方案。</label>
+                <label class="option"><input type="radio" name="q7" value="E"> 鼓勵大家先別急著否定，讓我們花 30 分鐘再 brainstorming 更多可能性。</label>
+                <label class="option"><input type="radio" name="q7" value="I"> 提議「我們先做出來看看」，用實際成果來驗證哪個方案比較好。</label>
+                <label class="option"><input type="radio" name="q7" value="S"> 扮演和事佬，先安撫雙方情緒，強調我們是「同一艘船上的人」。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q8. 如果現在有一份很繁瑣的資料整理工作（例如：逐字稿、數據 key-in），你的態度是？</p>
+                <label class="option"><input type="radio" name="q8" value="I"> 雖然無聊，但這是必要的基礎工作，我會靜下心來把它做完做好。</label>
+                <label class="option"><input type="radio" name="q8" value="E"> 這太花時間了，我們應該想辦法自動化，或者找找看有沒有現成的資料庫？</label>
+                <label class="option"><input type="radio" name="q8" value="N"> 我會先設計一個表格模板，讓大家分工填寫，效率比較高。</label>
+                <label class="option"><input type="radio" name="q8" value="S"> 我不太擅長這個...但我可以幫忙做最後的美化和校對。</label>
+            </div>
+
+            <h2>Part 3: 專案收尾與呈現</h2>
+
+            <div class="question-block">
+                <p>Q9. 專案即將到截止日了，但還有很多細節沒完成，你最擔心的是？</p>
+                <label class="option"><input type="radio" name="q9" value="S"> 簡報的視覺風格不統一，看起來很廉價。</label>
+                <label class="option"><input type="radio" name="q9" value="I"> 負責的那個功能還會閃退 (crash)，不夠完美。</label>
+                <label class="option"><input type="radio" name="q9" value="E"> 報告的結論好像不夠有力，沒有回應到最初的問題。</label>
+                <label class="option"><input type="radio" name="q9" value="N"> 還有一個組員的進度落後，可能會拖累大家。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q10. 在準備上台報告時，你最享受的環節是？</p>
+                <label class="option"><input type="radio" name="q10" value="S"> 把組員的文字稿，修改得更流暢、更有說服力。</label>
+                <label class="option"><input type="radio" name="q10" value="N"> 規劃報告的「腳本」，安排誰在什麼時候上台，以及預估 Q&A。</label>
+                <label class="option"><input type="radio" name="q10" value="I"> 檢查最終成品的每個細節，確保一切運作正常、沒有錯誤。</label>
+                <label class="option"><input type="radio" name="q10" value="E"> 重新審視整個專案，思考我們最大的「亮點」和「洞察」是什麼。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q11. 如果你是主要報告者，在台上你最可能？</p>
+                <label class="option"><input type="radio" name="q11" value="S"> 脫稿演出，跟觀眾熱情互動，用生動的故事吸引他們。</label>
+                <label class="option"><input type="radio" name="q11" value="N"> 嚴謹地按照簡報架構，清晰地陳述研究背景、方法和結論。</label>
+                <label class="option"><input type="radio" name="q11" value="I"> 直接 Demo 我們的成品，讓成果自己說話。</label>
+                <label class="option"><input type="radio" name="q11" value="E"> 強調我們在過程中發現了什麼「意料之外」的洞見。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q12. Q&A 環節，當被評審問到一個尖銳、你沒想過的問題時，你會？</p>
+                <label class="option"><input type="radio" name="q12" value="E"> 坦誠地說「這是個好問題」，然後試著從我們的研究初衷去推導可能的答案。</label>
+                <label class="option"><input type="radio" name="q12" value="N"> 感謝提問，並將問題拆解，先回應有把握的部分，並承諾會後補充。</label>
+                <label class="option"><input type="radio" name="q12" value="S"> 巧妙地將問題引導回我們準備充分、最有自信的「亮點」上。</label>
+                <label class="option"><input type="radio" name="q12" value="I"> 如果問題是關於執行細節，我會詳細說明我們嘗試過的步驟和遇到的困難。</label>
+            </div>
+
+            <h2>Part 4: 個人偏好</h2>
+
+            <div class="question-block">
+                <p>Q13. 在團隊中，你最受不了的情況是？</p>
+                <label class="option"><input type="radio" name="q13" value="N"> 會議冗長沒效率，大家七嘴八舌抓不到重點。</label>
+                <label class="option"><input type="radio" name="q13" value="S"> 最終的簡報或成品看起來很粗糙、很醜。</label>
+                <label class="option"><input type="radio" name="q13" value="I"> 執行力低落，大家只說不做，進度一直拖延。</label>
+                <label class="option"><input type="radio" name="q13" value="E"> 墨守成規，不願意嘗試新點子，只想安全過關。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q14. 你認為哪種讚美最讓你開心？</p>
+                <label class="option"><input type="radio" name="q14" value="S"> 「你的簡報做得太棒了，非常有說服力！」</label>
+                <label class="option"><input type="radio" name="q14" value="E"> 「這個點子超酷，你們是怎麼想到的？」</label>
+                <label class="option"><input type="radio" name="q14" value="I"> 「天啊，這個功能好順，你們的成品完整度真高！」</label>
+                <label class="option"><input type="radio" name="q14" value="N"> 「你們的團隊合作真好，進度掌控得太穩了！」</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q15. 如果一個專案 100 分，你寧願？</p>
+                <label class="option"><input type="radio" name="q15" value="E"> 點子 100 分，執行 70 分。</label>
+                <label class="option"><input type="radio" name="q15" value="I"> 點子 70 分，執行 100 分。</label>
+                <label class="option"><input type="radio" name="q15" value="S"> 點子 70 分，簡報 100 分。</label>
+                <label class="option"><input type="radio" name="q15" value="N"> 點子 70 分，流程 100 分。</label>
+            </div>
+
+            <div class="question-block">
+                <p>Q16. 對你而言，參與團體報告最大的收穫是？</p>
+                <label class="option"><input type="radio" name="q16" value="N"> 學習如何協調不同意見，讓團隊順利運作。</label>
+                <label class="option"><input type="radio" name="q16" value="E"> 深入探索一個自己原本不熟的領域。</label>
+                <label class="option"><input type="radio" name="q16" value="I"> 實際動手做出一個滿意的作品。</label>
+                <label class="option"><input type="radio" name="q16" value="S"> 練習在眾人面前清楚表達，並說服他人。</label>
+            </div>
+
+            <p id="error-message">請檢查！你還有題目沒有填寫完喔。</p>
+            <button type="submit" class="submit-btn" id="submit-btn">完成作答！查看我的團隊超能力</button>
+        </form>
+
+        <div id="results">
+            <h2>你的團隊超能力分析</h2>
+            <div id="chart-container">
+                <canvas id="radar-chart"></canvas>
+            </div>
+
+            <p style="font-size: 1.3rem; margin-top: 20px;">你的主要團隊角色是：</p>
+
+            <img id="avatar-image" src="" alt="角色頭像">
+
+            <h3 id="role-title"></h3>
+            <p id="role-description"></p>
+
+            <div id="copy-section">
+                <p>步驟一：複製下方 16 題的答案字串</p>
+                <textarea id="answer-string" rows="2" readonly></textarea>
+                <br>
+                <button id="copy-btn">複製答案</button>
+                <br><br>
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                <p>步驟二：將答案貼到指定 Google 表單</p>
+                <a href="https://forms.gle/WN1YitwHyEZxe81K9"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   id="gform-link">
+                    前往 Google 表單填寫
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Phase 1: 角色定義
+        const roles = {
+            N: {
+                title: "團隊舵手 (Navigator)",
+                description: "如同船隻的舵手，你擅長穩定軍心、整合眾人意見，確保團隊在正確的航道上順利航向目標。",
+                label: "組織協調"
+            },
+            E: {
+                title: "靈感探險家 (Explorer)",
+                description: "你是團隊的點子庫與資料雷達。你熱愛探索未知、提出「為什麼」，並能為團隊挖掘出意想不到的靈感與深度。",
+                label: "概念發想"
+            },
+            I: {
+                title: "首席實踐家 (Implementer)",
+                description: "你是團隊的「搞定者」(Go-getter)。你擅長捲起袖子，將討論中的想法一步步化為現實，並對最終產出的品質負責。",
+                label: "執行製作"
+            },
+            S: {
+                title: "魅力代言人 (Spokesperson)",
+                description: "你是團隊的「化妝師」與「麥風」。你擅長將成果包裝得精美，並透過有說服力的簡報與表達，讓他人的目光聚焦在你們的亮點上。",
+                label: "溝通傳達"
+            }
+        };
+
+        // [新功能] Phase 5: 角色頭像路徑
+        // 嚴格按照您提供的檔名
+        const avatarImages = {
+            path: '../pic/belbin-team-roles/',
+            N: { male: 'navigator-male.png', female: 'navigator-female.png' },
+            E: { male: 'explorer-male.png', female: 'explore-female.png' }, // 注意: 'explore'
+            I: { male: 'implementer-male.png', female: 'implementer-female.png' },
+            S: { male: 'spokesperson-male.png', female: 'spokenperson-female.png' } // 注意: 'spokenperson'
+        };
+
+        // --- DOM 元素 ---
+        const genderSelectionDiv = document.getElementById('gender-selection');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const errorGender = document.getElementById('error-message-gender');
+
+        const quizForm = document.getElementById('quiz-form');
+        const resultsDiv = document.getElementById('results');
+        const errorMessage = document.getElementById('error-message');
+        const submitButton = document.getElementById('submit-btn');
+        const copyButton = document.getElementById('copy-btn');
+        const answerTextarea = document.getElementById('answer-string');
+        const avatarImgEl = document.getElementById('avatar-image');
+
+        const totalQuestions = 16;
+        let myRadarChart = null;
+        let selectedGender = null; // [新功能] 儲存選擇的性別
+
+        // [新功能] 步驟一：開始測驗按鈕
+        startQuizBtn.addEventListener('click', function() {
+            const genderValue = document.querySelector('input[name="gender"]:checked');
+
+            if (genderValue) {
+                selectedGender = genderValue.value; // 儲存 'male' 或 'female'
+                genderSelectionDiv.style.display = 'none'; // 隱藏性別選擇
+                quizForm.style.display = 'block'; // 顯示測驗題目
+                errorGender.style.display = 'none';
+
+                // 捲動到測驗開頭
+                quizForm.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                errorGender.style.display = 'block';
+            }
+        });
+
+
+        // [新功能] 步驟二：提交測驗
+        quizForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // 防止表單真的提交
+
+            const formData = new FormData(quizForm);
+            const userAnswers = [];
+            const scores = { N: 0, E: 0, I: 0, S: 0 };
+
+            // 檢查是否所有題目都回答了
+            let answeredCount = 0;
+            for (let i = 1; i <= totalQuestions; i++) {
+                const answer = formData.get(`q${i}`);
+                if (answer) {
+                    userAnswers.push(answer);
+                    scores[answer]++;
+                    answeredCount++;
+                }
+            }
+
+            if (answeredCount < totalQuestions) {
+                // 顯示錯誤訊息
+                errorMessage.style.display = 'block';
+                // 捲動到錯誤訊息處
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // 隱藏錯誤訊息並顯示結果
+                errorMessage.style.display = 'none';
+                displayResults(scores, userAnswers);
+
+                // 隱藏表單和提交按鈕
+                quizForm.style.display = 'none';
+
+                // 捲動到結果處
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        function displayResults(scores, userAnswers) {
+            // 1. 找出最高分的角色
+            let maxScore = -1;
+            let primaryRole = 'N'; // 預設角色
+
+            // 為了讓角色更分散，我們採用陣列隨機排序來決定同分時的優先序
+            const dimensions = ['N', 'E', 'I', 'S'].sort(() => 0.5 - Math.random());
+
+            dimensions.forEach(dim => {
+                if (scores[dim] > maxScore) {
+                    maxScore = scores[dim];
+                    primaryRole = dim;
+                }
+            });
+
+            // 2. [新功能] 顯示對應的角色頭像
+            try {
+                const filename = avatarImages[primaryRole][selectedGender];
+                const fullPath = avatarImages.path + filename;
+                avatarImgEl.src = fullPath;
+                avatarImgEl.alt = roles[primaryRole].title;
+                avatarImgEl.style.display = 'block'; // 顯示圖片
+            } catch (e) {
+                console.error("無法加載圖片:", e);
+                // 如果圖片路徑錯誤，保持隱藏
+                avatarImgEl.style.display = 'none';
+            }
+
+            // 3. 顯示角色名稱和描述
+            document.getElementById('role-title').textContent = roles[primaryRole].title;
+            document.getElementById('role-description').textContent = roles[primaryRole].description;
+
+            // 4. 繪製雷達圖 (使用侘寂風配色)
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            const chartData = {
+                labels: [
+                    roles.N.label, // 組織協調
+                    roles.E.label, // 概念發想
+                    roles.I.label, // 執行製作
+                    roles.S.label  // 溝通傳達
+                ],
+                datasets: [{
+                    label: '你的能力分布',
+                    data: [
+                        scores.N,
+                        scores.E,
+                        scores.I,
+                        scores.S
+                    ],
+                    fill: true,
+                    backgroundColor: 'rgba(90, 110, 108, 0.2)',  /* 灰綠 (侘寂風) */
+                    borderColor: 'rgba(90, 110, 108, 1)',      /* 灰綠 (侘寂風) */
+                    pointBackgroundColor: 'rgba(90, 110, 108, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(90, 110, 108, 1)'
+                }]
+            };
+
+            // 確保銷毀舊的圖表（如果存在）
+            if (myRadarChart) {
+                myRadarChart.destroy();
+            }
+
+            myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: chartData,
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: { display: true, color: '#dcdcdc' },
+                            grid: { color: '#e0e0e0' },
+                            suggestedMin: 0,
+                            suggestedMax: 8,
+                            ticks: {
+                                stepSize: 1,
+                                backdropColor: 'rgba(0, 0, 0, 0)',
+                                color: '#5a6e6c'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: '#333a45' /* 深灰藍 */
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#333a45',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 5. 處理答案字串
+            const answerString = userAnswers.join(',');
+            answerTextarea.value = answerString;
+        }
+
+        // 複製到剪貼簿的邏輯
+        copyButton.addEventListener('click', function() {
+            answerTextarea.select(); // 選擇 textarea 中的文字
+
+            try {
+                // 現代瀏覽器使用 navigator.clipboard
+                navigator.clipboard.writeText(answerTextarea.value).then(() => {
+                    copyButton.textContent = '已複製！';
+                    copyButton.style.backgroundColor = '#6c757d'; // 變灰
+                    setTimeout(() => {
+                        copyButton.textContent = '複製答案';
+                        copyButton.style.backgroundColor = '#a9b4af'; // 恢復原色
+                    }, 2000);
+                }).catch(err => {
+                    fallbackCopyText(answerTextarea.value);
+                });
+            } catch (err) {
+                fallbackCopyText(answerTextarea.value);
+            }
+        });
+
+        // 舊瀏覽器的降級複製方案
+        function fallbackCopyText(text) {
+            if (document.execCommand('copy')) {
+                copyButton.textContent = '已複製！';
+                copyButton.style.backgroundColor = '#6c757d';
+                setTimeout(() => {
+                    copyButton.textContent = '複製答案';
+                    copyButton.style.backgroundColor = '#a9b4af';
+                }, 2000);
+            } else {
+                copyButton.textContent = '複製失敗';
+                copyButton.style.backgroundColor = '#dc3545'; // 顯示錯誤紅色
+            }
+        }
+
+    </script>
+
+</body>
+</html>

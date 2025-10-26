@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 8: What is Love?</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* SVG 容器樣式 */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .svg-responsive {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* 步驟容器樣式 */
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 1rem auto;
+        }
+
+        /* 投影片圖片樣式 */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin: 0 auto 1.5rem auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card ul {
+            text-align: left;
+            margin-left: 1rem;
+        }
+
+        .step-card li {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+
+        pre:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        pre::after {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background-image: url('../pic/copy-white.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        pre:hover::after {
+            opacity: 1;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+
+        .image-gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .discussion-topics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .topic-section {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .topic-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .quote-text {
+            font-style: italic;
+            font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+            color: var(--highlight-color);
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 8px 8px 0;
+        }
+
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            /* 手機版 SVG 樣式 */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .svg-responsive {
+                min-width: 100%;
+                min-height: 100%;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .image-gallery {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            pre {
+                padding: 0.8rem;
+                font-size: 0.75rem;
+                margin: 0.6rem 0;
+                letter-spacing: 0.2px;
+                word-break: break-word;
+                white-space: pre-wrap;
+                overflow-wrap: break-word;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            pre::after {
+                width: 12px;
+                height: 12px;
+                top: 0.2rem;
+                right: 0.4rem;
+            }
+
+            .step-card pre {
+                margin: 0.5rem -0.5rem;
+                border-radius: 6px;
+            }
+
+            .step-container {
+                gap: 1.5rem;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            /* 手機版圖片優化 */
+            .slide-image {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+
+            .image-gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title Page -->
+        <section class="slide active">
+            <h1>What is Love?</h1>
+            <h2 class="slide-subtitle">From Attraction to Letting Go</h2>
+        </section>
+
+        <!-- Slide 2: Opening Introduction -->
+        <section class="slide hidden">
+            <div class="step-card text-left">
+                <p style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); line-height: 1.8; text-align: center; margin-bottom: 2rem;">
+                    "Sometimes I wonder, we spend so much time learning skills, pursuing efficiency, understanding technology, yet we rarely spend time understanding—what is love."
+                </p>
+                <p style="text-align: left;">
+                    We say "I like him," "I love her," but behind these feelings is a whole set of psychological processes. We are drawn by passion, yet tempered by reality; we seek intimacy, yet fear losing freedom.
+                </p>
+                <p style="text-align: left;">
+                    This class invites you to explore five dimensions: the nature of love, relationship development, boundaries of respect, the language of communication, and the meaning of heartbreak. Because learning to love is not just about having someone, but about understanding ourselves more clearly. When we can understand our own ways of loving, we are less likely to get lost in love.
+                </p>
+            </div>
+        </section>
+
+        <!-- Slide 3: Opening Reflection Page -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../svg/w8-what-is-love.svg" alt="Do we really understand love?" class="svg-responsive" />
+            </div>
+        </section>
+
+        <!-- Slide 4: ChatGPT Content Generation -->
+        <section class="slide">
+            <h3>Continuing from last week, ChatGPT connecting to Canva was unstable and failed,<br>
+                so we'll generate content with ChatGPT and input it into Canva's native system.</h3>
+        </section>
+
+        <!-- Slide 5: ChatGPT Prompt -->
+        <section class="slide scrollable">
+            <h3>ChatGPT Generates Presentation Content and Pages</h3>
+            <div class="step-card text-left">
+                <h4>You can reference the following prompt:</h4>
+                <pre><code># System Prompt：五頁式知識簡報生成器（文字版）
+
+## 角色設定
+你是一位學術簡報設計師與資料查核專員，擅長以清晰、具邏輯與美學感的方式整理學術主題。
+
+你的任務是生成一份五頁以內的文字簡報內容，內容須正確、脈絡完整，並能引發思考。
+
+---
+
+## 目標
+1. 專注於簡報內容的正確性與脈絡完整性。
+2. 面向大學生程度以上的一般大眾，語言需清晰易懂且具啟發性。
+3. 簡報風格可多元，最後可提供 2–3 種風格建議（例如學術風、極簡風、資訊圖表風），以便 Canva 或其他設計工具參考。
+
+---
+
+## 輸入規範
+使用者會提供「主題」。請你：
+1. 以英文思考並查核多個可靠來源（學術期刊、政府報告、權威媒體等）。
+2. 確認資料一致性並避免矛盾。
+3. 僅在資訊正確無誤的情況下生成內容。
+
+---
+
+## 簡報結構
+- 頁數：不超過 5 頁
+- 每頁文字量：不超過 120 字
+- 語言：繁體中文（台灣用語）
+- 聽眾：大學生以上的一般大眾
+- 格式：標題 + 內文
+
+---
+
+## 內容模板
+**Page 1：主題簡介**
+定義與背景，說明與現代社會或生活的關聯。
+
+**Page 2：重要性**
+說明主題的重要性與社會、心理、科技層面影響。
+
+**Page 3：事例與研究**
+提供具代表性的案例或研究，附上出處（作者, 年份, 機構）。
+
+**Page 4：延伸觀點**
+補充反思或不同角度的洞見。
+
+**Page 5：結語與風格建議**
+總結主題核心觀點，提出呼籲或行動方向，最後列出 2–3 種可採用的簡報設計風格建議。
+
+---
+
+## 輸出要求
+1. 僅輸出文字，不生成 Canva 或 PPTX。
+2. 內容需精煉、流暢、具邏輯。
+3. 禁用未經查證或推測性資料。
+4. 明確標註文獻出處。
+5. 格式需以 **Markdown** 呈現，不帶任何表情符號，並放入 **code block** 中。</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 6: Canva Screenshot Display -->
+        <section class="slide scrollable">
+            <h3>Workflow from GPT Content Generation to Canva</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>Step 1: Prompt Input</h4>
+                    <img src="../pic/w8/1-prompt.jpg" alt="Prompt Input" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 2: Content Slides</h4>
+                    <img src="../pic/w8/2-content-slide.jpg" alt="Content Slides" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 3: Fact Checking</h4>
+                    <img src="../pic/w8/3-fact-checking.jpg" alt="Fact Checking" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 4: Canva Homepage</h4>
+                    <img src="../pic/w8/4-canva-homepage.jpg" alt="Canva Homepage" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 5: Canva Input</h4>
+                    <img src="../pic/w8/5-canva-input.jpg" alt="Canva Input" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 6: Canva Input 2</h4>
+                    <img src="../pic/w8/6-canva-input2.jpg" alt="Canva Input 2" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 7: Canva Output</h4>
+                    <img src="../pic/w8/7-canva-output.jpg" alt="Canva Output" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>Step 8: Canva Output 2</h4>
+                    <img src="../pic/w8/8-canva-output2.jpg" alt="Canva Output 2" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Main Topic -->
+        <section class="slide">
+            <h2>Getting to the Main Topic: "What is Love?"</h2>
+        </section>
+
+        <!-- Slide 8: Five Themes -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../svg/w8-love-5-perspectives.svg" alt="Five themes in relationships: emotions, boundaries, and growth" class="svg-responsive" />
+            </div>
+        </section>
+
+        <!-- Slide 9: Group Discussion Instructions -->
+        <section class="slide scrollable">
+            <h3>Group Discussion Activity</h3>
+            <div class="step-card text-left">
+                <h4>Divide into 5 Groups</h4>
+                <p>Start from your "personal experiences" and "situational assumptions," which will serve as a good foundation for using AI to find "objective definitions" and "cases" afterward.</p>
+
+                <h4>Time Allocation</h4>
+                <p>(Before grouping, spend 5 minutes organizing your thoughts: 20 minutes discussion, 5 minutes oral presentation, questions from each group.)</p>
+
+                <h4>Discussion Focus</h4>
+                <p>Answer the questions in the theme, explain your experiences and assumptions, the definitions and cases found through AI, and whether they support your experiences. What are the reasons?</p>
+            </div>
+        </section>
+
+        <!-- Slide 10: Theme 1 - Multiple Facets of Love -->
+        <section class="slide scrollable">
+            <h3>【Theme 1: Multiple Facets of Love】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>1a. (Definition) What do you think is the biggest difference between "love" and "liking"?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>1b. (Scenario) Do you think "love at first sight" is more like "love" or "infatuation"? Why?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>1c. (Importance) Why is it important to clarify "what my feelings for him/her really are"?</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Theme 2 - Stages of Relationship Development -->
+        <section class="slide scrollable">
+            <h3>【Theme 2: Stages of Relationship Development】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>2a. (Scenario) What do you find most enjoyable (or most troubling) about the "ambiguous" phase?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>2b. (Process) Why do you think the feelings of the "honeymoon phase" (e.g., wanting to be together all the time) usually cannot last permanently?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>2c. (Challenge) When the "adjustment period" appears (e.g., discovering the other person has flaws you cannot tolerate), do you think this is a sign of "incompatibility" or a "normal" process?</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Theme 3 - Body Autonomy and Consent -->
+        <section class="slide scrollable">
+            <h3>【Theme 3: Body Autonomy and Consent】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>3a. (Definition/Boundaries) In daily life (not just in intimate relationships), what "boundaries" are important to you? (e.g., others touching your things without permission, looking at your phone)</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>3b. (Core Concept) Why is the phrase "silence does not equal consent" important?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>3c. (Scenario) In what situations do you think we easily "assume" the other person has consented, but they may actually not have? (e.g., posting photos with friends on IG, ordering food for friends)</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Theme 4 - Communication Skills for Healthy Relationships -->
+        <section class="slide scrollable">
+            <h3>【Theme 4: Communication Skills for Healthy Relationships】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>4a. (Scenario) When you are dissatisfied with a friend or partner, do you usually choose to "speak up directly" or "endure"? Why?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>4b. (Accusation vs. Expression) Imagine a scenario: "The other person read your important message but didn't reply." What is the first "accusatory" thought that comes to mind? (e.g., You don't care about me!)</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>4c. (Skill) Following the above, if you were to turn this "accusation" into "expressing your feelings," how would you say it? (e.g., I saw you read it, but you didn't reply, and I'm a bit worried...)</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Theme 5 - Coping with Breakup and Heartbreak -->
+        <section class="slide scrollable">
+            <h3>【Theme 5: Coping with Breakup and Heartbreak】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>5a. (Definition) Do you think "heartbreak" equals "failure"? Why?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>5b. (Unhealthy Examples) What "unhealthy" ways of coping with heartbreak have you observed (or seen in movies/TV shows)?</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>5c. (Healthy Examples) What do you think is the one thing a friend "should do" and "should not do" to help someone who has just broken up?</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Hidden Slide - Active Love -->
+        <section class="slide">
+            <h3>Active Love</h3>
+            <div class="quote-text">
+                Psychologist Erich Fromm in "The Art of Loving":<br>
+                "Love is not primarily a strong emotion, but an active decision and determination."
+            </div>
+        </section>
+
+        <!-- Slide 16: Hidden Slide - True Respect -->
+        <section class="slide">
+            <h3>True Respect</h3>
+            <div class="quote-text">
+                "Is true respect waiting for someone to say no, or assuming from the start that they don't want to?"
+            </div>
+        </section>
+
+        <!-- Slide 17: Hidden Slide - Stability of Love -->
+        <section class="slide">
+            <h3>Stability of Love</h3>
+            <div class="quote-text">
+                The stability of love comes from adaptation and adjustment, not from emotional highs and lows.
+            </div>
+        </section>
+
+        <!-- Slide 18: Hidden Slide - The Nature of Adjustment -->
+        <section class="slide">
+            <h3>The Nature of Adjustment</h3>
+            <div class="quote-text">
+                Adjustment is not the fading of love, but love evolving from feeling to understanding.<br>
+                The essence of adjustment is two worldviews realigning.
+            </div>
+        </section>
+
+        <!-- Slide 19: Hidden Slide - Losing a Relationship -->
+        <section class="slide">
+            <h3>Losing a Relationship</h3>
+            <div class="quote-text">
+                When we lose a relationship, who exactly are we mourning?<br>
+                Not just "him/her," but "myself in the relationship"
+            </div>
+        </section>
+
+        <!-- Slide 20: This Week's Assignment -->
+        <section class="slide scrollable hidden">
+            <h3>This Week's Assignment</h3>
+            <div class="step-card text-left">
+                <h4>Team Collaboration Skills Identification Tool</h4>
+                <p>Understand what you're good at and identify your role in a team</p>
+
+                <h4>Announcement for Next Week 11/4:</h4>
+                <p>Next week's class will conduct midterm report grouping.<br>
+                Class grouping, directly discuss report content, the topic is "love."</p>
+
+                <h4>The Following Week 11/11:</h4>
+                <p>Midterm group presentation, with one group presenting for 10 minutes and the other group asking questions for 5 minutes.</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // Touch support
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            // Code block click-to-copy functionality
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(block => {
+                const originalText = block.querySelector('code').textContent;
+
+                block.addEventListener('click', async function() {
+                    if (this.querySelector('code').textContent === 'Copied!') {
+                        return;
+                    }
+
+                    const text = originalText.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = 'Copied!';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+
+                    } catch (err) {
+                        console.error('Copy failed:', err);
+
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = 'Copied!';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,53 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Noto Sans TC', sans-serif; background-color: #F4F2EF;">
+  <title>我們真的懂愛嗎？ 資訊圖</title>
+  <desc>一張探索愛的本質的資訊圖，風格為侘寂 (wabi-sabi) 手繪風。問題包含：情緒、佔有或理解？感覺或選擇？以及為何「說不」也是一種愛？</desc>
+
+  <defs>
+    <filter id="wabi-sabi-filter" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="1" seed="15" result="turbulence"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <style>
+      /* 使用帶有筆觸感的襯線體 (Serif) 作為標題 */
+      .h1 { font-size: 90px; fill: #5E6C6A; font-weight: 600; font-family: 'Kaiti TC', 'Noto Serif TC', serif; }
+      .h2 { font-size: 60px; fill: #333333; font-family: 'Kaiti TC', 'Noto Serif TC', serif; line-height: 1.5; }
+      .body { font-size: 40px; fill: #333333; opacity: 0.8; font-family: 'Noto Sans TC', sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#F4F2EF" />
+
+  <circle cx="1600" cy="250" r="150" fill="#C2B8A3" opacity="0.1" />
+  <ellipse cx="300" cy="750" rx="200" ry="100" fill="#A9B2AE" opacity="0.08" />
+
+  <g filter="url(#wabi-sabi-filter)">
+
+    <text x="120" y="180" class="h1">我們真的懂愛嗎？</text>
+    <text x="120" y="270" class="body">我所謂的「愛」，是...</text>
+
+    <path d="M 1550, 180
+             C 1500, 130, 1450, 200, 1450, 280
+             C 1450, 360, 1500, 430, 1580, 430
+             C 1660, 430, 1710, 360, 1710, 280
+             C 1710, 200, 1650, 130, 1580, 140"
+          stroke="#C2B8A3" stroke-width="6" fill="none" opacity="0.6" stroke-linecap="round" />
+
+    <g transform="translate(120, 480)">
+      <text y="0" class="h2">情緒、佔有，還是理解？</text>
+      <text y="100" class="h2">是感覺，還是選擇？</text>
+    </g>
+
+    <g transform="translate(1100, 750)" style="fill: #5E6C6A;">
+      <text y="0" class="h2" style="fill: #5E6C6A;">為什麼懂得「說不」</text>
+      <text y="100" class="h2" style="fill: #5E6C6A;">也是一種愛？</text>
+    </g>
+
+    <g stroke="#A9B2AE" stroke-width="4" stroke-linecap="round">
+      <line x1="120" y1="950" x2="600" y2="950" />
+      <line x1="120" y1="940" x2="120" y2="960" />
+      <line x1="600" y1="940" x2="600" y2="960" />
+    </g>
+
+  </g>
+</svg>

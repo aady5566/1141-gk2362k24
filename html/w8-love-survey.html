@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 8: 什麼是愛？</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* SVG 容器樣式 */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .svg-responsive {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* 步驟容器樣式 */
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 1rem auto;
+        }
+
+        /* 投影片圖片樣式 */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin: 0 auto 1.5rem auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card ul {
+            text-align: left;
+            margin-left: 1rem;
+        }
+
+        .step-card li {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+
+        pre:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        pre::after {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background-image: url('../pic/copy-white.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        pre:hover::after {
+            opacity: 1;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+
+        .image-gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .discussion-topics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .topic-section {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .topic-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .quote-text {
+            font-style: italic;
+            font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+            color: var(--highlight-color);
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 8px 8px 0;
+        }
+
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            /* 手機版 SVG 樣式 */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .svg-responsive {
+                min-width: 100%;
+                min-height: 100%;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .image-gallery {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            pre {
+                padding: 0.8rem;
+                font-size: 0.75rem;
+                margin: 0.6rem 0;
+                letter-spacing: 0.2px;
+                word-break: break-word;
+                white-space: pre-wrap;
+                overflow-wrap: break-word;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            pre::after {
+                width: 12px;
+                height: 12px;
+                top: 0.2rem;
+                right: 0.4rem;
+            }
+
+            .step-card pre {
+                margin: 0.5rem -0.5rem;
+                border-radius: 6px;
+            }
+
+            .step-container {
+                gap: 1.5rem;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            /* 手機版圖片優化 */
+            .slide-image {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .slide {
+                padding: 4vw;
+            }
+
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.8rem; }
+
+            .image-gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題頁 -->
+        <section class="slide active">
+            <h1>什麼是愛？</h1>
+            <h2 class="slide-subtitle">從心動到放手的關係</h2>
+        </section>
+
+        <!-- Slide 2: 開場引言 -->
+        <section class="slide hidden">
+            <div class="step-card text-left">
+                <p style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); line-height: 1.8; text-align: center; margin-bottom: 2rem;">
+                    「有時候我在想，我們花那麼多時間在學習技能、追求效率、了解科技，卻很少花時間去理解——什麼是愛。」
+                </p>
+                <p style="text-align: left;">
+                    我們會說「我喜歡他」、「我愛她」，但這些感受背後，其實是一整套心理運作。我們被激情吸引，卻也被現實磨合；我們追求親密，卻又害怕失去自由。
+                </p>
+                <p style="text-align: left;">
+                    這堂課，想邀請你一起探討五個面向：愛的本質、關係的發展、尊重的界線、溝通的語言，以及失戀的意義。因為學會愛，不只是為了擁有別人，而是為了更清楚地認識自己。而當我們能理解自己的愛方式，就比較不容易在愛裡迷路。
+                </p>
+            </div>
+        </section>
+
+        <!-- Slide 3: 開場思考頁 -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../svg/w8-what-is-love.svg" alt="我們真的懂愛嗎？" class="svg-responsive" />
+            </div>
+        </section>
+
+        <!-- Slide 4: ChatGPT 內容生成 -->
+        <section class="slide">
+            <h3>延續上週，ChatGPT 連結 Canva 不穩定的失敗，</br>
+                絕對成功的 ChatGPT 產內容回到 Canva 原生系統。</h3>
+        </section>
+
+        <!-- Slide 5: ChatGPT Prompt -->
+        <section class="slide scrollable">
+            <h3>ChatGPT 產生簡報內容和分頁</h3>
+            <div class="step-card text-left">
+                <h4>可參考以下 prompt:</h4>
+                <pre><code># System Prompt：五頁式知識簡報生成器（文字版）
+
+## 角色設定
+你是一位學術簡報設計師與資料查核專員，擅長以清晰、具邏輯與美學感的方式整理學術主題。
+
+你的任務是生成一份五頁以內的文字簡報內容，內容須正確、脈絡完整，並能引發思考。
+
+---
+
+## 目標
+1. 專注於簡報內容的正確性與脈絡完整性。
+2. 面向大學生程度以上的一般大眾，語言需清晰易懂且具啟發性。
+3. 簡報風格可多元，最後可提供 2–3 種風格建議（例如學術風、極簡風、資訊圖表風），以便 Canva 或其他設計工具參考。
+
+---
+
+## 輸入規範
+使用者會提供「主題」。請你：
+1. 以英文思考並查核多個可靠來源（學術期刊、政府報告、權威媒體等）。
+2. 確認資料一致性並避免矛盾。
+3. 僅在資訊正確無誤的情況下生成內容。
+
+---
+
+## 簡報結構
+- 頁數：不超過 5 頁
+- 每頁文字量：不超過 120 字
+- 語言：繁體中文（台灣用語）
+- 聽眾：大學生以上的一般大眾
+- 格式：標題 + 內文
+
+---
+
+## 內容模板
+**Page 1：主題簡介**
+定義與背景，說明與現代社會或生活的關聯。
+
+**Page 2：重要性**
+說明主題的重要性與社會、心理、科技層面影響。
+
+**Page 3：事例與研究**
+提供具代表性的案例或研究，附上出處（作者, 年份, 機構）。
+
+**Page 4：延伸觀點**
+補充反思或不同角度的洞見。
+
+**Page 5：結語與風格建議**
+總結主題核心觀點，提出呼籲或行動方向，最後列出 2–3 種可採用的簡報設計風格建議。
+
+---
+
+## 輸出要求
+1. 僅輸出文字，不生成 Canva 或 PPTX。
+2. 內容需精煉、流暢、具邏輯。
+3. 禁用未經查證或推測性資料。
+4. 明確標註文獻出處。
+5. 格式需以 **Markdown** 呈現，不帶任何表情符號，並放入 **code block** 中。</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 6: Canva 截圖展示 -->
+        <section class="slide scrollable">
+            <h3>從 GPT 產生內容到 Canva 的流程</h3>
+            <div class="step-container">
+                <div class="step-card">
+                    <h4>步驟 1: Prompt 輸入</h4>
+                    <img src="../pic/w8/1-prompt.jpg" alt="Prompt 輸入" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 2: 內容投影片</h4>
+                    <img src="../pic/w8/2-content-slide.jpg" alt="內容投影片" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 3: 事實查核</h4>
+                    <img src="../pic/w8/3-fact-checking.jpg" alt="事實查核" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 4: Canva 首頁</h4>
+                    <img src="../pic/w8/4-canva-homepage.jpg" alt="Canva 首頁" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 5: Canva 輸入</h4>
+                    <img src="../pic/w8/5-canva-input.jpg" alt="Canva 輸入" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 6: Canva 輸入2</h4>
+                    <img src="../pic/w8/6-canva-input2.jpg" alt="Canva 輸入2" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 7: Canva 輸出</h4>
+                    <img src="../pic/w8/7-canva-output.jpg" alt="Canva 輸出" class="slide-image">
+                </div>
+                <div class="step-card">
+                    <h4>步驟 8: Canva 輸出2</h4>
+                    <img src="../pic/w8/8-canva-output2.jpg" alt="Canva 輸出2" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: 進入正題 -->
+        <section class="slide">
+            <h2>進入正題：「什麼是愛？」</h2>
+        </section>
+
+        <!-- Slide 8: 五個主題 -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../svg/w8-love-5-perspectives.svg" alt="關係中的五個主題，關於情感、界線與成長" class="svg-responsive" />
+            </div>
+        </section>
+
+        <!-- Slide 9: 分組討論說明 -->
+        <section class="slide scrollable">
+            <h3>分組討論活動</h3>
+            <div class="step-card text-left">
+                <h4>分 5 組討論</h4>
+                <p>從你們的「個人經驗」和「情境假設」出發，後續使用 AI 查找「客觀定義」和「案例」打下良好的基礎。</p>
+
+                <h4>時間安排</h4>
+                <p>（分組前，先花 5 分鐘整理自己的想法：20 分鐘討論，5 分鐘口頭報告，各組提問。）</p>
+
+                <h4>討論重點</h4>
+                <p>回答主題中的問題，說明你們的經驗和假設為何、AI查找的定義和案例為何，是否支持你們的經驗？原因是什麼？</p>
+            </div>
+        </section>
+
+        <!-- Slide 10: 主題1 - 愛情的多重面貌 -->
+        <section class="slide scrollable">
+            <h3>【主題 1：愛情的多重面貌】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>1a. (定義) 你認為「愛」和「喜歡」最大的差別是什麼？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>1b. (情境) 「一見鍾情」你覺得比較偏向「愛」還是「迷戀」？為什麼？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>1c. (重要性) 為什麼釐清「我對他/她的感覺究竟是什麼」很重要？</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: 主題2 - 關係的發展階段 -->
+        <section class="slide scrollable">
+            <h3>【主題 2：關係的發展階段】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>2a. (情境) 你認為「曖昧」階段最讓人享受（或最讓人困擾）的地方是什麼？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>2b. (過程) 為什麼你認為「熱戀期」的感覺（例如：一天到晚都想膩在一起）通常無法永久持續？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>2c. (挑戰) 當「磨合期」出現時（例如：發現對方有你無法忍受的小缺點），你認為這是「不適合」的警訊，還是「正常」的過程？</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: 主題3 - 身體自主權與同意 -->
+        <section class="slide scrollable">
+            <h3>【主題 3：身體自主權與同意 (Consent)】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>3a. (定義/界線) 在日常生活中（不只是親密關係），有哪些「界線」對你來說很重要？（例如：別人亂動你的東西、偷看你的手機）</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>3b. (核心概念) 為什麼「沒有說不，不等於同意」這句話很重要？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>3c. (情境) 你認為，在哪些情境下，我們很容易「假設」對方同意了，但其實可能並沒有？（例如：在 IG 發有朋友的合照、幫朋友點餐）</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: 主題4 - 健康關係的溝通術 -->
+        <section class="slide scrollable">
+            <h3>【主題 4：健康關係的溝通術】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>4a. (情境) 當你對朋友或伴侶感到不滿時，你通常會選擇「直接說出來」還是「忍耐」？為什麼？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>4b. (指責 vs 表達) 想像一個情境：「對方已讀不回你的重要訊息」。你腦中第一個閃過的「指責性」念頭是什麼？（例如：你根本不在乎我！）</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>4c. (技巧) 承上題，如果要把這個「指責」改成「表達自己的感受」，你會怎麼說？（例如：我看你已讀了，但沒有回，我有點擔心...）</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: 主題5 - 分手與失戀的調適 -->
+        <section class="slide scrollable">
+            <h3>【主題 5：分手與失戀的調適】</h3>
+            <div class="discussion-topics">
+                <div class="step-card text-left">
+                    <h4>5a. (定義) 你認為「失戀」是否等同於「失敗」？為什麼？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>5b. (不健康案例) 你觀察到（或在影劇中看到）有哪些「不健康」的失戀調適方式？</h4>
+                </div>
+                <div class="step-card text-left">
+                    <h4>5c. (健康案例) 你認為，要幫助一個剛失戀的朋友，身為朋友「最該做」和「最不該做」的一件事分別是什麼？</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: 隱藏投影片 - 主動愛 -->
+        <section class="slide hidden">
+            <h3>主動愛</h3>
+            <div class="quote-text">
+                心理學家艾里希・佛洛姆（Erich Fromm）在《愛的藝術》：<br>
+                「愛不僅是強烈的情感，而是一種主動的行動與決定。」
+            </div>
+        </section>
+
+        <!-- Slide 16: 隱藏投影片 - 真正的尊重 -->
+        <section class="slide hidden">
+            <h3>真正的尊重</h3>
+            <div class="quote-text">
+                「真正的尊重，是等對方說不，還是從一開始就假設對方不願意？」
+            </div>
+        </section>
+
+        <!-- Slide 17: 隱藏投影片 - 愛的穩定性 -->
+        <section class="slide hidden">
+            <h3>愛的穩定性</h3>
+            <div class="quote-text">
+                愛的穩定性來自於調整與適應，而非情緒的高低起伏。
+            </div>
+        </section>
+
+        <!-- Slide 18: 隱藏投影片 - 磨合的本質 -->
+        <section class="slide hidden">
+            <h3>磨合的本質</h3>
+            <div class="quote-text">
+                磨合不是愛的消退，而是愛從感覺進化為理解。<br>
+                磨合的本質，是兩個世界觀在重新對齊。
+            </div>
+        </section>
+
+        <!-- Slide 19: 隱藏投影片 - 失去關係時 -->
+        <section class="slide hidden">
+            <h3>失去關係時</h3>
+            <div class="quote-text">
+                失去關係時，我們哀悼的，到底是誰？<br>
+                不只是「他／她」，而是「關係中的我」
+            </div>
+        </section>
+
+        <!-- Slide 20: 本週作業 -->
+        <section class="slide scrollable hidden">
+            <h3>本週作業</h3>
+            <div class="step-card text-left">
+                <h4>團隊合作能力識別工具</h4>
+                <p>了解自己擅長什麼，定位自己團隊中的角色為何</p>
+
+                <h4>預告下週 11/4：</h4>
+                <p>下週課堂進行期中考報告分組。<br>
+                課堂分組，直接討論報告內容，題目就是「愛」。</p>
+
+                <h4>下下週 11/11：</h4>
+                <p>期中團體簡報，另一組 10 分鐘簡報，另一組 5 分鐘提問。</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            // 程式碼區塊點擊複製功能
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(block => {
+                const originalText = block.querySelector('code').textContent;
+
+                block.addEventListener('click', async function() {
+                    if (this.querySelector('code').textContent === '已複製！') {
+                        return;
+                    }
+
+                    const text = originalText.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        const codeElement = this.querySelector('code');
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
