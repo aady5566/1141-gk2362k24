@@ -79,7 +79,8 @@
     <path d="M 800 280 Q 960 285 1120 280" stroke="#C2B8A3" stroke-width="2" fill="none" filter="url(#wabiSabiFilter)"/>
   </g>
 
-  <g id="ContentBlocks" filter="url(#wabiSabiFilter)">
+  <!-- 裝飾圖示使用 filter -->
+  <g id="ContentBlocks-icons" filter="url(#wabiSabiFilter)">
 
     <g id="Theme1" transform="translate(360, 420)">
       <title>愛情的多重面貌</title>
@@ -89,7 +90,6 @@
         <ellipse cx="-30" cy="0" rx="45" ry="45" class="icon-stroke" />
         <ellipse cx="30" cy="0" rx="45" ry="45" class="icon-stroke" />
       </g>
-      <text x="0" y="100" class="h2">愛情的多重面貌</text>
     </g>
 
     <g id="Theme2" transform="translate(960, 420)">
@@ -100,7 +100,6 @@
         <circle cx="20" cy="-10" r="6" class="icon-fill-secondary" />
         <circle cx="60" cy="30" r="7" class="icon-fill-secondary" />
       </g>
-      <text x="0" y="100" class="h2">關係的發展階段</text>
     </g>
 
     <g id="Theme3" transform="translate(1560, 420)">
@@ -109,7 +108,6 @@
         <path d="M -40 20 C -40 0 -30 -30 0 -30 C 30 -30 40 0 40 20 C 40 30 30 50 15 50 C 0 50 -40 30 -40 20 Z M -30 -25 Q -25 -50 0 -55 M -10 -30 Q -5 -50 10 -55 M 15 -28 Q 20 -48 30 -50" class="icon-stroke" />
         <path d="M -60 -10 A 70 70 0 0 1 60 -10" stroke="#A9B2AE" stroke-width="4" fill="none" stroke-dasharray="10 10"/>
       </g>
-      <text x="0" y="100" class="h2">身體自主與同意</text>
     </g>
 
     <g id="Theme4" transform="translate(610, 750)">
@@ -118,7 +116,6 @@
         <path d="M -80 -40 Q -80 -70 -50 -70 L 50 -70 Q 80 -70 80 -40 L 80 -10 Q 80 20 50 20 L -20 20 L -30 40 L -40 20 L -50 20 Q -80 20 -80 -10 Z" class="icon-fill-secondary" />
         <path d="M -80 -40 Q -80 -70 -50 -70 L 50 -70 Q 80 -70 80 -40 L 80 -10 Q 80 20 50 20 L -20 20 L -30 40 L -40 20 L -50 20 Q -80 20 -80 -10 Z" class="icon-stroke" />
       </g>
-      <text x="0" y="100" class="h2">健康關係的溝通術</text>
     </g>
 
     <g id="Theme5" transform="translate(1310, 750)">
@@ -129,9 +126,17 @@
         <path d="M 0 -30 Q 5 0 0 50" class="icon-stroke" />
         <path d="M 0 -30 L -5 -20 Q -15 -35 -5 -45 Q -2 -55 5 -60" class="icon-stroke" stroke="#5E6C6A" stroke-width="4" />
       </g>
-      <text x="0" y="100" class="h2">分手與失戀的調適</text>
     </g>
 
+  </g>
+
+  <!-- 文字不用 filter，保持清晰 -->
+  <g id="ContentBlocks-text">
+    <text x="360" y="470" class="h2">愛情的多重面貌</text>
+    <text x="960" y="470" class="h2">關係的發展階段</text>
+    <text x="1560" y="470" class="h2">身體自主與同意</text>
+    <text x="610" y="800" class="h2">健康關係的溝通術</text>
+    <text x="1310" y="800" class="h2">分手與失戀的調適</text>
   </g>
 
   <g id="Footer">
