@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="-200 -200 400 400" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 黑色背景對齊中心 -->
+    <rect x="-200" y="-200" width="400" height="400" fill="#111" />
+
+    <!-- Group 1 -->
+    <g>
+        <g>
+            <rect x="-55" y="-55" width="110" height="110" fill="none" stroke="white" stroke-width="1" />
+            <rect x="-55" y="-55" width="110" height="110" fill="none" stroke="white" stroke-width="1" transform="rotate(180)" />
+        </g>
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="12s" repeatCount="indefinite" />
+    </g>
+
+    <!-- Group 2 -->
+    <g>
+        <g>
+            <rect x="-60" y="-60" width="120" height="120" fill="none" stroke="white" stroke-width="1" />
+            <rect x="-60" y="-60" width="120" height="120" fill="none" stroke="white" stroke-width="1" transform="rotate(180)" />
+        </g>
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="20s" repeatCount="indefinite" />
+    </g>
+
+    <!-- Group 3 -->
+    <g>
+        <g>
+            <rect x="-15" y="-15" width="30" height="30" fill="none" stroke="white" stroke-width="1" />
+            <rect x="-15" y="-15" width="30" height="30" fill="none" stroke="white" stroke-width="1" transform="rotate(180)" />
+        </g>
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="30s" repeatCount="indefinite" />
+    </g>
+</svg>
